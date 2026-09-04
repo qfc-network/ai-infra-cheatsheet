@@ -177,6 +177,12 @@ python scripts/generate.py
 Corrections should cite an NVIDIA datasheet, product page, or press release —
 see [CONTRIBUTING.md](CONTRIBUTING.md).
 
+## Acknowledgements
+
+The DGX comparison that started this repo comes from ServerMall's write-up
+[NVIDIA DGX B300 vs DGX B200 vs DGX H100/H200](https://servermall.com/blog/nvidia-dgx-b300-vs-dgx-b200-vs-dgx-h100-h200-which-dgx-server-to-choose-under-llm-inference-and-fine/).
+Spec values here are re-checked against NVIDIA's own material, so some differ.
+
 ## Disclaimer
 
 Community-maintained and unaffiliated with NVIDIA Corporation. Specifications

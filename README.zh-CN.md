@@ -174,6 +174,12 @@ python scripts/generate.py
 修改请附上 NVIDIA 官方规格书、产品页或新闻稿链接，详见
 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
+## 致谢
+
+本项目最初的 DGX 对照表来自 ServerMall 的这篇文章
+[NVIDIA DGX B300 vs DGX B200 vs DGX H100/H200](https://servermall.com/blog/nvidia-dgx-b300-vs-dgx-b200-vs-dgx-h100-h200-which-dgx-server-to-choose-under-llm-inference-and-fine/)。
+本仓库的数值都会再对照 NVIDIA 官方资料核一遍，因此个别数字与原文不同。
+
 ## 免责声明
 
 本项目由社区维护，与 NVIDIA Corporation 无关。规格数据整理自 NVIDIA 公开资料，
