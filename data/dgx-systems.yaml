@@ -44,7 +44,7 @@ items:
       cluster_network: up to 8 x 200 Gbit/s (HDR IB)
       cpu: 2 x AMD EPYC 7742 (64C)
       system_memory: 1 TB, up to 2 TB
-      storage: 30 TB U.2 NVMe
+      storage: 8 x 3.84 TB U.2 + 2 x 1.9 TB M.2 (OS)
       height: 6U
       power: 6.5 kW
       cooling: air
@@ -71,7 +71,7 @@ items:
       cluster_network: up to 8 x 400 Gbit/s (ConnectX-7)
       cpu: 2 x Intel Xeon Platinum 8480C (56C)
       system_memory: 2 TB
-      storage: 30 TB U.2 NVMe
+      storage: 8 x 3.84 TB U.2 + 2 x 1.9 TB M.2 (OS)
       height: 8U
       power: 10.2 kW
       cooling: air
@@ -80,7 +80,7 @@ items:
       fp4: 无原生 FP4
       cooling: 风冷
     sources:
-      - https://www.nvidia.com/en-us/data-center/dgx-h100/
+      - https://docs.nvidia.com/dgx/dgxh100-user-guide/introduction-to-dgxh100.html
       - https://resources.nvidia.com/en-us-dgx-systems/ai-enterprise-dgx
   - id: dgx-h200
     name: DGX H200
@@ -98,7 +98,7 @@ items:
       cluster_network: up to 8 x 400 Gbit/s (ConnectX-7)
       cpu: 2 x Intel Xeon Platinum 8480C (56C)
       system_memory: 2 TB
-      storage: 30 TB U.2 NVMe
+      storage: 8 x 3.84 TB U.2 + 2 x 1.9 TB M.2 (OS)
       height: 8U
       power: 10.2 kW
       cooling: air
@@ -116,7 +116,7 @@ items:
       gpu: 8 x B200 SXM
       memory_per_gpu: 180 GB HBM3e
       memory_total: 1,440 GB
-      memory_bandwidth: 7.7 TB/s
+      memory_bandwidth: 8 TB/s (64 TB/s per node)
       fp4: 144 / 72 PFLOPS
       fp8: 72 / 36 PFLOPS
       fp16: 36 PFLOPS
@@ -125,7 +125,7 @@ items:
       cluster_network: up to 8 x 400 Gbit/s (ConnectX-7)
       cpu: 2 x Intel Xeon Platinum 8570 (56C)
       system_memory: 2 TB, up to 4 TB
-      storage: 30 TB U.2 NVMe
+      storage: 8 x 3.84 TB U.2 + 2 x 1.9 TB M.2 (OS)
       height: 10U
       power: 14.3 kW
       cooling: air
@@ -141,7 +141,7 @@ items:
       architecture: Blackwell Ultra
       gpu: 8 x B300 SXM
       memory_per_gpu: 288 GB HBM3e
-      memory_total: 2,304 GB
+      memory_total: 2.1 TB (NVIDIA spec)
       memory_bandwidth: 8 TB/s
       fp4: 144 / 108 PFLOPS
       fp8: 72 / 36 PFLOPS
@@ -149,11 +149,11 @@ items:
       interconnect: NVLink 5 / NVSwitch 4
       nvlink_bw: 1.8 TB/s
       cluster_network: up to 8 x 800 Gbit/s (ConnectX-8)
-      cpu: 2 x Intel Xeon 6 (6776P class)
+      cpu: 2 x Intel Xeon 6776P
       system_memory: 2 TB, up to 4 TB
-      storage: 30 TB U.2 NVMe
+      storage: 8 x 3.84 TB E1.S + 2 x 1.9 TB M.2 (OS)
       height: 10U
-      power: ~14-15 kW
+      power: ~14 kW
       cooling: air
       launch: 2025
     specs_zh:
@@ -162,12 +162,19 @@ items:
       - https://www.nvidia.com/en-us/data-center/dgx-b300/
 notes:
   - >-
+    DGX B300 GPU memory is listed by NVIDIA as 2.1 TB per node; 8 x 288 GB of
+    B300 chip capacity would be 2.3 TB, so the shipping configuration reserves
+    part of it.
+  - >-
     Peak FLOPS are dense unless a sparse/dense pair is given; NVIDIA marketing
     numbers usually quote the sparse (2:4 structured sparsity) figure.
   - >-
     B200 is documented as 192 GB HBM3e at the chip level; DGX B200 ships a
     180 GB per-GPU configuration (1,440 GB per node).
 notes_zh:
+  - >-
+    NVIDIA 官方页面标注 DGX B300 整机显存为 2.1 TB；按 B300 芯片 8 x 288 GB 计算应为
+    2.3 TB，说明出厂配置保留了一部分。
   - >-
     未特别标注时算力为稠密值；NVIDIA 官方宣传数字通常是稀疏（2:4 结构化稀疏）值。
   - >-
