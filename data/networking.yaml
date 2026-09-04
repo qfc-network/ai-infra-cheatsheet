@@ -1,0 +1,65 @@
+id: networking
+title: Scale-Out Networking
+title_zh: 横向扩展网络
+summary: >-
+  Once you leave the NVLink domain, GPU-to-GPU traffic runs over InfiniBand or
+  Spectrum-X Ethernet.
+summary_zh: >-
+  出了 NVLink 域之后，GPU 之间的流量走 InfiniBand 或 Spectrum-X 以太网。
+orientation: columns
+fields:
+  - {key: type,        label: Type,                 label_zh: 类型}
+  - {key: port_speed,  label: Port speed,           label_zh: 端口速率}
+  - {key: switch,      label: Switch,               label_zh: 交换机}
+  - {key: radix,       label: Switch capacity,      label_zh: 交换容量}
+  - {key: nic,         label: Matching NIC,         label_zh: 配套网卡}
+  - {key: in_network,  label: In-network compute,   label_zh: 网内计算}
+  - {key: launch,      label: Availability,         label_zh: 上市时间}
+items:
+  - id: quantum-2
+    name: Quantum-2 InfiniBand
+    specs:
+      type: InfiniBand NDR
+      port_speed: 400 Gb/s
+      switch: QM9700 / QM9790
+      radix: 64 x 400 Gb/s, 51.2 Tb/s
+      nic: ConnectX-7
+      in_network: SHARPv3
+      launch: 2021-2022
+    sources:
+      - https://www.nvidia.com/en-us/networking/quantum2/
+  - id: quantum-x800
+    name: Quantum-X800 InfiniBand
+    specs:
+      type: InfiniBand XDR
+      port_speed: 800 Gb/s
+      switch: Q3400-RA
+      radix: 144 x 800 Gb/s
+      nic: ConnectX-8 SuperNIC
+      in_network: SHARPv4
+      launch: 2024-2025
+    sources:
+      - https://www.nvidia.com/en-us/networking/quantum-x800/
+  - id: spectrum-x
+    name: Spectrum-X Ethernet
+    specs:
+      type: Ethernet (lossless, AI-tuned)
+      port_speed: 800 GbE
+      switch: Spectrum-4 SN5600
+      radix: 64 x 800 GbE, 51.2 Tb/s
+      nic: BlueField-3 SuperNIC / ConnectX-8
+      in_network: adaptive routing, congestion control
+      launch: 2023-2024
+    specs_zh:
+      type: 以太网（无损、面向 AI 调优）
+      in_network: 自适应路由 + 拥塞控制
+    sources:
+      - https://www.nvidia.com/en-us/networking/spectrumx/
+notes:
+  - >-
+    A DGX/HGX node typically pairs 8 compute NICs (one per GPU, east-west) with
+    1-2 DPUs for storage and management traffic.
+notes_zh:
+  - >-
+    一台 DGX/HGX 通常是 8 张计算网卡（每卡一张，用于东西向）+ 1~2 张 DPU
+    （用于存储与管理流量）。

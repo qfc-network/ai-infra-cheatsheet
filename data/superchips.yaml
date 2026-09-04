@@ -1,0 +1,87 @@
+id: superchips
+title: Grace-based Superchips
+title_zh: Grace 系列超级芯片
+summary: >-
+  CPU+GPU packages joined by NVLink-C2C, giving the GPU cache-coherent access to
+  the CPU's LPDDR5X as a second memory tier.
+summary_zh: >-
+  通过 NVLink-C2C 把 CPU 与 GPU 封装在一起，GPU 可缓存一致地访问 CPU 侧 LPDDR5X，
+  形成第二级大容量内存。
+orientation: columns
+fields:
+  - {key: composition,   label: Composition,          label_zh: 组成}
+  - {key: cpu_cores,     label: CPU cores,            label_zh: CPU 核心}
+  - {key: hbm,           label: HBM,                  label_zh: HBM 显存}
+  - {key: lpddr,         label: CPU memory,           label_zh: CPU 内存}
+  - {key: c2c,           label: NVLink-C2C,           label_zh: NVLink-C2C}
+  - {key: nvlink,        label: External NVLink,      label_zh: 对外 NVLink}
+  - {key: power,         label: Module power,         label_zh: 模组功耗}
+  - {key: used_in,       label: Used in,              label_zh: 用于}
+  - {key: launch,        label: Availability,         label_zh: 上市时间}
+items:
+  - id: gh200
+    name: GH200 Grace Hopper
+    specs:
+      composition: 1 x Grace + 1 x H100/H200
+      cpu_cores: 72 Arm Neoverse V2
+      hbm: 96 GB HBM3 or 144 GB HBM3e
+      lpddr: 480 GB LPDDR5X, ~500 GB/s
+      c2c: 900 GB/s
+      nvlink: NVLink 4, 900 GB/s
+      power: up to 1,000 W
+      used_in: GH200 NVL2, MGX servers
+      launch: 2023-2024
+    sources:
+      - https://www.nvidia.com/en-us/data-center/grace-hopper-superchip/
+  - id: gb200
+    name: GB200 Grace Blackwell
+    specs:
+      composition: 1 x Grace + 2 x B200
+      cpu_cores: 72 Arm Neoverse V2
+      hbm: 384 GB HBM3e
+      lpddr: 480 GB LPDDR5X
+      c2c: 900 GB/s
+      nvlink: NVLink 5, 1.8 TB/s per GPU
+      power: up to ~2,700 W
+      used_in: GB200 NVL72, GB200 NVL2
+      launch: 2024-2025
+    sources:
+      - https://www.nvidia.com/en-us/data-center/gb200-nvl72/
+  - id: gb300
+    name: GB300 Grace Blackwell Ultra
+    specs:
+      composition: 1 x Grace + 2 x B300
+      cpu_cores: 72 Arm Neoverse V2
+      hbm: 576 GB HBM3e
+      lpddr: up to 800 GB LPDDR5X
+      c2c: 900 GB/s
+      nvlink: NVLink 5, 1.8 TB/s per GPU
+      power: ~3 kW class
+      used_in: GB300 NVL72
+      launch: 2025
+    specs_zh:
+      power: 约 3 kW 级
+    sources:
+      - https://www.nvidia.com/en-us/data-center/gb300-nvl72/
+  - id: vr200
+    name: VR200 Vera Rubin (announced)
+    specs:
+      composition: 1 x Vera + 2 x Rubin
+      cpu_cores: 88 custom Arm cores / 176 threads
+      hbm: 288 GB HBM4 per GPU
+      lpddr: LPDDR5X (TBA)
+      c2c: NVLink-C2C (next gen)
+      nvlink: NVLink 6
+      power: TBA
+      used_in: Vera Rubin NVL144
+      launch: 2026 (roadmap)
+    specs_zh:
+      lpddr: LPDDR5X（未公布）
+      power: 未公布
+      launch: 2026（路线图）
+    sources:
+      - https://nvidianews.nvidia.com/news/nvidia-blackwell-ultra-ai-factory-platform-paves-way-for-age-of-ai-reasoning
+notes:
+  - Roadmap parts are listed from public announcements and may change before shipping.
+notes_zh:
+  - 路线图产品来自公开发布信息，量产前规格可能变化。

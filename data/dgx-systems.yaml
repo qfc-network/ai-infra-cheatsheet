@@ -1,0 +1,174 @@
+id: dgx-systems
+title: DGX Systems (8-GPU nodes)
+title_zh: DGX 整机（8 卡节点）
+summary: >-
+  NVIDIA's own 8-GPU appliance line. One node = 8 SXM GPUs on a single NVSwitch
+  fabric, dual x86 CPUs, and 8-10 network ports for scale-out.
+summary_zh: >-
+  NVIDIA 官方的 8 卡整机产品线。一台 = 8 张 SXM GPU + 单机内 NVSwitch 全互联 +
+  双路 x86 CPU + 8~10 个横向扩展网口。
+orientation: columns
+fields:
+  - {key: architecture,       label: Architecture,          label_zh: 架构}
+  - {key: gpu,                label: GPU,                   label_zh: GPU}
+  - {key: memory_per_gpu,     label: Memory per GPU,        label_zh: 单卡显存}
+  - {key: memory_total,       label: Total GPU memory,      label_zh: 整机显存}
+  - {key: memory_bandwidth,   label: Memory bandwidth/GPU,  label_zh: 单卡显存带宽}
+  - {key: fp4,                label: FP4 (sparse/dense),    label_zh: FP4（稀疏/稠密）}
+  - {key: fp8,                label: FP8 (sparse/dense),    label_zh: FP8（稀疏/稠密）}
+  - {key: fp16,               label: FP16/BF16 (sparse),    label_zh: FP16/BF16（稀疏）}
+  - {key: interconnect,       label: GPU interconnect,      label_zh: GPU 互联}
+  - {key: nvlink_bw,          label: NVLink BW per GPU,     label_zh: 单卡 NVLink 带宽}
+  - {key: cluster_network,    label: Cluster network,       label_zh: 集群网络}
+  - {key: cpu,                label: CPU,                   label_zh: CPU}
+  - {key: system_memory,      label: System memory,         label_zh: 系统内存}
+  - {key: storage,            label: Internal NVMe,         label_zh: 内置 NVMe}
+  - {key: height,             label: Height,                label_zh: 高度}
+  - {key: power,              label: Max power,             label_zh: 最大功耗}
+  - {key: cooling,            label: Cooling,               label_zh: 散热}
+  - {key: launch,             label: Announced,             label_zh: 发布时间}
+items:
+  - id: dgx-a100
+    name: DGX A100
+    specs:
+      architecture: Ampere
+      gpu: 8 x A100 SXM4
+      memory_per_gpu: 80 GB HBM2e
+      memory_total: 640 GB
+      memory_bandwidth: 2.0 TB/s
+      fp4: not supported
+      fp8: not supported
+      fp16: 5 PFLOPS
+      interconnect: NVLink 3 / NVSwitch 2
+      nvlink_bw: 600 GB/s
+      cluster_network: up to 8 x 200 Gbit/s (HDR IB)
+      cpu: 2 x AMD EPYC 7742 (64C)
+      system_memory: 1 TB, up to 2 TB
+      storage: 30 TB U.2 NVMe
+      height: 6U
+      power: 6.5 kW
+      cooling: air
+      launch: 2020
+    specs_zh:
+      fp4: 不支持
+      fp8: 不支持
+      cooling: 风冷
+    sources:
+      - https://www.nvidia.com/en-us/data-center/dgx-a100/
+  - id: dgx-h100
+    name: DGX H100
+    specs:
+      architecture: Hopper
+      gpu: 8 x H100 SXM5
+      memory_per_gpu: 80 GB HBM3
+      memory_total: 640 GB
+      memory_bandwidth: 3.35 TB/s
+      fp4: no native FP4
+      fp8: ~32 / 16 PFLOPS
+      fp16: ~16 PFLOPS
+      interconnect: NVLink 4 / NVSwitch 3
+      nvlink_bw: 900 GB/s
+      cluster_network: up to 8 x 400 Gbit/s (ConnectX-7)
+      cpu: 2 x Intel Xeon Platinum 8480C (56C)
+      system_memory: 2 TB
+      storage: 30 TB U.2 NVMe
+      height: 8U
+      power: 10.2 kW
+      cooling: air
+      launch: 2022
+    specs_zh:
+      fp4: 无原生 FP4
+      cooling: 风冷
+    sources:
+      - https://www.nvidia.com/en-us/data-center/dgx-h100/
+      - https://resources.nvidia.com/en-us-dgx-systems/ai-enterprise-dgx
+  - id: dgx-h200
+    name: DGX H200
+    specs:
+      architecture: Hopper
+      gpu: 8 x H200 SXM5
+      memory_per_gpu: 141 GB HBM3e
+      memory_total: 1,128 GB
+      memory_bandwidth: 4.8 TB/s
+      fp4: no native FP4
+      fp8: ~32 / 16 PFLOPS
+      fp16: ~16 PFLOPS
+      interconnect: NVLink 4 / NVSwitch 3
+      nvlink_bw: 900 GB/s
+      cluster_network: up to 8 x 400 Gbit/s (ConnectX-7)
+      cpu: 2 x Intel Xeon Platinum 8480C (56C)
+      system_memory: 2 TB
+      storage: 30 TB U.2 NVMe
+      height: 8U
+      power: 10.2 kW
+      cooling: air
+      launch: 2023
+    specs_zh:
+      fp4: 无原生 FP4
+      cooling: 风冷
+    sources:
+      - https://www.nvidia.com/en-us/data-center/dgx-platform/
+      - https://www.nvidia.com/en-us/data-center/h200/
+  - id: dgx-b200
+    name: DGX B200
+    specs:
+      architecture: Blackwell
+      gpu: 8 x B200 SXM
+      memory_per_gpu: 180 GB HBM3e
+      memory_total: 1,440 GB
+      memory_bandwidth: 7.7 TB/s
+      fp4: 144 / 72 PFLOPS
+      fp8: 72 / 36 PFLOPS
+      fp16: 36 PFLOPS
+      interconnect: NVLink 5 / NVSwitch 4
+      nvlink_bw: 1.8 TB/s
+      cluster_network: up to 8 x 400 Gbit/s (ConnectX-7)
+      cpu: 2 x Intel Xeon Platinum 8570 (56C)
+      system_memory: 2 TB, up to 4 TB
+      storage: 30 TB U.2 NVMe
+      height: 10U
+      power: 14.3 kW
+      cooling: air
+      launch: 2024
+    specs_zh:
+      cooling: 风冷
+    sources:
+      - https://www.nvidia.com/en-us/data-center/dgx-b200/
+      - https://resources.nvidia.com/en-us-dgx-systems/dgx-b200-datasheet
+  - id: dgx-b300
+    name: DGX B300
+    specs:
+      architecture: Blackwell Ultra
+      gpu: 8 x B300 SXM
+      memory_per_gpu: 288 GB HBM3e
+      memory_total: 2,304 GB
+      memory_bandwidth: 8 TB/s
+      fp4: 144 / 108 PFLOPS
+      fp8: 72 / 36 PFLOPS
+      fp16: 36 PFLOPS
+      interconnect: NVLink 5 / NVSwitch 4
+      nvlink_bw: 1.8 TB/s
+      cluster_network: up to 8 x 800 Gbit/s (ConnectX-8)
+      cpu: 2 x Intel Xeon 6 (6776P class)
+      system_memory: 2 TB, up to 4 TB
+      storage: 30 TB U.2 NVMe
+      height: 10U
+      power: ~14-15 kW
+      cooling: air
+      launch: 2025
+    specs_zh:
+      cooling: 风冷
+    sources:
+      - https://www.nvidia.com/en-us/data-center/dgx-b300/
+notes:
+  - >-
+    Peak FLOPS are dense unless a sparse/dense pair is given; NVIDIA marketing
+    numbers usually quote the sparse (2:4 structured sparsity) figure.
+  - >-
+    B200 is documented as 192 GB HBM3e at the chip level; DGX B200 ships a
+    180 GB per-GPU configuration (1,440 GB per node).
+notes_zh:
+  - >-
+    未特别标注时算力为稠密值；NVIDIA 官方宣传数字通常是稀疏（2:4 结构化稀疏）值。
+  - >-
+    B200 芯片规格为 192 GB HBM3e，但 DGX B200 整机按每卡 180 GB 配置（整机 1,440 GB）。

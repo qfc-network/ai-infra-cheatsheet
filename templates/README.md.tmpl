@@ -1,0 +1,67 @@
+# NVIDIA AI Infrastructure Cheat Sheet
+
+Side-by-side spec tables for NVIDIA's AI data center stack — GPUs, DGX systems,
+Grace superchips, rack-scale NVLink systems, and the networking that ties them
+together. Every table is generated from the YAML files in [`data/`](data/), so
+corrections are a one-line pull request.
+
+[English](README.md) · [简体中文](README.zh-CN.md)
+
+## Contents
+
+- [DGX Systems (8-GPU nodes)](#dgx-systems-8-gpu-nodes)
+- [Flagship Data Center GPUs (SXM)](#flagship-data-center-gpus-sxm)
+- [Grace-based Superchips](#grace-based-superchips)
+- [Rack-Scale NVLink Systems](#rack-scale-nvlink-systems)
+- [NVLink & NVSwitch Generations](#nvlink--nvswitch-generations)
+- [Scale-Out Networking](#scale-out-networking)
+- [Platform Roadmap](#platform-roadmap)
+
+{{section:dgx-systems}}
+
+{{section:datacenter-gpus}}
+
+{{section:superchips}}
+
+{{section:rack-scale}}
+
+{{section:interconnect}}
+
+{{section:networking}}
+
+{{section:roadmap}}
+
+## How to read the numbers
+
+- **Sparse vs dense.** NVIDIA headline FLOPS are usually the sparse (2:4
+  structured sparsity) number, which is 2x the dense number. Tables state which
+  one they use.
+- **Bandwidth.** NVLink figures are bidirectional aggregate per GPU.
+- **Same die, different bins.** Air-cooled HGX/DGX parts run at lower power and
+  lower clocks than the liquid-cooled superchip versions of the same chip.
+- **Roadmap entries** come from keynotes and press releases, not datasheets.
+
+## Contributing
+
+Fix a number, add a product, add a source: edit the YAML in [`data/`](data/),
+run the generator, commit both the data and the regenerated Markdown.
+
+```bash
+pip install -r requirements.txt
+python scripts/generate.py
+```
+
+Corrections should cite an NVIDIA datasheet, product page, or press release —
+see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Disclaimer
+
+Community-maintained and unaffiliated with NVIDIA Corporation. Specifications
+are collected from public NVIDIA material and may be incomplete or out of date;
+always confirm against the official datasheet before buying or sizing anything.
+NVIDIA, DGX, Grace, Hopper, Blackwell, NVLink and Spectrum-X are trademarks of
+NVIDIA Corporation.
+
+## License
+
+Data and documentation: [CC BY 4.0](LICENSE). Scripts: [MIT](LICENSE-CODE).

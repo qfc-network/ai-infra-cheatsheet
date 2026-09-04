@@ -1,0 +1,62 @@
+# NVIDIA AI 基础设施速查表
+
+一份 NVIDIA AI 数据中心全栈的对照速查表：GPU、DGX 整机、Grace 超级芯片、
+机柜级 NVLink 系统，以及把它们连起来的网络。所有表格都由
+[`data/`](data/) 下的 YAML 自动生成，改一个数字就是一个 PR。
+
+[English](README.md) · [简体中文](README.zh-CN.md)
+
+## 目录
+
+- [DGX 整机（8 卡节点）](#dgx-整机8-卡节点)
+- [数据中心旗舰 GPU（SXM）](#数据中心旗舰-gpusxm)
+- [Grace 系列超级芯片](#grace-系列超级芯片)
+- [机柜级 NVLink 系统](#机柜级-nvlink-系统)
+- [NVLink / NVSwitch 各代对比](#nvlink--nvswitch-各代对比)
+- [横向扩展网络](#横向扩展网络)
+- [平台路线图](#平台路线图)
+
+{{section:dgx-systems}}
+
+{{section:datacenter-gpus}}
+
+{{section:superchips}}
+
+{{section:rack-scale}}
+
+{{section:interconnect}}
+
+{{section:networking}}
+
+{{section:roadmap}}
+
+## 数字怎么看
+
+- **稀疏 vs 稠密**：NVIDIA 宣传的算力通常是稀疏（2:4 结构化稀疏）值，
+  为稠密值的 2 倍。本表会标明用的是哪一个。
+- **带宽口径**：NVLink 带宽为单卡所有链路的双向合计值。
+- **同 die 不同档**：风冷 HGX/DGX 版本的功耗与频率都低于同一颗芯片的液冷超级芯片版本。
+- **路线图条目**来自发布会与新闻稿，不是规格书。
+
+## 参与贡献
+
+修数字、加产品、补来源：改 [`data/`](data/) 里的 YAML，跑一下生成脚本，
+把数据和重新生成的 Markdown 一起提交。
+
+```bash
+pip install -r requirements.txt
+python scripts/generate.py
+```
+
+修改请附上 NVIDIA 官方规格书、产品页或新闻稿链接，详见
+[CONTRIBUTING.md](CONTRIBUTING.md)。
+
+## 免责声明
+
+本项目由社区维护，与 NVIDIA Corporation 无关。规格数据整理自 NVIDIA 公开资料，
+可能不完整或已过时；采购与容量规划请以官方规格书为准。
+NVIDIA、DGX、Grace、Hopper、Blackwell、NVLink、Spectrum-X 均为 NVIDIA Corporation 的商标。
+
+## 许可
+
+数据与文档采用 [CC BY 4.0](LICENSE)，脚本采用 [MIT](LICENSE-CODE)。

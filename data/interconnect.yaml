@@ -1,0 +1,42 @@
+id: interconnect
+title: NVLink & NVSwitch Generations
+title_zh: NVLink / NVSwitch 各代对比
+summary: >-
+  Per-GPU NVLink bandwidth is bidirectional aggregate across all links, which is
+  how NVIDIA quotes it.
+summary_zh: >-
+  单卡 NVLink 带宽为所有链路的双向合计值（与 NVIDIA 官方口径一致）。
+orientation: rows
+fields:
+  - {key: generation,      label: Generation,             label_zh: 代次}
+  - {key: gpu,             label: First GPU,              label_zh: 首发 GPU}
+  - {key: year,            label: Year,                   label_zh: 年份}
+  - {key: link_bw,         label: Per-link BW,            label_zh: 单链路带宽}
+  - {key: links,           label: Links per GPU,          label_zh: 单卡链路数}
+  - {key: total_bw,        label: Total BW per GPU,       label_zh: 单卡总带宽}
+  - {key: switch,          label: Switch,                 label_zh: 配套交换}
+  - {key: domain,          label: Max GPUs in domain,     label_zh: 最大互联规模}
+items:
+  - id: nvlink1
+    name: NVLink 1
+    specs: {generation: "1", gpu: P100, year: "2016", link_bw: 40 GB/s, links: "4", total_bw: 160 GB/s, switch: none, domain: 8 (hybrid cube mesh)}
+    specs_zh: {switch: 无, domain: 8（立方网格）}
+  - id: nvlink2
+    name: NVLink 2
+    specs: {generation: "2", gpu: V100, year: "2017", link_bw: 50 GB/s, links: "6", total_bw: 300 GB/s, switch: NVSwitch 1, domain: "16 (DGX-2)"}
+  - id: nvlink3
+    name: NVLink 3
+    specs: {generation: "3", gpu: A100, year: "2020", link_bw: 50 GB/s, links: "12", total_bw: 600 GB/s, switch: NVSwitch 2, domain: "8 per node, 16 via NVLink Switch"}
+    specs_zh: {domain: 单机 8 卡，经 NVLink Switch 可 16 卡}
+  - id: nvlink4
+    name: NVLink 4
+    specs: {generation: "4", gpu: H100, year: "2022", link_bw: 50 GB/s, links: "18", total_bw: 900 GB/s, switch: NVSwitch 3, domain: "8 per node, up to 256 with NVLink Switch System"}
+    specs_zh: {domain: 单机 8 卡，NVLink Switch System 最多 256 卡}
+  - id: nvlink5
+    name: NVLink 5
+    specs: {generation: "5", gpu: B200 / B300, year: "2024", link_bw: 100 GB/s, links: "18", total_bw: 1.8 TB/s, switch: NVLink Switch (7.2 TB/s per chip), domain: "72 in one rack (NVL72), 576 across racks"}
+    specs_zh: {switch: NVLink Switch（单芯片 7.2 TB/s）, domain: 单柜 72 卡（NVL72），跨柜可达 576 卡}
+notes:
+  - NVLink-C2C is the 900 GB/s CPU-to-GPU link used inside Grace superchips; it is separate from GPU-to-GPU NVLink.
+notes_zh:
+  - NVLink-C2C 是 Grace 超级芯片内部 900 GB/s 的 CPU-GPU 互联，与 GPU 间 NVLink 不是同一条链路。

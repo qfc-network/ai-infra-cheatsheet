@@ -1,0 +1,95 @@
+id: rack-scale
+title: Rack-Scale NVLink Systems
+title_zh: 机柜级 NVLink 系统
+summary: >-
+  One rack behaves as a single large GPU: every GPU in the rack sits inside one
+  NVLink domain instead of talking over the network.
+summary_zh: >-
+  整机柜当作一块大 GPU 使用：柜内所有 GPU 处于同一个 NVLink 域内，卡间通信不走网络。
+orientation: columns
+fields:
+  - {key: gpus,            label: GPUs,                  label_zh: GPU 数量}
+  - {key: cpus,            label: CPUs,                  label_zh: CPU 数量}
+  - {key: nvlink_domain,   label: NVLink domain,         label_zh: NVLink 域}
+  - {key: nvlink_bw,       label: Aggregate NVLink BW,   label_zh: NVLink 总带宽}
+  - {key: hbm,             label: HBM capacity,          label_zh: HBM 容量}
+  - {key: fast_memory,     label: Fast memory (HBM+LPDDR),label_zh: 快速内存（HBM+LPDDR）}
+  - {key: fp4,             label: FP4 inference,         label_zh: FP4 推理算力}
+  - {key: fp8,             label: FP8 training,          label_zh: FP8 训练算力}
+  - {key: network,         label: Scale-out NIC,         label_zh: 横向扩展网卡}
+  - {key: power,           label: Rack power,            label_zh: 机柜功耗}
+  - {key: cooling,         label: Cooling,               label_zh: 散热}
+  - {key: launch,          label: Availability,          label_zh: 上市时间}
+items:
+  - id: gb200-nvl72
+    name: GB200 NVL72
+    specs:
+      gpus: 72 x B200
+      cpus: 36 x Grace
+      nvlink_domain: 72 GPUs
+      nvlink_bw: 130 TB/s
+      hbm: 13.4 TB HBM3e
+      fast_memory: ~30 TB
+      fp4: 1.4 EFLOPS (sparse)
+      fp8: 720 PFLOPS (sparse)
+      network: ConnectX-7 400 Gb/s / BlueField-3
+      power: ~120 kW
+      cooling: liquid
+      launch: 2024-2025
+    specs_zh:
+      fp4: 1.4 EFLOPS（稀疏）
+      fp8: 720 PFLOPS（稀疏）
+      cooling: 液冷
+    sources:
+      - https://www.nvidia.com/en-us/data-center/gb200-nvl72/
+  - id: gb300-nvl72
+    name: GB300 NVL72
+    specs:
+      gpus: 72 x B300
+      cpus: 36 x Grace
+      nvlink_domain: 72 GPUs
+      nvlink_bw: 130 TB/s
+      hbm: 20 TB HBM3e
+      fast_memory: 40 TB
+      fp4: 1.1 EFLOPS (dense)
+      fp8: 0.36 EFLOPS (dense)
+      network: ConnectX-8 800 Gb/s / BlueField-3
+      power: ~130-140 kW
+      cooling: liquid
+      launch: 2025
+    specs_zh:
+      fp4: 1.1 EFLOPS（稠密）
+      fp8: 0.36 EFLOPS（稠密）
+      cooling: 液冷
+    sources:
+      - https://www.nvidia.com/en-us/data-center/gb300-nvl72/
+  - id: vr200-nvl144
+    name: Vera Rubin NVL144 (announced)
+    specs:
+      gpus: 144 Rubin dies (72 packages)
+      cpus: 36 x Vera
+      nvlink_domain: 144 GPU dies
+      nvlink_bw: NVLink 6 switch
+      hbm: ~21 TB HBM4
+      fast_memory: ~75 TB
+      fp4: 3.6 EFLOPS
+      fp8: 1.2 EFLOPS
+      network: ConnectX-9 / Spectrum-X
+      power: TBA
+      cooling: liquid
+      launch: 2026 (roadmap)
+    specs_zh:
+      nvlink_bw: NVLink 6 交换
+      power: 未公布
+      cooling: 液冷
+      launch: 2026（路线图）
+    sources:
+      - https://nvidianews.nvidia.com/news/nvidia-blackwell-ultra-ai-factory-platform-paves-way-for-age-of-ai-reasoning
+notes:
+  - >-
+    "GPU count" follows NVIDIA's convention: NVL72 counts packages, NVL144 counts
+    reticle-sized dies. Both racks hold 72 GPU packages.
+notes_zh:
+  - >-
+    "GPU 数量" 沿用 NVIDIA 的口径：NVL72 按封装计数，NVL144 按 die 计数，
+    两者机柜内都是 72 个 GPU 封装。

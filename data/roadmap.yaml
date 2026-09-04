@@ -1,0 +1,41 @@
+id: roadmap
+title: Platform Roadmap
+title_zh: 平台路线图
+summary: >-
+  NVIDIA's publicly stated one-architecture-per-year cadence. Everything from
+  2026 on is announcement-level information.
+summary_zh: >-
+  NVIDIA 公开宣布的"一年一代架构"节奏。2026 年及以后均为发布会公布信息，非量产规格。
+orientation: rows
+fields:
+  - {key: year,     label: Year,          label_zh: 年份}
+  - {key: gpu,      label: GPU,           label_zh: GPU}
+  - {key: cpu,      label: CPU,           label_zh: CPU}
+  - {key: memory,   label: GPU memory,    label_zh: GPU 显存}
+  - {key: nvlink,   label: NVLink,        label_zh: NVLink}
+  - {key: network,  label: Network,       label_zh: 网络}
+  - {key: rack,     label: Rack system,   label_zh: 机柜系统}
+items:
+  - id: hopper
+    name: Hopper
+    specs: {year: "2022-2023", gpu: H100 / H200, cpu: Grace (GH200), memory: HBM3 / HBM3e, nvlink: NVLink 4, network: Quantum-2 NDR 400G, rack: "-"}
+  - id: blackwell
+    name: Blackwell
+    specs: {year: "2024-2025", gpu: B200, cpu: Grace (GB200), memory: HBM3e 180-192 GB, nvlink: NVLink 5, network: Quantum-X800 / Spectrum-X, rack: GB200 NVL72}
+  - id: blackwell-ultra
+    name: Blackwell Ultra
+    specs: {year: "2025", gpu: B300, cpu: Grace (GB300), memory: HBM3e 288 GB, nvlink: NVLink 5, network: ConnectX-8 800G, rack: GB300 NVL72}
+  - id: rubin
+    name: Rubin
+    specs: {year: "2026", gpu: Rubin, cpu: Vera, memory: HBM4 288 GB, nvlink: NVLink 6, network: ConnectX-9 / Spectrum-X, rack: Vera Rubin NVL144}
+  - id: rubin-ultra
+    name: Rubin Ultra
+    specs: {year: "2027", gpu: Rubin Ultra, cpu: Vera, memory: HBM4e, nvlink: NVLink 7, network: Spectrum-X / Quantum next-gen, rack: Rubin Ultra NVL576}
+  - id: feynman
+    name: Feynman
+    specs: {year: "2028", gpu: Feynman, cpu: Vera, memory: TBA, nvlink: TBA, network: TBA, rack: TBA}
+    specs_zh: {memory: 未公布, nvlink: 未公布, network: 未公布, rack: 未公布}
+notes:
+  - Roadmap rows are from GTC keynotes and press releases; treat dates and specs as targets, not commitments.
+notes_zh:
+  - 路线图内容来自 GTC 主题演讲与新闻稿，时间与规格均为目标值而非承诺。
