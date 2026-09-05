@@ -1,0 +1,151 @@
+id: compute-capability
+title: CUDA Versions & Compute Capability
+title_zh: CUDA 版本与计算能力
+summary: >-
+  Which sm_ target belongs to which architecture, and which toolkit still
+  supports it. The sm_-to-family mapping is quoted from the CUDA 13.3 nvcc
+  documentation; the GPU column is added for orientation.
+summary_zh: >-
+  哪个 sm_ 目标属于哪代架构，以及哪个工具链还支持它。
+  sm_ 与架构的对应关系摘自 CUDA 13.3 的 nvcc 文档，GPU 那一列是为了方便定位补的。
+orientation: rows
+fields:
+  - {key: sm,          label: sm_ targets,          label_zh: sm_ 目标}
+  - {key: gpus,        label: Representative GPUs,  label_zh: 代表性 GPU}
+  - {key: introduced,  label: Added in CUDA,        label_zh: 起始 CUDA 版本}
+  - {key: features,    label: Notable additions,    label_zh: 主要新增}
+  - {key: cuda13,      label: "In CUDA 13.3?",      label_zh: CUDA 13.3 是否支持}
+items:
+  - id: maxwell
+    name: Maxwell
+    specs:
+      sm: sm_50, sm_52, sm_53
+      gpus: GTX 900 series, Tesla M40
+      introduced: CUDA 6.5
+      features: unified memory improvements
+      cuda13: dropped
+    specs_zh:
+      gpus: GTX 900 系列、Tesla M40
+      features: 统一内存改进
+      cuda13: 已移除
+  - id: pascal
+    name: Pascal
+    specs:
+      sm: sm_60, sm_61
+      gpus: P100 (60), P40 and GTX 10 series (61)
+      introduced: CUDA 8
+      features: first NVLink, FP16 on P100
+      cuda13: dropped
+    specs_zh:
+      gpus: P100（60）、P40 与 GTX 10 系列（61）
+      features: 首代 NVLink，P100 支持 FP16
+      cuda13: 已移除
+  - id: volta
+    name: Volta
+    specs:
+      sm: sm_70, sm_72
+      gpus: V100, Titan V
+      introduced: CUDA 9
+      features: first Tensor Cores, independent thread scheduling
+      cuda13: dropped
+    specs_zh:
+      features: 首代 Tensor Core、独立线程调度
+      cuda13: 已移除
+  - id: turing
+    name: Turing
+    specs:
+      sm: sm_75
+      gpus: T4, RTX 20 series, Quadro RTX
+      introduced: CUDA 10
+      features: INT8 and INT4 tensor ops, RT cores
+      cuda13: "yes - the oldest still supported, and nvcc's default target"
+    specs_zh:
+      gpus: T4、RTX 20 系列、Quadro RTX
+      features: INT8 / INT4 张量运算、RT Core
+      cuda13: 支持——目前支持的最老一代，也是 nvcc 的默认目标
+  - id: ampere
+    name: Ampere
+    specs:
+      sm: sm_80, sm_86, sm_87, sm_88
+      gpus: A100 (80), A40 and RTX 30 (86), Jetson Orin (87)
+      introduced: CUDA 11
+      features: TF32, BF16, 2:4 structured sparsity, MIG
+      cuda13: "yes"
+    specs_zh:
+      gpus: A100（80）、A40 与 RTX 30（86）、Jetson Orin（87）
+      features: TF32、BF16、2:4 结构化稀疏、MIG
+      cuda13: 支持
+  - id: ada
+    name: Ada Lovelace
+    specs:
+      sm: sm_89
+      gpus: L40S, L4, RTX 40 series, RTX 6000 Ada
+      introduced: CUDA 11.8
+      features: FP8 tensor cores
+      cuda13: "yes"
+    specs_zh:
+      gpus: L40S、L4、RTX 40 系列、RTX 6000 Ada
+      features: FP8 张量核
+      cuda13: 支持
+  - id: hopper
+    name: Hopper
+    specs:
+      sm: sm_90, sm_90a
+      gpus: H100, H200, GH200
+      introduced: CUDA 12
+      features: FP8 Transformer Engine, TMA, thread block clusters, DPX
+      cuda13: "yes"
+    specs_zh:
+      features: FP8 Transformer Engine、TMA、线程块簇、DPX
+      cuda13: 支持
+  - id: blackwell
+    name: Blackwell
+    specs:
+      sm: sm_100, sm_103, sm_110, sm_120, sm_121 (each with f and a variants)
+      gpus: B200 and GB200, B300 and GB300, RTX 50 series, RTX PRO 6000
+      introduced: CUDA 12.8
+      features: FP4 tensor cores, second-generation Transformer Engine
+      cuda13: "yes"
+    specs_zh:
+      sm: sm_100、sm_103、sm_110、sm_120、sm_121（各有 f 与 a 变体）
+      gpus: B200 与 GB200、B300 与 GB300、RTX 50 系列、RTX PRO 6000
+      features: FP4 张量核、第二代 Transformer Engine
+      cuda13: 支持
+notes:
+  - >-
+    CUDA 13 dropped Maxwell, Pascal and Volta. nvcc 13.3 accepts nothing older
+    than sm_75, so a V100 needs a CUDA 12.x toolchain - worth checking before
+    planning around older hardware.
+  - >-
+    The suffixes matter. A bare sm_90 target is forward-compatible; sm_90a is
+    architecture-specific and unlocks instructions that exist only on that
+    architecture (the Hopper wgmma path CUTLASS and FlashAttention-3 use). CUDA
+    13 adds an f suffix for family-specific targets, which sit between the two.
+  - >-
+    Compute capability is not performance. sm_87 (Jetson Orin) and sm_80 (A100)
+    are both Ampere; they share features and share nothing else.
+  - >-
+    NVIDIA does not publish a product for every sm_ value. sm_88 is documented
+    as Ampere and sm_110 as Blackwell, but the docs name no GPU for either, so
+    this table does not guess one.
+  - >-
+    Minor version compatibility: since CUDA 11, an application built against
+    one minor version runs on any later driver in the same major series, so you
+    do not need to match toolkit and driver exactly.
+notes_zh:
+  - >-
+    CUDA 13 移除了 Maxwell、Pascal 和 Volta。nvcc 13.3 最低只接受 sm_75，
+    也就是说 V100 必须用 CUDA 12.x 工具链——围绕老硬件做规划前值得先确认这一条。
+  - >-
+    后缀是有讲究的。裸的 sm_90 向前兼容；sm_90a 是架构专属，会解锁只有该架构才有的指令
+    （CUTLASS 和 FlashAttention-3 用的 Hopper wgmma 就是这条路径）。
+    CUDA 13 新增了 f 后缀表示"家族专属"，介于两者之间。
+  - >-
+    计算能力不代表性能。sm_87（Jetson Orin）和 sm_80（A100）都是 Ampere，
+    它们共享特性，除此之外毫无共同之处。
+  - >-
+    NVIDIA 并没有给每个 sm_ 值都公布对应产品。文档里 sm_88 归 Ampere、sm_110 归 Blackwell，
+    但都没点名具体 GPU，所以本表不去猜。
+  - >-
+    次版本兼容：自 CUDA 11 起，用某个次版本编译的程序可以在同一大版本的任意更新驱动上运行，
+    不需要工具链和驱动严格对齐。

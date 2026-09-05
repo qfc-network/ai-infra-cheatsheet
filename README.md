@@ -2,7 +2,7 @@
 
 [![generate](https://github.com/qfc-network/ai-infra-cheatsheet/actions/workflows/generate.yml/badge.svg)](https://github.com/qfc-network/ai-infra-cheatsheet/actions/workflows/generate.yml)
 [![Stars](https://img.shields.io/github/stars/qfc-network/ai-infra-cheatsheet?style=flat&logo=github)](https://github.com/qfc-network/ai-infra-cheatsheet/stargazers)
-[![Tables](https://img.shields.io/badge/tables-23-blue)](#contents)
+[![Tables](https://img.shields.io/badge/tables-24-blue)](#contents)
 [![License: CC BY 4.0](https://img.shields.io/badge/license-CC%20BY%204.0-green)](LICENSE)
 
 Side-by-side spec tables for the hardware people actually run models on — from a
@@ -54,6 +54,7 @@ so a correction is a one-line pull request.
 **Software**
 - [Inference Engines & Local Apps](#inference-engines--local-apps)
 - [GPU Compute Stacks](#gpu-compute-stacks)
+- [CUDA Versions & Compute Capability](#cuda-versions--compute-capability)
 
 **Sizing math**
 - [Quantization vs VRAM (weights)](#quantization-vs-vram-weights)
@@ -501,6 +502,27 @@ CUDA's counterparts, one per vendor. Note that every one of them ships a CUDA tr
 > - Most people never touch any of this. If your models run under vLLM, SGLang or llama.cpp, the engine has already absorbed the porting problem - which is why the inference engine table matters more than this one for most readers.
 > - The gap shows up at the edges: a brand-new attention variant, a custom fused kernel, a paper's reference implementation. Those land on CUDA first and reach other stacks months later, if at all.
 > - Collectives are the quiet dependency. Multi-GPU training needs NCCL or its equivalent to be fast and correct; RCCL and HCCL are real, but the ecosystem's tuning assumptions are written around NCCL.
+
+### CUDA Versions & Compute Capability
+
+Which sm_ target belongs to which architecture, and which toolkit still supports it. The sm_-to-family mapping is quoted from the CUDA 13.3 nvcc documentation; the GPU column is added for orientation.
+
+| Name | sm_ targets | Representative GPUs | Added in CUDA | Notable additions | In CUDA 13.3? |
+|---|---|---|---|---|---|
+| Maxwell | sm_50, sm_52, sm_53 | GTX 900 series, Tesla M40 | CUDA 6.5 | unified memory improvements | dropped |
+| Pascal | sm_60, sm_61 | P100 (60), P40 and GTX 10 series (61) | CUDA 8 | first NVLink, FP16 on P100 | dropped |
+| Volta | sm_70, sm_72 | V100, Titan V | CUDA 9 | first Tensor Cores, independent thread scheduling | dropped |
+| Turing | sm_75 | T4, RTX 20 series, Quadro RTX | CUDA 10 | INT8 and INT4 tensor ops, RT cores | yes - the oldest still supported, and nvcc's default target |
+| Ampere | sm_80, sm_86, sm_87, sm_88 | A100 (80), A40 and RTX 30 (86), Jetson Orin (87) | CUDA 11 | TF32, BF16, 2:4 structured sparsity, MIG | yes |
+| Ada Lovelace | sm_89 | L40S, L4, RTX 40 series, RTX 6000 Ada | CUDA 11.8 | FP8 tensor cores | yes |
+| Hopper | sm_90, sm_90a | H100, H200, GH200 | CUDA 12 | FP8 Transformer Engine, TMA, thread block clusters, DPX | yes |
+| Blackwell | sm_100, sm_103, sm_110, sm_120, sm_121 (each with f and a variants) | B200 and GB200, B300 and GB300, RTX 50 series, RTX PRO 6000 | CUDA 12.8 | FP4 tensor cores, second-generation Transformer Engine | yes |
+
+> - CUDA 13 dropped Maxwell, Pascal and Volta. nvcc 13.3 accepts nothing older than sm_75, so a V100 needs a CUDA 12.x toolchain - worth checking before planning around older hardware.
+> - The suffixes matter. A bare sm_90 target is forward-compatible; sm_90a is architecture-specific and unlocks instructions that exist only on that architecture (the Hopper wgmma path CUTLASS and FlashAttention-3 use). CUDA 13 adds an f suffix for family-specific targets, which sit between the two.
+> - Compute capability is not performance. sm_87 (Jetson Orin) and sm_80 (A100) are both Ampere; they share features and share nothing else.
+> - NVIDIA does not publish a product for every sm_ value. sm_88 is documented as Ampere and sm_110 as Blackwell, but the docs name no GPU for either, so this table does not guess one.
+> - Minor version compatibility: since CUDA 11, an application built against one minor version runs on any later driver in the same major series, so you do not need to match toolkit and driver exactly.
 
 ## Sizing math
 

@@ -58,6 +58,7 @@ ORDER = [
     # Software
     "inference-engines",
     "compute-stacks",
+    "compute-capability",
     # Sizing math
     "quantization",
     "kv-cache",

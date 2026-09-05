@@ -45,6 +45,9 @@ specs:
   hardware: H100, H200 and Blackwell   # block style: commas are safe
 ```
 
+A leading `?` or `:` inside an inline mapping breaks it the same way — quote the
+value (`label: "In CUDA 13.3?"`) or use block style.
+
 ## Adding a field
 
 Add it to the category's `fields:` list with both `label` and `label_zh`, then
