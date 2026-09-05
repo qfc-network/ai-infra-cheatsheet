@@ -33,6 +33,8 @@ ORDER = [
     "dgx-systems",
     "datacenter-gpus",
     "consumer-gpus",
+    "quantization",
+    "kv-cache",
     "superchips",
     "rack-scale",
     "interconnect",

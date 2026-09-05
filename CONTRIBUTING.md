@@ -33,6 +33,17 @@ fails if they drift apart.
 6. **No marketing adjectives.** "up to", "class" and "~" are allowed when the
    source itself is approximate.
 
+## YAML gotcha
+
+Inline mappings (`specs: {a: 1, b: 2}`) are fine for short values, but a value
+containing a comma silently splits into a new key and the validator rejects it.
+Either quote it or use block style:
+
+```yaml
+specs:
+  hardware: H100, H200 and Blackwell   # block style: commas are safe
+```
+
 ## Adding a field
 
 Add it to the category's `fields:` list with both `label` and `label_zh`, then

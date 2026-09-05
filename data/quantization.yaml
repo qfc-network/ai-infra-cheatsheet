@@ -1,0 +1,125 @@
+id: quantization
+title: Quantization vs VRAM (weights)
+title_zh: 量化格式与显存占用（权重）
+summary: >-
+  Weight memory = parameters x bytes per parameter. Sizes below are in GiB
+  (2^30 bytes), the same unit a card's "24 GB" label uses.
+summary_zh: >-
+  权重显存 = 参数量 x 每参数字节数。下表单位为 GiB（2^30 字节），
+  与显卡标称的 "24 GB" 是同一口径。
+orientation: rows
+fields:
+  - {key: bits,      label: Bits/param,        label_zh: 每参数位数}
+  - {key: per_1b,    label: Per 1B params,     label_zh: 每 10 亿参数}
+  - {key: m7,        label: 7B model,          label_zh: 7B 模型}
+  - {key: m13,       label: 13B model,         label_zh: 13B 模型}
+  - {key: m32,       label: 32B model,         label_zh: 32B 模型}
+  - {key: m70,       label: 70B model,         label_zh: 70B 模型}
+  - {key: hardware,  label: Native support,    label_zh: 硬件原生支持}
+  - {key: use,       label: Typical use,       label_zh: 典型用途}
+items:
+  - id: fp32
+    name: FP32
+    specs:
+      bits: "32"
+      per_1b: 3.7 GiB
+      m7: 26 GiB
+      m13: 48 GiB
+      m32: 119 GiB
+      m70: 261 GiB
+      hardware: everything
+      use: training master weights; rarely used for inference
+    specs_zh:
+      hardware: 全部
+      use: 训练主权重，推理基本不用
+  - id: fp16
+    name: FP16 / BF16
+    specs:
+      bits: "16"
+      per_1b: 1.9 GiB
+      m7: 13 GiB
+      m13: 24 GiB
+      m32: 60 GiB
+      m70: 130 GiB
+      hardware: FP16 from V100; BF16 from A100 / RTX 30
+      use: the accuracy baseline everything else is measured against
+    specs_zh:
+      hardware: FP16 自 V100 起；BF16 自 A100 / RTX 30 起
+      use: 精度基线，其他格式都拿它做对比
+  - id: fp8
+    name: FP8 (E4M3)
+    specs:
+      bits: "8"
+      per_1b: 0.93 GiB
+      m7: 6.5 GiB
+      m13: 12 GiB
+      m32: 30 GiB
+      m70: 65 GiB
+      hardware: H100 / H200 / Ada (RTX 40) / Blackwell
+      use: near-lossless; no dequantization step on supported hardware
+    specs_zh:
+      hardware: H100 / H200 / Ada（RTX 40）/ Blackwell
+      use: 接近无损，且在支持的硬件上不需要反量化
+  - id: int8
+    name: INT8
+    specs:
+      bits: "8"
+      per_1b: 0.93 GiB
+      m7: 6.5 GiB
+      m13: 12 GiB
+      m32: 30 GiB
+      m70: 65 GiB
+      hardware: Turing (RTX 20) onward
+      use: the 8-bit option on pre-Hopper hardware
+    specs_zh:
+      hardware: Turing（RTX 20）及以后
+      use: Hopper 之前硬件上的 8bit 方案
+  - id: int4
+    name: INT4 / NF4 / GPTQ / AWQ
+    specs:
+      bits: "4"
+      per_1b: 0.47 GiB
+      m7: 3.3 GiB
+      m13: 6.1 GiB
+      m32: 15 GiB
+      m70: 33 GiB
+      hardware: any GPU (dequantized in software)
+      use: the workhorse for running a big model on one consumer card
+    specs_zh:
+      hardware: 任意 GPU（软件反量化）
+      use: 单张消费卡跑大模型的主力方案
+  - id: fp4
+    name: FP4 (NVFP4 / MXFP4)
+    specs:
+      bits: "4"
+      per_1b: 0.47 GiB
+      m7: 3.3 GiB
+      m13: 6.1 GiB
+      m32: 15 GiB
+      m70: 33 GiB
+      hardware: Blackwell only (RTX 50 / B200 / B300)
+      use: 4-bit with tensor core support; no dequantization
+    specs_zh:
+      hardware: 仅 Blackwell（RTX 50 / B200 / B300）
+      use: 有张量核原生支持的 4bit，无需反量化
+notes:
+  - >-
+    Add 10-15% to the 4-bit rows in practice: quantized formats store scales and
+    zero-points alongside the weights, so "4-bit" is closer to 4.5 bits/param.
+  - >-
+    Weights are only part of it. Add the KV cache (next table), activations, the
+    CUDA context (~0.5-1 GiB) and fragmentation before deciding a model fits.
+  - >-
+    Native hardware support buys speed, not capacity. INT4 on a 3090 takes the
+    same VRAM as FP4 on a 5090, but the 3090 dequantizes to FP16 inside the
+    kernel while the 5090 multiplies in 4-bit directly.
+notes_zh:
+  - >-
+    实际用 4bit 时在表上再加 10~15%：量化格式要额外存 scale 和 zero-point，
+    所谓 "4bit" 实际接近每参数 4.5 bit。
+  - >-
+    权重只是一部分。判断能不能装下，还要加上 KV cache（见下表）、激活值、
+    CUDA 上下文（约 0.5~1 GiB）以及显存碎片。
+  - >-
+    硬件原生支持买到的是速度不是容量。3090 上的 INT4 和 5090 上的 FP4 占显存一样多，
+    但 3090 要在 kernel 里反量化回 FP16 再算，5090 可以直接用 4bit 做乘法。

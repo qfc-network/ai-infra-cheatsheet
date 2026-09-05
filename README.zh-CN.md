@@ -11,6 +11,8 @@
 - [DGX 整机](#dgx-整机)
 - [数据中心旗舰 GPU（SXM）](#数据中心旗舰-gpusxm)
 - [消费级与工作站 GPU](#消费级与工作站-gpu)
+- [量化格式与显存占用（权重）](#量化格式与显存占用权重)
+- [KV Cache 与上下文长度](#kv-cache-与上下文长度)
 - [Grace 系列超级芯片](#grace-系列超级芯片)
 - [机柜级 NVLink 系统](#机柜级-nvlink-系统)
 - [NVLink / NVSwitch 各代对比](#nvlink--nvswitch-各代对比)
@@ -94,6 +96,39 @@ NVIDIA 官方整机产品线，从 2017 年的 DGX-1 到今天的 Blackwell Ultr
 > - RTX 3090 之后 GeForce 就没有 NVLink 了。4090/5090 多卡做张量并行只能走 PCIe， 比 DGX 机内 1.8 TB/s 的 NVLink 慢一个数量级左右——跑流水线并行或每卡一个副本没问题， 跑张量并行会很难受。
 > - GeForce 没有 ECC、没有 MIG，而且 NVIDIA 的 GeForce 驱动许可协议对数据中心部署有限制。 要对外出租算力前请自己读一遍许可条款；这也是各家托管商买 RTX PRO 或数据中心卡的主要原因。
 > - "本地 LLM 大致可跑" 按权重加少量 KV cache 估算。长上下文、批量推理或不量化都会显著拉低上限。
+
+## 量化格式与显存占用（权重）
+
+权重显存 = 参数量 x 每参数字节数。下表单位为 GiB（2^30 字节）， 与显卡标称的 "24 GB" 是同一口径。
+
+| 名称 | 每参数位数 | 每 10 亿参数 | 7B 模型 | 13B 模型 | 32B 模型 | 70B 模型 | 硬件原生支持 | 典型用途 |
+|---|---|---|---|---|---|---|---|---|
+| FP32 | 32 | 3.7 GiB | 26 GiB | 48 GiB | 119 GiB | 261 GiB | 全部 | 训练主权重，推理基本不用 |
+| FP16 / BF16 | 16 | 1.9 GiB | 13 GiB | 24 GiB | 60 GiB | 130 GiB | FP16 自 V100 起；BF16 自 A100 / RTX 30 起 | 精度基线，其他格式都拿它做对比 |
+| FP8 (E4M3) | 8 | 0.93 GiB | 6.5 GiB | 12 GiB | 30 GiB | 65 GiB | H100 / H200 / Ada（RTX 40）/ Blackwell | 接近无损，且在支持的硬件上不需要反量化 |
+| INT8 | 8 | 0.93 GiB | 6.5 GiB | 12 GiB | 30 GiB | 65 GiB | Turing（RTX 20）及以后 | Hopper 之前硬件上的 8bit 方案 |
+| INT4 / NF4 / GPTQ / AWQ | 4 | 0.47 GiB | 3.3 GiB | 6.1 GiB | 15 GiB | 33 GiB | 任意 GPU（软件反量化） | 单张消费卡跑大模型的主力方案 |
+| FP4 (NVFP4 / MXFP4) | 4 | 0.47 GiB | 3.3 GiB | 6.1 GiB | 15 GiB | 33 GiB | 仅 Blackwell（RTX 50 / B200 / B300） | 有张量核原生支持的 4bit，无需反量化 |
+
+> - 实际用 4bit 时在表上再加 10~15%：量化格式要额外存 scale 和 zero-point， 所谓 "4bit" 实际接近每参数 4.5 bit。
+> - 权重只是一部分。判断能不能装下，还要加上 KV cache（见下表）、激活值、 CUDA 上下文（约 0.5~1 GiB）以及显存碎片。
+> - 硬件原生支持买到的是速度不是容量。3090 上的 INT4 和 5090 上的 FP4 占显存一样多， 但 3090 要在 kernel 里反量化回 FP16 再算，5090 可以直接用 4bit 做乘法。
+
+## KV Cache 与上下文长度
+
+每 token 的 KV 字节数 = 2 x 层数 x kv_head 数 x head_dim x 每元素字节数。 下表是单条序列、FP16 KV cache 的占用（GiB）。具体层数和 kv_head 数请查模型的 config.json。
+
+| 名称 | 配置 | 每 token | 1K 上下文 | 8K 上下文 | 32K 上下文 | 128K 上下文 |
+|---|---|---|---|---|---|---|
+| 7B, multi-head attention | 32 层 x 32 kv head x 128 | 512 KiB | 0.5 GiB | 4 GiB | 16 GiB | 64 GiB |
+| 8B, grouped-query (8 kv heads) | 32 层 x 8 kv head x 128 | 128 KiB | 0.13 GiB | 1 GiB | 4 GiB | 16 GiB |
+| 32B, grouped-query (8 kv heads) | 64 层 x 8 kv head x 128 | 256 KiB | 0.25 GiB | 2 GiB | 8 GiB | 32 GiB |
+| 70B, grouped-query (8 kv heads) | 80 层 x 8 kv head x 128 | 320 KiB | 0.31 GiB | 2.5 GiB | 10 GiB | 40 GiB |
+
+> - KV cache 量化到 FP8 或 INT8，所有数字直接减半——这通常是换回上下文长度最划算的做法。
+> - 还要乘以 batch size。KV cache 是每条序列一份，同时服务 8 个请求就是 8 倍。 在服务端把显存撑爆的通常是它，不是权重。
+> - GQA 是这里影响最大的一项：7B 的 MHA 行比 8B 的 GQA 行贵 4 倍，尽管模型更小。 MLA（潜在注意力）还能在此基础上再降大约一个数量级。
+> - 这就是为什么 24 GB 的卡"装得下" 30B 四位量化模型（权重 15 GiB）， 但一开长上下文就 OOM：32K 的 KV cache 又要 8 GiB。
 
 ## Grace 系列超级芯片
 

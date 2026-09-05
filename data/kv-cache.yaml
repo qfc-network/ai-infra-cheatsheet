@@ -1,0 +1,89 @@
+id: kv-cache
+title: KV Cache vs Context Length
+title_zh: KV Cache 与上下文长度
+summary: >-
+  KV bytes per token = 2 x layers x kv_heads x head_dim x bytes_per_element.
+  Figures below are an FP16 KV cache for a single sequence, in GiB. Check your
+  model's config.json for its real layer and kv_head counts.
+summary_zh: >-
+  每 token 的 KV 字节数 = 2 x 层数 x kv_head 数 x head_dim x 每元素字节数。
+  下表是单条序列、FP16 KV cache 的占用（GiB）。具体层数和 kv_head 数请查模型的 config.json。
+orientation: rows
+fields:
+  - {key: shape,      label: Config,              label_zh: 配置}
+  - {key: per_token,  label: Per token,           label_zh: 每 token}
+  - {key: c1k,        label: 1K context,          label_zh: 1K 上下文}
+  - {key: c8k,        label: 8K context,          label_zh: 8K 上下文}
+  - {key: c32k,       label: 32K context,         label_zh: 32K 上下文}
+  - {key: c128k,      label: 128K context,        label_zh: 128K 上下文}
+items:
+  - id: mha-7b
+    name: 7B, multi-head attention
+    specs:
+      shape: 32 layers x 32 kv heads x 128
+      per_token: 512 KiB
+      c1k: 0.5 GiB
+      c8k: 4 GiB
+      c32k: 16 GiB
+      c128k: 64 GiB
+    specs_zh:
+      shape: 32 层 x 32 kv head x 128
+  - id: gqa-8b
+    name: 8B, grouped-query (8 kv heads)
+    specs:
+      shape: 32 layers x 8 kv heads x 128
+      per_token: 128 KiB
+      c1k: 0.13 GiB
+      c8k: 1 GiB
+      c32k: 4 GiB
+      c128k: 16 GiB
+    specs_zh:
+      shape: 32 层 x 8 kv head x 128
+  - id: gqa-32b
+    name: 32B, grouped-query (8 kv heads)
+    specs:
+      shape: 64 layers x 8 kv heads x 128
+      per_token: 256 KiB
+      c1k: 0.25 GiB
+      c8k: 2 GiB
+      c32k: 8 GiB
+      c128k: 32 GiB
+    specs_zh:
+      shape: 64 层 x 8 kv head x 128
+  - id: gqa-70b
+    name: 70B, grouped-query (8 kv heads)
+    specs:
+      shape: 80 layers x 8 kv heads x 128
+      per_token: 320 KiB
+      c1k: 0.31 GiB
+      c8k: 2.5 GiB
+      c32k: 10 GiB
+      c128k: 40 GiB
+    specs_zh:
+      shape: 80 层 x 8 kv head x 128
+notes:
+  - >-
+    Halve every number for an FP8 or INT8 KV cache. This is usually the cheapest
+    way to buy context length back.
+  - >-
+    Multiply by batch size. The KV cache is per sequence, so 8 concurrent
+    requests cost 8x. On a serving GPU this, not the weights, is what runs out.
+  - >-
+    Grouped-query attention is the biggest lever here: the 7B MHA row costs 4x
+    the 8B GQA row despite being the smaller model. Latent attention (MLA) cuts
+    it by roughly another order of magnitude.
+  - >-
+    This is why a 24 GB card "fits" a 30B 4-bit model (15 GiB of weights) and
+    then dies at long context: 32K of KV cache is another 8 GiB.
+notes_zh:
+  - >-
+    KV cache 量化到 FP8 或 INT8，所有数字直接减半——这通常是换回上下文长度最划算的做法。
+  - >-
+    还要乘以 batch size。KV cache 是每条序列一份，同时服务 8 个请求就是 8 倍。
+    在服务端把显存撑爆的通常是它，不是权重。
+  - >-
+    GQA 是这里影响最大的一项：7B 的 MHA 行比 8B 的 GQA 行贵 4 倍，尽管模型更小。
+    MLA（潜在注意力）还能在此基础上再降大约一个数量级。
+  - >-
+    这就是为什么 24 GB 的卡"装得下" 30B 四位量化模型（权重 15 GiB），
+    但一开长上下文就 OOM：32K 的 KV cache 又要 8 GiB。
