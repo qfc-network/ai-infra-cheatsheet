@@ -50,6 +50,7 @@ ORDER = [
     "intel-accelerators",
     # Cross-vendor
     "head-to-head",
+    "local-options",
     # Sizing math
     "quantization",
     "kv-cache",

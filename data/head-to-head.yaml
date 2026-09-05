@@ -1,13 +1,14 @@
 id: head-to-head
-title: NVIDIA vs AMD, Generation by Generation
-title_zh: NVIDIA 与 AMD 逐代对位
+title: Data Center - NVIDIA vs AMD vs Intel
+title_zh: 数据中心 - NVIDIA / AMD / Intel 对位
 summary: >-
-  Which AMD part competes with which NVIDIA part, and what actually separates
-  them. Memory capacity has been AMD's lever; domain size and software have been
-  NVIDIA's.
+  Which part competes with which, and what actually separates them. AMD's lever
+  is memory capacity, Intel's is on-die Ethernet and price, NVIDIA's is domain
+  size and software. Apple is absent because it sells no data center accelerator.
 summary_zh: >-
-  哪张 AMD 卡对标哪张 NVIDIA 卡，以及真正拉开差距的是什么。
-  AMD 的杠杆一直是显存容量，NVIDIA 的是互联域规模和软件。
+  谁和谁对位，以及真正拉开差距的是什么。AMD 的杠杆是显存容量，
+  Intel 的是片上以太网和价格，NVIDIA 的是互联域规模和软件。
+  这张表没有苹果，因为它不卖数据中心加速卡。
 orientation: rows
 fields:
   - {key: year,      label: Era,               label_zh: 时期}
@@ -15,6 +16,8 @@ fields:
   - {key: nv_mem,    label: NVIDIA HBM,        label_zh: NVIDIA 显存}
   - {key: amd,       label: AMD,               label_zh: AMD}
   - {key: amd_mem,   label: AMD HBM,           label_zh: AMD 显存}
+  - {key: intel,     label: Intel,             label_zh: Intel}
+  - {key: intel_mem, label: Intel HBM,         label_zh: Intel 显存}
   - {key: takeaway,  label: What decides it,   label_zh: 决定因素}
 items:
   - id: hopper-cdna3
@@ -25,6 +28,8 @@ items:
       nv_mem: 80 GB
       amd: MI300X
       amd_mem: 192 GB
+      intel: Gaudi 2
+      intel_mem: 96 GB
       takeaway: AMD fits models H100 cannot; NVIDIA wins on software maturity and a 256-GPU NVLink domain
     specs_zh:
       takeaway: AMD 装得下 H100 装不下的模型；NVIDIA 赢在软件成熟度和 256 卡 NVLink 域
@@ -36,6 +41,8 @@ items:
       nv_mem: 141 GB
       amd: MI325X
       amd_mem: 256 GB
+      intel: Gaudi 3
+      intel_mem: 128 GB
       takeaway: same matchup, both sides added HBM; AMD still ~1.8x the capacity
     specs_zh:
       takeaway: 同一组对位，双方都加了 HBM；AMD 容量仍约为 1.8 倍
@@ -47,9 +54,12 @@ items:
       nv_mem: 180 GB
       amd: MI355X
       amd_mem: 288 GB
+      intel: Gaudi 3 (no successor shipping)
+      intel_mem: 128 GB
       takeaway: first generation where both have native 4-bit, but in incompatible formats (NVFP4 vs MXFP4)
     specs_zh:
-      takeaway: 双方第一次都有原生 4bit，但格式互不兼容（NVFP4 与 MXFP4）
+      intel: Gaudi 3（无后继在售）
+      takeaway: 双方第一次都有原生 4bit，但格式互不兼容（NVFP4 与 MXFP4）；Gaudi 3 完全没有 FP4
   - id: blackwell-ultra-cdna4
     name: Blackwell Ultra vs CDNA 4
     specs:
@@ -58,8 +68,11 @@ items:
       nv_mem: 288 GB
       amd: MI355X
       amd_mem: 288 GB
+      intel: Gaudi 3 (no successor shipping)
+      intel_mem: 128 GB
       takeaway: memory parity for the first time; the gap moves entirely to rack scale (NVL72 vs 8-GPU nodes)
     specs_zh:
+      intel: Gaudi 3（无后继在售）
       takeaway: 显存首次持平，差距完全转移到机柜级（NVL72 对 8 卡节点）
   - id: rubin-mi400
     name: Rubin vs MI400
@@ -69,12 +82,20 @@ items:
       nv_mem: 288 GB HBM4
       amd: MI400 series / Helios
       amd_mem: TBA
+      intel: roadmap unsettled
+      intel_mem: TBA
       takeaway: both go rack-scale; AMD bets on open UALink + Ultra Ethernet against NVLink
     specs_zh:
       year: 2026（路线图）
       amd_mem: 未公布
+      intel: 路线图未定
+      intel_mem: 未公布
       takeaway: 双方都上机柜级；AMD 押注开放的 UALink + Ultra Ethernet 对抗 NVLink
 notes:
+  - >-
+    Gaudi 3 has no FP4 and no successor shipping, so it competes on FP8 against
+    Hopper-class parts on price and on not needing InfiniBand, not on peak
+    numbers against Blackwell.
   - >-
     Memory capacity decides what you can run at all, and AMD has led on it every
     generation until B300. If a model fits on one MI300X but needs two H100s,
@@ -94,6 +115,9 @@ notes:
     use different scaling-block layouts, so a checkpoint quantized for one needs
     requantizing for the other.
 notes_zh:
+  - >-
+    Gaudi 3 没有 FP4，也没有后继型号在售，所以它是拿 FP8 在 Hopper 这一档比价格、
+    比"不需要 InfiniBand"，而不是拿峰值去和 Blackwell 硬碰。
   - >-
     显存容量决定"能不能跑"，而在 B300 之前 AMD 每一代都领先。
     如果一个模型单张 MI300X 装得下、却要两张 H100，那还没跑分 AMD 就已经赢了这一局。

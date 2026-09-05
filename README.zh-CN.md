@@ -35,7 +35,8 @@
 - [Intel Gaudi 加速卡](#intel-gaudi-加速卡)
 
 **正面对位**
-- [NVIDIA 与 AMD 逐代对位](#nvidia-与-amd-逐代对位)
+- [数据中心 - NVIDIA / AMD / Intel 对位](#数据中心---nvidia--amd--intel-对位)
+- [按显存档位看本地选择](#按显存档位看本地选择)
 
 **容量换算**
 - [量化格式与显存占用（权重）](#量化格式与显存占用权重)
@@ -349,22 +350,41 @@ Gaudi 的特点不在算力，而在于横向扩展网络做进了芯片： 每�
 
 ## 正面对位
 
-### NVIDIA 与 AMD 逐代对位
+### 数据中心 - NVIDIA / AMD / Intel 对位
 
-哪张 AMD 卡对标哪张 NVIDIA 卡，以及真正拉开差距的是什么。 AMD 的杠杆一直是显存容量，NVIDIA 的是互联域规模和软件。
+谁和谁对位，以及真正拉开差距的是什么。AMD 的杠杆是显存容量， Intel 的是片上以太网和价格，NVIDIA 的是互联域规模和软件。 这张表没有苹果，因为它不卖数据中心加速卡。
 
-| 名称 | 时期 | NVIDIA | NVIDIA 显存 | AMD | AMD 显存 | 决定因素 |
-|---|---|---|---|---|---|---|
-| Hopper vs CDNA 3 | 2023 | H100 SXM | 80 GB | MI300X | 192 GB | AMD 装得下 H100 装不下的模型；NVIDIA 赢在软件成熟度和 256 卡 NVLink 域 |
-| Hopper refresh vs CDNA 3 refresh | 2024 | H200 SXM | 141 GB | MI325X | 256 GB | 同一组对位，双方都加了 HBM；AMD 容量仍约为 1.8 倍 |
-| Blackwell vs CDNA 4 | 2025 | B200 SXM | 180 GB | MI355X | 288 GB | 双方第一次都有原生 4bit，但格式互不兼容（NVFP4 与 MXFP4） |
-| Blackwell Ultra vs CDNA 4 | 2025 | B300 SXM | 288 GB | MI355X | 288 GB | 显存首次持平，差距完全转移到机柜级（NVL72 对 8 卡节点） |
-| Rubin vs MI400 | 2026（路线图） | Rubin / VR200 NVL144 | 288 GB HBM4 | MI400 series / Helios | 未公布 | 双方都上机柜级；AMD 押注开放的 UALink + Ultra Ethernet 对抗 NVLink |
+| 名称 | 时期 | NVIDIA | NVIDIA 显存 | AMD | AMD 显存 | Intel | Intel 显存 | 决定因素 |
+|---|---|---|---|---|---|---|---|---|
+| Hopper vs CDNA 3 | 2023 | H100 SXM | 80 GB | MI300X | 192 GB | Gaudi 2 | 96 GB | AMD 装得下 H100 装不下的模型；NVIDIA 赢在软件成熟度和 256 卡 NVLink 域 |
+| Hopper refresh vs CDNA 3 refresh | 2024 | H200 SXM | 141 GB | MI325X | 256 GB | Gaudi 3 | 128 GB | 同一组对位，双方都加了 HBM；AMD 容量仍约为 1.8 倍 |
+| Blackwell vs CDNA 4 | 2025 | B200 SXM | 180 GB | MI355X | 288 GB | Gaudi 3（无后继在售） | 128 GB | 双方第一次都有原生 4bit，但格式互不兼容（NVFP4 与 MXFP4）；Gaudi 3 完全没有 FP4 |
+| Blackwell Ultra vs CDNA 4 | 2025 | B300 SXM | 288 GB | MI355X | 288 GB | Gaudi 3（无后继在售） | 128 GB | 显存首次持平，差距完全转移到机柜级（NVL72 对 8 卡节点） |
+| Rubin vs MI400 | 2026（路线图） | Rubin / VR200 NVL144 | 288 GB HBM4 | MI400 series / Helios | 未公布 | 路线图未定 | 未公布 | 双方都上机柜级；AMD 押注开放的 UALink + Ultra Ethernet 对抗 NVLink |
 
+> - Gaudi 3 没有 FP4，也没有后继型号在售，所以它是拿 FP8 在 Hopper 这一档比价格、 比"不需要 InfiniBand"，而不是拿峰值去和 Blackwell 硬碰。
 > - 显存容量决定"能不能跑"，而在 B300 之前 AMD 每一代都领先。 如果一个模型单张 MI300X 装得下、却要两张 H100，那还没跑分 AMD 就已经赢了这一局。
 > - scale-up 域的规模决定"怎么切模型"。NVIDIA 把 NVLink 扩到了单柜 72 卡， 而 Helios 之前 AMD 的一致性域是 8 卡。超过 8 卡做张量并行时， 这是结构性差异，不是调优能解决的问题。
 > - 软件是规格表里看不到的那部分。CUDA 在算子、库和框架默认路径上领先十年以上。 ROCm 在主流模型的推理和训练上已经追上不少，但一旦涉及自定义或全新的东西差距依然明显。
 > - 两家的 4bit 格式不通用。NVIDIA 的 NVFP4 和 AMD 的 MXFP4 缩放块布局不同， 为其一量化好的权重要重新量化才能给另一边用。
+
+### 按显存档位看本地选择
+
+实际选型的顺序：先按模型定容量，再看谁家有货。48 GB 以上带宽会断崖式下跌， 因为再往上都是统一内存，不是独立显存。
+
+| 名称 | NVIDIA | AMD | Apple | Intel | 典型带宽 | 能从容跑 |
+|---|---|---|---|---|---|---|
+| 16 GB | RTX 5060 Ti / 4060 Ti 16 GB | RX 9070 XT | Mac mini M6 | Arc Pro B50 | 200-650 GB/s | 14B 四位量化 |
+| 24 GB | RTX 3090 / RTX 4090 | RX 7900 XTX | Mac mini M5 Pro | Arc Pro B60 | 300-1,000 GB/s | 约 30B 四位量化 |
+| 32 GB | RTX 5090 | Radeon AI PRO R9700 | Mac mini M6 (32 GB) | Arc Pro B70 | 170-1,792 GB/s | 30B 四位量化且能带像样的上下文 |
+| 48 GB | RTX 6000 Ada | Radeon PRO W7900 | Mac Studio M5 Max (48 GB) | 该档位无产品 | 460-960 GB/s | 70B 四位量化 |
+| 96-128 GB | RTX PRO 6000（96 GB 显存）、DGX Spark（128 GB 统一内存） | Ryzen AI Max+ 395（128 GB 统一内存） | Mac Studio M5 Max 128 GB / M5 Ultra 96 GB | 该档位无产品 | 统一内存 256 GB/s，RTX PRO 卡 1,792 GB/s | 70B 八位量化，120B+ 四位量化 |
+| 256-512 GB | 该档位无产品 | 该档位无产品 | Mac Studio M5 Ultra | 该档位无产品 | 1.2 TB/s | 400B+ 四位量化 |
+
+> - 48 GB 以上，容量和带宽就不再同步增长了。96 GB 的 RTX PRO 6000 有 1,792 GB/s， 而 128 GB 的 DGX Spark 或 Strix Halo 只有 256~273 GB/s。纸面上同一档， 出词速度差约 7 倍。
+> - 只有苹果卖单机 256~512 GB，而且 M5 Ultra 在这个容量下还有 1.2 TB/s—— 代价是没有 FP4 通路，也没有集群网络。
+> - Intel 到 32 GB 为止。再往上它的答案是多张 B60 或 B70 走 PCIe，而不是更大的单卡。
+> - 表中提到但本仓库没有独立条目的型号（RTX 5060 Ti、RTX 6000 Ada）仅用于定位， 除显存档位外不对其规格作任何声明。
 
 ## 容量换算
 

@@ -37,7 +37,8 @@ sizing math that decides what fits. Every table is generated from the YAML in
 - [Intel Gaudi Accelerators](#intel-gaudi-accelerators)
 
 **Head to head**
-- [NVIDIA vs AMD, Generation by Generation](#nvidia-vs-amd-generation-by-generation)
+- [Data Center - NVIDIA vs AMD vs Intel](#data-center---nvidia-vs-amd-vs-intel)
+- [Local Options by Memory Tier](#local-options-by-memory-tier)
 
 **Sizing math**
 - [Quantization vs VRAM (weights)](#quantization-vs-vram-weights)
@@ -351,22 +352,41 @@ Gaudi's distinguishing feature is not the compute, it is that the scale-out netw
 
 ## Head to head
 
-### NVIDIA vs AMD, Generation by Generation
+### Data Center - NVIDIA vs AMD vs Intel
 
-Which AMD part competes with which NVIDIA part, and what actually separates them. Memory capacity has been AMD's lever; domain size and software have been NVIDIA's.
+Which part competes with which, and what actually separates them. AMD's lever is memory capacity, Intel's is on-die Ethernet and price, NVIDIA's is domain size and software. Apple is absent because it sells no data center accelerator.
 
-| Name | Era | NVIDIA | NVIDIA HBM | AMD | AMD HBM | What decides it |
-|---|---|---|---|---|---|---|
-| Hopper vs CDNA 3 | 2023 | H100 SXM | 80 GB | MI300X | 192 GB | AMD fits models H100 cannot; NVIDIA wins on software maturity and a 256-GPU NVLink domain |
-| Hopper refresh vs CDNA 3 refresh | 2024 | H200 SXM | 141 GB | MI325X | 256 GB | same matchup, both sides added HBM; AMD still ~1.8x the capacity |
-| Blackwell vs CDNA 4 | 2025 | B200 SXM | 180 GB | MI355X | 288 GB | first generation where both have native 4-bit, but in incompatible formats (NVFP4 vs MXFP4) |
-| Blackwell Ultra vs CDNA 4 | 2025 | B300 SXM | 288 GB | MI355X | 288 GB | memory parity for the first time; the gap moves entirely to rack scale (NVL72 vs 8-GPU nodes) |
-| Rubin vs MI400 | 2026 (roadmap) | Rubin / VR200 NVL144 | 288 GB HBM4 | MI400 series / Helios | TBA | both go rack-scale; AMD bets on open UALink + Ultra Ethernet against NVLink |
+| Name | Era | NVIDIA | NVIDIA HBM | AMD | AMD HBM | Intel | Intel HBM | What decides it |
+|---|---|---|---|---|---|---|---|---|
+| Hopper vs CDNA 3 | 2023 | H100 SXM | 80 GB | MI300X | 192 GB | Gaudi 2 | 96 GB | AMD fits models H100 cannot; NVIDIA wins on software maturity and a 256-GPU NVLink domain |
+| Hopper refresh vs CDNA 3 refresh | 2024 | H200 SXM | 141 GB | MI325X | 256 GB | Gaudi 3 | 128 GB | same matchup, both sides added HBM; AMD still ~1.8x the capacity |
+| Blackwell vs CDNA 4 | 2025 | B200 SXM | 180 GB | MI355X | 288 GB | Gaudi 3 (no successor shipping) | 128 GB | first generation where both have native 4-bit, but in incompatible formats (NVFP4 vs MXFP4) |
+| Blackwell Ultra vs CDNA 4 | 2025 | B300 SXM | 288 GB | MI355X | 288 GB | Gaudi 3 (no successor shipping) | 128 GB | memory parity for the first time; the gap moves entirely to rack scale (NVL72 vs 8-GPU nodes) |
+| Rubin vs MI400 | 2026 (roadmap) | Rubin / VR200 NVL144 | 288 GB HBM4 | MI400 series / Helios | TBA | roadmap unsettled | TBA | both go rack-scale; AMD bets on open UALink + Ultra Ethernet against NVLink |
 
+> - Gaudi 3 has no FP4 and no successor shipping, so it competes on FP8 against Hopper-class parts on price and on not needing InfiniBand, not on peak numbers against Blackwell.
 > - Memory capacity decides what you can run at all, and AMD has led on it every generation until B300. If a model fits on one MI300X but needs two H100s, AMD wins that comparison before any benchmark runs.
 > - Scale-up domain size decides how you shard. NVIDIA extended NVLink to 72 GPUs in one rack; AMD's coherent domain is 8 GPUs until Helios ships. For tensor parallelism across more than 8 GPUs that difference is structural, not a tuning problem.
 > - Software is the part no spec table shows. CUDA has a decade-plus lead in kernels, libraries and framework defaults. ROCm has closed much of the gap for mainstream inference and training on popular models, and much less of it for anything custom or new.
 > - The 4-bit formats are not interchangeable. NVIDIA's NVFP4 and AMD's MXFP4 use different scaling-block layouts, so a checkpoint quantized for one needs requantizing for the other.
+
+### Local Options by Memory Tier
+
+The practical way to shop: pick the capacity your model needs, then see who sells it. Bandwidth falls off a cliff above 48 GB, because everything past that point is unified memory rather than dedicated VRAM.
+
+| Name | NVIDIA | AMD | Apple | Intel | Typical bandwidth | Runs comfortably |
+|---|---|---|---|---|---|---|
+| 16 GB | RTX 5060 Ti / 4060 Ti 16 GB | RX 9070 XT | Mac mini M6 | Arc Pro B50 | 200-650 GB/s | 14B at 4-bit |
+| 24 GB | RTX 3090 / RTX 4090 | RX 7900 XTX | Mac mini M5 Pro | Arc Pro B60 | 300-1,000 GB/s | ~30B at 4-bit |
+| 32 GB | RTX 5090 | Radeon AI PRO R9700 | Mac mini M6 (32 GB) | Arc Pro B70 | 170-1,792 GB/s | 30B at 4-bit with real context |
+| 48 GB | RTX 6000 Ada | Radeon PRO W7900 | Mac Studio M5 Max (48 GB) | nothing at this tier | 460-960 GB/s | 70B at 4-bit |
+| 96-128 GB | RTX PRO 6000 (96 GB VRAM), DGX Spark (128 GB unified) | Ryzen AI Max+ 395 (128 GB unified) | Mac Studio M5 Max 128 GB / M5 Ultra 96 GB | nothing at this tier | 256 GB/s unified, 1,792 GB/s on the RTX PRO card | 70B at 8-bit, 120B+ at 4-bit |
+| 256-512 GB | nothing at this tier | nothing at this tier | Mac Studio M5 Ultra | nothing at this tier | 1.2 TB/s | 400B+ at 4-bit |
+
+> - Capacity and bandwidth stop moving together above 48 GB. A 96 GB RTX PRO 6000 holds 1,792 GB/s; a 128 GB DGX Spark or Strix Halo box holds 256-273 GB/s. Same tier on paper, roughly 7x apart on decode speed.
+> - Apple is the only vendor selling 256-512 GB to one machine, and the M5 Ultra holds 1.2 TB/s while doing it - but with no FP4 path and no cluster fabric.
+> - Intel stops at 32 GB. Above that tier its answer is multiple B60 or B70 cards over PCIe, not a bigger card.
+> - Parts named here that have no row of their own elsewhere in this repo (RTX 5060 Ti, RTX 6000 Ada) are listed for orientation only; no specs are claimed for them beyond the memory tier.
 
 ## Sizing math
 

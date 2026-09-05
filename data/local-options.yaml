@@ -1,0 +1,121 @@
+id: local-options
+title: Local Options by Memory Tier
+title_zh: 按显存档位看本地选择
+summary: >-
+  The practical way to shop: pick the capacity your model needs, then see who
+  sells it. Bandwidth falls off a cliff above 48 GB, because everything past
+  that point is unified memory rather than dedicated VRAM.
+summary_zh: >-
+  实际选型的顺序：先按模型定容量，再看谁家有货。48 GB 以上带宽会断崖式下跌，
+  因为再往上都是统一内存，不是独立显存。
+orientation: rows
+fields:
+  - {key: nvidia,     label: NVIDIA,          label_zh: NVIDIA}
+  - {key: amd,        label: AMD,             label_zh: AMD}
+  - {key: apple,      label: Apple,           label_zh: Apple}
+  - {key: intel,      label: Intel,           label_zh: Intel}
+  - {key: bandwidth,  label: Typical bandwidth, label_zh: 典型带宽}
+  - {key: runs,       label: Runs comfortably,  label_zh: 能从容跑}
+items:
+  - id: t16
+    name: 16 GB
+    specs:
+      nvidia: RTX 5060 Ti / 4060 Ti 16 GB
+      amd: RX 9070 XT
+      apple: Mac mini M6
+      intel: Arc Pro B50
+      bandwidth: 200-650 GB/s
+      runs: 14B at 4-bit
+    specs_zh:
+      runs: 14B 四位量化
+  - id: t24
+    name: 24 GB
+    specs:
+      nvidia: RTX 3090 / RTX 4090
+      amd: RX 7900 XTX
+      apple: Mac mini M5 Pro
+      intel: Arc Pro B60
+      bandwidth: 300-1,000 GB/s
+      runs: ~30B at 4-bit
+    specs_zh:
+      runs: 约 30B 四位量化
+  - id: t32
+    name: 32 GB
+    specs:
+      nvidia: RTX 5090
+      amd: Radeon AI PRO R9700
+      apple: Mac mini M6 (32 GB)
+      intel: Arc Pro B70
+      bandwidth: 170-1,792 GB/s
+      runs: 30B at 4-bit with real context
+    specs_zh:
+      runs: 30B 四位量化且能带像样的上下文
+  - id: t48
+    name: 48 GB
+    specs:
+      nvidia: RTX 6000 Ada
+      amd: Radeon PRO W7900
+      apple: Mac Studio M5 Max (48 GB)
+      intel: nothing at this tier
+      bandwidth: 460-960 GB/s
+      runs: 70B at 4-bit
+    specs_zh:
+      intel: 该档位无产品
+      runs: 70B 四位量化
+  - id: t96
+    name: 96-128 GB
+    specs:
+      nvidia: RTX PRO 6000 (96 GB VRAM), DGX Spark (128 GB unified)
+      amd: Ryzen AI Max+ 395 (128 GB unified)
+      apple: Mac Studio M5 Max 128 GB / M5 Ultra 96 GB
+      intel: nothing at this tier
+      bandwidth: 256 GB/s unified, 1,792 GB/s on the RTX PRO card
+      runs: 70B at 8-bit, 120B+ at 4-bit
+    specs_zh:
+      nvidia: RTX PRO 6000（96 GB 显存）、DGX Spark（128 GB 统一内存）
+      amd: Ryzen AI Max+ 395（128 GB 统一内存）
+      intel: 该档位无产品
+      bandwidth: 统一内存 256 GB/s，RTX PRO 卡 1,792 GB/s
+      runs: 70B 八位量化，120B+ 四位量化
+  - id: t256
+    name: 256-512 GB
+    specs:
+      nvidia: nothing at this tier
+      amd: nothing at this tier
+      apple: Mac Studio M5 Ultra
+      intel: nothing at this tier
+      bandwidth: 1.2 TB/s
+      runs: 400B+ at 4-bit
+    specs_zh:
+      nvidia: 该档位无产品
+      amd: 该档位无产品
+      intel: 该档位无产品
+      runs: 400B+ 四位量化
+notes:
+  - >-
+    Capacity and bandwidth stop moving together above 48 GB. A 96 GB RTX PRO
+    6000 holds 1,792 GB/s; a 128 GB DGX Spark or Strix Halo box holds 256-273
+    GB/s. Same tier on paper, roughly 7x apart on decode speed.
+  - >-
+    Apple is the only vendor selling 256-512 GB to one machine, and the M5 Ultra
+    holds 1.2 TB/s while doing it - but with no FP4 path and no cluster fabric.
+  - >-
+    Intel stops at 32 GB. Above that tier its answer is multiple B60 or B70
+    cards over PCIe, not a bigger card.
+  - >-
+    Parts named here that have no row of their own elsewhere in this repo
+    (RTX 5060 Ti, RTX 6000 Ada) are listed for orientation only; no specs are
+    claimed for them beyond the memory tier.
+notes_zh:
+  - >-
+    48 GB 以上，容量和带宽就不再同步增长了。96 GB 的 RTX PRO 6000 有 1,792 GB/s，
+    而 128 GB 的 DGX Spark 或 Strix Halo 只有 256~273 GB/s。纸面上同一档，
+    出词速度差约 7 倍。
+  - >-
+    只有苹果卖单机 256~512 GB，而且 M5 Ultra 在这个容量下还有 1.2 TB/s——
+    代价是没有 FP4 通路，也没有集群网络。
+  - >-
+    Intel 到 32 GB 为止。再往上它的答案是多张 B60 或 B70 走 PCIe，而不是更大的单卡。
+  - >-
+    表中提到但本仓库没有独立条目的型号（RTX 5060 Ti、RTX 6000 Ada）仅用于定位，
+    除显存档位外不对其规格作任何声明。
