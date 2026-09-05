@@ -38,6 +38,7 @@ ORDER = [
     # NVIDIA data center
     "dgx-systems",
     "datacenter-gpus",
+    "pcie-gpus",
     "superchips",
     "rack-scale",
     "interconnect",

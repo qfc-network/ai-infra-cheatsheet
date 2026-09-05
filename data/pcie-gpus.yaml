@@ -1,0 +1,191 @@
+id: pcie-gpus
+title: Data Center PCIe Cards
+title_zh: 数据中心 PCIe 加速卡
+summary: >-
+  The deployment option that is not an SXM baseboard. What separates these cards
+  is power and form factor, not peak FLOPS - a 70 W single-slot card drops into
+  any server, a 600 W dual-slot card needs a chassis built for it.
+summary_zh: >-
+  SXM 基板之外的另一条部署路线。这些卡的区别在功耗和形态，不在峰值算力——
+  70 W 单槽卡随便哪台服务器都插得下，600 W 双槽卡得配专门的机箱。
+orientation: columns
+fields:
+  - {key: architecture,  label: Architecture,          label_zh: 架构}
+  - {key: memory,        label: Memory,                label_zh: 显存}
+  - {key: bandwidth,     label: Memory bandwidth,      label_zh: 显存带宽}
+  - {key: fp16,          label: FP16 Tensor,           label_zh: FP16 张量}
+  - {key: fp8,           label: FP8 Tensor,            label_zh: FP8 张量}
+  - {key: form,          label: Form factor,           label_zh: 形态}
+  - {key: pcie,          label: PCIe,                  label_zh: PCIe}
+  - {key: nvlink,        label: NVLink,                label_zh: NVLink}
+  - {key: mig,           label: MIG,                   label_zh: MIG}
+  - {key: power,         label: Max power,             label_zh: 最大功耗}
+  - {key: launch,        label: Launch,                label_zh: 上市时间}
+items:
+  - id: t4
+    name: T4
+    specs:
+      architecture: Turing
+      memory: 16 GB GDDR6
+      bandwidth: 300 GB/s
+      fp16: 65 TFLOPS (dense - Turing has no sparsity)
+      fp8: not supported
+      form: low-profile, single slot
+      pcie: Gen3 x16, 32 GB/s
+      nvlink: none
+      mig: not supported
+      power: 70 W
+      launch: 2018
+    specs_zh:
+      fp16: 65 TFLOPS（稠密——Turing 没有稀疏）
+      fp8: 不支持
+      form: 半高单槽
+      nvlink: 无
+      mig: 不支持
+    sources:
+      - https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/tesla-t4/t4-tensor-core-datasheet-951643.pdf
+  - id: a10
+    name: A10
+    specs:
+      architecture: Ampere
+      memory: 24 GB GDDR6
+      bandwidth: 600 GB/s
+      fp16: 125 / 250 TFLOPS (dense / sparse)
+      fp8: not supported
+      form: full-height full-length, single slot
+      pcie: Gen4 x16, 64 GB/s
+      nvlink: none
+      mig: not supported
+      power: 150 W
+      launch: 2021
+    specs_zh:
+      fp16: 125 / 250 TFLOPS（稠密 / 稀疏）
+      fp8: 不支持
+      form: 全高全长单槽
+      nvlink: 无
+      mig: 不支持
+    sources:
+      - https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/a10/pdf/datasheet-new/nvidia-a10-datasheet.pdf
+  - id: l4
+    name: L4
+    specs:
+      architecture: Ada Lovelace
+      memory: 24 GB GDDR6
+      bandwidth: 300 GB/s
+      fp16: 242 TFLOPS (sparse)
+      fp8: 485 TFLOPS (sparse)
+      form: low-profile, single slot
+      pcie: Gen4 x16, 64 GB/s
+      nvlink: none
+      mig: not supported
+      power: 72 W
+      launch: 2023
+    specs_zh:
+      fp16: 242 TFLOPS（稀疏）
+      fp8: 485 TFLOPS（稀疏）
+      form: 半高单槽
+      nvlink: 无
+      mig: 不支持
+    sources:
+      - https://www.nvidia.com/en-us/data-center/l4/
+  - id: l40s
+    name: L40S
+    specs:
+      architecture: Ada Lovelace
+      memory: 48 GB GDDR6 with ECC
+      bandwidth: 864 GB/s
+      fp16: 733 TFLOPS (sparse)
+      fp8: 1,466 TFLOPS (sparse)
+      form: full-height full-length, dual slot
+      pcie: Gen4 x16, 64 GB/s
+      nvlink: none
+      mig: not supported
+      power: 350 W
+      launch: 2023
+    specs_zh:
+      memory: 48 GB GDDR6，带 ECC
+      fp16: 733 TFLOPS（稀疏）
+      fp8: 1,466 TFLOPS（稀疏）
+      form: 全高全长双槽
+      nvlink: 无
+      mig: 不支持
+    sources:
+      - https://www.nvidia.com/en-us/data-center/l40s/
+  - id: h100-nvl
+    name: H100 NVL
+    specs:
+      architecture: Hopper
+      memory: 94 GB HBM3
+      bandwidth: 3,938 GB/s
+      fp16: 1,671 TFLOPS (sparse)
+      fp8: 3,341 TFLOPS (sparse)
+      form: full-height full-length, dual slot
+      pcie: Gen5 x16, 128 GB/s
+      nvlink: bridge, pairs of cards
+      mig: up to 7 instances
+      power: 400 W
+      launch: 2023
+    specs_zh:
+      fp16: 1,671 TFLOPS（稀疏）
+      fp8: 3,341 TFLOPS（稀疏）
+      form: 全高全长双槽
+      nvlink: 桥接，成对使用
+      mig: 最多 7 个实例
+    sources:
+      - https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/h100/PB-11773-001_v01.pdf
+      - https://www.nvidia.com/en-us/data-center/h100/
+  - id: h200-nvl
+    name: H200 NVL
+    specs:
+      architecture: Hopper
+      memory: 141 GB HBM3e
+      bandwidth: 4.8 TB/s
+      fp16: 1,671 TFLOPS (sparse)
+      fp8: 3,341 TFLOPS (sparse)
+      form: dual slot, air cooled
+      pcie: Gen5 x16, 128 GB/s
+      nvlink: 2- or 4-way bridge, 900 GB/s per GPU
+      mig: up to 7 instances at 16.5 GB
+      power: up to 600 W (configurable)
+      launch: 2024
+    specs_zh:
+      fp16: 1,671 TFLOPS（稀疏）
+      fp8: 3,341 TFLOPS（稀疏）
+      form: 双槽风冷
+      nvlink: 2 卡或 4 卡桥接，单卡 900 GB/s
+      mig: 最多 7 个实例，每个 16.5 GB
+      power: 最高 600 W（可配置）
+    sources:
+      - https://www.nvidia.com/en-us/data-center/h200/
+notes:
+  - >-
+    Power is the real axis. A 70 W L4 or T4 fits a standard server with no
+    changes; an L40S at 350 W needs airflow planning; an H200 NVL at up to 600 W
+    needs a chassis designed for it. That constraint, not FLOPS, is usually what
+    decides which card a fleet standardises on.
+  - >-
+    Only the HBM cards get MIG and an NVLink bridge. On GDDR6 cards, multi-card
+    work goes over PCIe and each card's memory stays its own; the H100 NVL and
+    H200 NVL can pair or quad up over a bridge instead.
+  - >-
+    H100 NVL and H200 NVL are the same Hopper die in the same PCIe power bin,
+    which is why their FP8 and FP16 figures match. The difference is memory:
+    94 GB HBM3 versus 141 GB HBM3e.
+  - >-
+    For the Blackwell generation in a PCIe slot, see the RTX PRO 6000 Blackwell
+    row in the consumer and workstation table - 96 GB GDDR7 with ECC, dual slot,
+    600 W. It is listed there rather than duplicated here.
+notes_zh:
+  - >-
+    功耗才是真正的分界线。70 W 的 L4 或 T4 插进标准服务器不用动任何东西；
+    350 W 的 L40S 要考虑风道；最高 600 W 的 H200 NVL 需要为它设计的机箱。
+    决定一个机群标准化选哪张卡的通常是这个约束，不是算力。
+  - >-
+    只有 HBM 卡才有 MIG 和 NVLink 桥接。GDDR6 卡的多卡协作只能走 PCIe，
+    各卡显存互不相通；H100 NVL 和 H200 NVL 则可以两卡或四卡通过桥接互联。
+  - >-
+    H100 NVL 与 H200 NVL 是同一颗 Hopper die、同一个 PCIe 功耗档，
+    所以 FP8 和 FP16 数字完全一样。区别在显存：94 GB HBM3 对 141 GB HBM3e。
+  - >-
+    Blackwell 这一代的 PCIe 选择见"消费级与工作站 GPU"表里的 RTX PRO 6000 Blackwell 一行——
+    96 GB GDDR7 带 ECC、双槽、600 W。放在那边，不在此重复。
