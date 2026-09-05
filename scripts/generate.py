@@ -186,6 +186,7 @@ def render_doc(cat: dict, lang: str) -> str:
 
 def render_readme(cats: dict, lang: str) -> str:
     template = (TEMPLATE_DIR / LANGS[lang]["template"]).read_text(encoding="utf-8")
+    template = template.replace("{{table_count}}", str(len(ORDER)))
     for cid in ORDER:
         cat = cats[cid]
         template = template.replace(f"{{{{section:{cid}}}}}", render_section(cat, lang).rstrip())

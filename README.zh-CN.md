@@ -1,7 +1,13 @@
 # AI 基础设施速查表
 
-一份"真正用来跑模型的硬件"对照速查表：从桌上的 Mac mini 到 72 卡的 NVLink 机柜，
-涵盖 NVIDIA、AMD、Apple，以及决定"到底装不装得下"的显存换算。
+[![generate](https://github.com/qfc-network/ai-infra-cheatsheet/actions/workflows/generate.yml/badge.svg)](https://github.com/qfc-network/ai-infra-cheatsheet/actions/workflows/generate.yml)
+[![Stars](https://img.shields.io/github/stars/qfc-network/ai-infra-cheatsheet?style=flat&logo=github)](https://github.com/qfc-network/ai-infra-cheatsheet/stargazers)
+[![Tables](https://img.shields.io/badge/tables-22-blue)](#目录)
+[![License: CC BY 4.0](https://img.shields.io/badge/license-CC%20BY%204.0-green)](LICENSE)
+
+一份"真正用来跑模型的硬件"对照速查表：从桌上的 Mac mini 到 8,192 卡的 SuperPoD，
+涵盖 NVIDIA、AMD、Intel、Apple、华为，决定芯片能不能用的推理引擎，
+以及决定"到底装不装得下"的显存换算。
 所有表格都由 [`data/`](data/) 下的 YAML 自动生成，改一个数字就是一个 PR。
 
 [English](README.md) · [简体中文](README.zh-CN.md)
@@ -521,16 +527,27 @@ Gaudi 的特点不在算力，而在于横向扩展网络做进了芯片： 每�
 
 ## 参与贡献
 
-修数字、加产品、补来源：改 [`data/`](data/) 里的 YAML，跑一下生成脚本，
-把数据和重新生成的 Markdown 一起提交。
+**发现数字有错？**两种方式都行：
 
-```bash
-pip install -r requirements.txt
-python scripts/generate.py
-```
+1. **提 issue** —
+   [用规格勘误模板](https://github.com/qfc-network/ai-infra-cheatsheet/issues/new?template=spec-correction.yml)，
+   填当前值、正确值、来源链接，一分钟的事。
+2. **提 PR** — 改 [`data/`](data/) 里的 YAML，重新生成，把数据和 Markdown 一起提交：
 
-修改请附上厂商官方规格书、产品页或新闻稿链接，详见
-[CONTRIBUTING.md](CONTRIBUTING.md)。
+   ```bash
+   pip install -r requirements.txt
+   python scripts/generate.py
+   ```
+
+三条规矩：
+
+- **不要手改 `README.md` 和 `docs/`**。它们由 `data/` 生成，改了 CI 会失败。
+- **每个值都要有来源**，优先级：厂商规格书 → 产品页 → 新闻稿或发布会 → 可靠技术媒体。
+- **"未公布"好过猜**。厂商从没公布过的数字就如实留"未公布"，
+  不要拿分析师估算去填。
+
+也欢迎整块补充新产品或新厂商——[CONTRIBUTING.md](CONTRIBUTING.md)
+里写了怎么加字段、加分类和中文文案。
 
 ## 致谢
 

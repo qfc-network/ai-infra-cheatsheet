@@ -1,9 +1,15 @@
 # AI Infrastructure Cheat Sheet
 
+[![generate](https://github.com/qfc-network/ai-infra-cheatsheet/actions/workflows/generate.yml/badge.svg)](https://github.com/qfc-network/ai-infra-cheatsheet/actions/workflows/generate.yml)
+[![Stars](https://img.shields.io/github/stars/qfc-network/ai-infra-cheatsheet?style=flat&logo=github)](https://github.com/qfc-network/ai-infra-cheatsheet/stargazers)
+[![Tables](https://img.shields.io/badge/tables-{{table_count}}-blue)](#contents)
+[![License: CC BY 4.0](https://img.shields.io/badge/license-CC%20BY%204.0-green)](LICENSE)
+
 Side-by-side spec tables for the hardware people actually run models on — from a
-Mac mini on a desk to a 72-GPU NVLink rack. NVIDIA, AMD and Apple, plus the
-sizing math that decides what fits. Every table is generated from the YAML in
-[`data/`](data/), so a correction is a one-line pull request.
+Mac mini on a desk to an 8,192-chip SuperPoD. NVIDIA, AMD, Intel, Apple and
+Huawei, the inference engines that make a chip usable, and the sizing math that
+decides what fits. Every table is generated from the YAML in [`data/`](data/),
+so a correction is a one-line pull request.
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
@@ -131,16 +137,30 @@ sizing math that decides what fits. Every table is generated from the YAML in
 
 ## Contributing
 
-Fix a number, add a product, add a source: edit the YAML in [`data/`](data/),
-run the generator, commit both the data and the regenerated Markdown.
+**Found a wrong number?** Either way works:
 
-```bash
-pip install -r requirements.txt
-python scripts/generate.py
-```
+1. **Open an issue** —
+   [use the spec-correction template](https://github.com/qfc-network/ai-infra-cheatsheet/issues/new?template=spec-correction.yml).
+   Current value, correct value, source URL. Takes a minute.
+2. **Send a PR** — edit the YAML in [`data/`](data/), regenerate, commit both
+   the data and the Markdown:
 
-Corrections should cite a vendor datasheet, product page, or press release —
-see [CONTRIBUTING.md](CONTRIBUTING.md).
+   ```bash
+   pip install -r requirements.txt
+   python scripts/generate.py
+   ```
+
+Three rules:
+
+- **Never edit `README.md` or `docs/` by hand.** They are generated from
+  `data/`, and CI fails if they drift.
+- **Every value needs a source**, in this order: vendor datasheet → product
+  page → press release or keynote → reputable technical press.
+- **"Not published" beats a guess.** If a vendor never released a figure, leave
+  the cell saying so rather than filling it with an analyst estimate.
+
+Adding a whole product or vendor is welcome too — [CONTRIBUTING.md](CONTRIBUTING.md)
+walks through adding a field, a category and the Chinese strings.
 
 ## Acknowledgements
 
