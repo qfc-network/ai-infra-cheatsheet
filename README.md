@@ -18,6 +18,29 @@ so a correction is a one-line pull request.
 > (FlashAttention, PagedAttention, GQA, quantization, NVLink and more).
 > This repo holds the hardware numbers; that one explains the mechanisms.
 
+## The stack
+
+```
+┌────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Model      weights + KV cache                                     what fits at all         │
+├────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Serving    vLLM · SGLang · TensorRT-LLM · llama.cpp · LM Studio   paged KV, batching       │
+├────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Framework  PyTorch · JAX · Keras · MLX · MindSpore · Paddle       where models are written │
+├────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Compute    CUDA · ROCm · oneAPI · Metal · CANN · MUSA             kernels and compilers    │
+├────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Silicon    B300 · MI355X · Gaudi 3 · M5 Ultra · Ascend 950        HBM, FLOPS, watts        │
+├────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Scale-up   NVLink 72 · Infinity Fabric 8 · UB 8,192               one coherent domain      │
+├────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Scale-out  InfiniBand · Spectrum-X · RoCE · Ultra Ethernet        across the network       │
+└────────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+Read it top-down when you are choosing a model, bottom-up when you are choosing
+hardware. The tables below are grouped along these layers.
+
 ## Contents
 
 **Desktop and local**
@@ -443,7 +466,7 @@ Which part competes with which, and what actually separates them. AMD's lever is
 
 ### Local Options by Memory Tier
 
-The practical way to shop: pick the capacity your model needs, then see who sells it. Bandwidth falls off a cliff above 48 GB, because everything past that point is unified memory rather than dedicated VRAM.
+The practical way to shop: pick the capacity your model needs, then see who sells it. Above 48 GB the field splits in two - dedicated VRAM on a card keeps its bandwidth but stops at 96 GB, while unified-memory boxes go far higher at roughly a quarter of the bandwidth.
 
 | Name | NVIDIA | AMD | Apple | Intel | Typical bandwidth | Runs comfortably |
 |---|---|---|---|---|---|---|
@@ -454,7 +477,7 @@ The practical way to shop: pick the capacity your model needs, then see who sell
 | 96-128 GB | RTX PRO 6000 (96 GB VRAM), DGX Spark (128 GB unified) | Ryzen AI Max+ 395 (128 GB unified) | Mac Studio M5 Max 128 GB / M5 Ultra 96 GB | nothing at this tier | 256 GB/s unified, 1,792 GB/s on the RTX PRO card | 70B at 8-bit, 120B+ at 4-bit |
 | 256-512 GB | nothing at this tier | nothing at this tier | Mac Studio M5 Ultra | nothing at this tier | 1.2 TB/s | 400B+ at 4-bit |
 
-> - Capacity and bandwidth stop moving together above 48 GB. A 96 GB RTX PRO 6000 holds 1,792 GB/s; a 128 GB DGX Spark or Strix Halo box holds 256-273 GB/s. Same tier on paper, roughly 7x apart on decode speed.
+> - Read the 96-128 GB row as two different products, not one tier. The 96 GB RTX PRO 6000 is dedicated VRAM at 1,792 GB/s; a 128 GB DGX Spark or Strix Halo box is unified memory at 256-273 GB/s. Same tier on paper, roughly 7x apart on decode speed.
 > - Apple is the only vendor selling 256-512 GB to one machine, and the M5 Ultra holds 1.2 TB/s while doing it - but with no FP4 path and no cluster fabric.
 > - Intel stops at 32 GB. Above that tier its answer is multiple B60 or B70 cards over PCIe, not a bigger card.
 > - Parts named here that have no row of their own elsewhere in this repo (RTX 5060 Ti, RTX 6000 Ada) are listed for orientation only; no specs are claimed for them beyond the memory tier.
@@ -558,8 +581,10 @@ Weight memory = parameters x bytes per parameter. Sizes below are in GiB (2^30 b
 | FP8 (E4M3) | 8 | 0.93 GiB | 6.5 GiB | 12 GiB | 30 GiB | 65 GiB | H100 / H200 / Ada (RTX 40) / Blackwell | near-lossless; no dequantization step on supported hardware |
 | INT8 | 8 | 0.93 GiB | 6.5 GiB | 12 GiB | 30 GiB | 65 GiB | Turing (RTX 20) onward | the 8-bit option on pre-Hopper hardware |
 | INT4 / NF4 / GPTQ / AWQ | 4 | 0.47 GiB | 3.3 GiB | 6.1 GiB | 15 GiB | 33 GiB | any GPU (dequantized in software) | the workhorse for running a big model on one consumer card |
-| FP4 (NVFP4 / MXFP4) | 4 | 0.47 GiB | 3.3 GiB | 6.1 GiB | 15 GiB | 33 GiB | Blackwell only (RTX 50 / B200 / B300) | 4-bit with tensor core support; no dequantization |
+| NVFP4 | 4 | 0.47 GiB | 3.3 GiB | 6.1 GiB | 15 GiB | 33 GiB | NVIDIA Blackwell (RTX 50, B200, B300) | 4-bit with tensor core support; no dequantization |
+| MXFP4 | 4 | 0.47 GiB | 3.3 GiB | 6.1 GiB | 15 GiB | 33 GiB | AMD CDNA 4 (MI350X, MI355X); Huawei Ascend 950 series | the OCP microscaling 4-bit format; also tensor-core native |
 
+> - NVFP4 and MXFP4 are not interchangeable. Both are 4 bits per weight and occupy the same memory, but they use different scaling-block layouts, so a checkpoint quantized for one must be requantized for the other.
 > - Add 10-15% to the 4-bit rows in practice: quantized formats store scales and zero-points alongside the weights, so "4-bit" is closer to 4.5 bits/param.
 > - Weights are only part of it. Add the KV cache (next table), activations, the CUDA context (~0.5-1 GiB) and fragmentation before deciding a model fits.
 > - Native hardware support buys speed, not capacity. INT4 on a 3090 takes the same VRAM as FP4 on a 5090, but the 3090 dequantizes to FP16 inside the kernel while the 5090 multiplies in 4-bit directly.

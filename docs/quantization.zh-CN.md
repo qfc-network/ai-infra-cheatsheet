@@ -9,8 +9,10 @@
 | FP8 (E4M3) | 8 | 0.93 GiB | 6.5 GiB | 12 GiB | 30 GiB | 65 GiB | H100 / H200 / Ada（RTX 40）/ Blackwell | 接近无损，且在支持的硬件上不需要反量化 |
 | INT8 | 8 | 0.93 GiB | 6.5 GiB | 12 GiB | 30 GiB | 65 GiB | Turing（RTX 20）及以后 | Hopper 之前硬件上的 8bit 方案 |
 | INT4 / NF4 / GPTQ / AWQ | 4 | 0.47 GiB | 3.3 GiB | 6.1 GiB | 15 GiB | 33 GiB | 任意 GPU（软件反量化） | 单张消费卡跑大模型的主力方案 |
-| FP4 (NVFP4 / MXFP4) | 4 | 0.47 GiB | 3.3 GiB | 6.1 GiB | 15 GiB | 33 GiB | 仅 Blackwell（RTX 50 / B200 / B300） | 有张量核原生支持的 4bit，无需反量化 |
+| NVFP4 | 4 | 0.47 GiB | 3.3 GiB | 6.1 GiB | 15 GiB | 33 GiB | NVIDIA Blackwell（RTX 50、B200、B300） | 有张量核原生支持的 4bit，无需反量化 |
+| MXFP4 | 4 | 0.47 GiB | 3.3 GiB | 6.1 GiB | 15 GiB | 33 GiB | AMD CDNA 4（MI350X、MI355X）；华为昇腾 950 系列 | OCP microscaling 的 4bit 格式，同样有张量核原生支持 |
 
+> - NVFP4 和 MXFP4 不通用。两者都是每权重 4 bit、占显存一样多， 但缩放块布局不同，为其一量化好的权重必须重新量化才能给另一边用。
 > - 实际用 4bit 时在表上再加 10~15%：量化格式要额外存 scale 和 zero-point， 所谓 "4bit" 实际接近每参数 4.5 bit。
 > - 权重只是一部分。判断能不能装下，还要加上 KV cache（见下表）、激活值、 CUDA 上下文（约 0.5~1 GiB）以及显存碎片。
 > - 硬件原生支持买到的是速度不是容量。3090 上的 INT4 和 5090 上的 FP4 占显存一样多， 但 3090 要在 kernel 里反量化回 FP16 再算，5090 可以直接用 4bit 做乘法。

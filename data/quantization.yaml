@@ -88,8 +88,8 @@ items:
     specs_zh:
       hardware: 任意 GPU（软件反量化）
       use: 单张消费卡跑大模型的主力方案
-  - id: fp4
-    name: FP4 (NVFP4 / MXFP4)
+  - id: nvfp4
+    name: NVFP4
     specs:
       bits: "4"
       per_1b: 0.47 GiB
@@ -97,12 +97,30 @@ items:
       m13: 6.1 GiB
       m32: 15 GiB
       m70: 33 GiB
-      hardware: Blackwell only (RTX 50 / B200 / B300)
+      hardware: NVIDIA Blackwell (RTX 50, B200, B300)
       use: 4-bit with tensor core support; no dequantization
     specs_zh:
-      hardware: 仅 Blackwell（RTX 50 / B200 / B300）
+      hardware: NVIDIA Blackwell（RTX 50、B200、B300）
       use: 有张量核原生支持的 4bit，无需反量化
+  - id: mxfp4
+    name: MXFP4
+    specs:
+      bits: "4"
+      per_1b: 0.47 GiB
+      m7: 3.3 GiB
+      m13: 6.1 GiB
+      m32: 15 GiB
+      m70: 33 GiB
+      hardware: AMD CDNA 4 (MI350X, MI355X); Huawei Ascend 950 series
+      use: the OCP microscaling 4-bit format; also tensor-core native
+    specs_zh:
+      hardware: AMD CDNA 4（MI350X、MI355X）；华为昇腾 950 系列
+      use: OCP microscaling 的 4bit 格式，同样有张量核原生支持
 notes:
+  - >-
+    NVFP4 and MXFP4 are not interchangeable. Both are 4 bits per weight and
+    occupy the same memory, but they use different scaling-block layouts, so a
+    checkpoint quantized for one must be requantized for the other.
   - >-
     Add 10-15% to the 4-bit rows in practice: quantized formats store scales and
     zero-points alongside the weights, so "4-bit" is closer to 4.5 bits/param.
@@ -114,6 +132,9 @@ notes:
     same VRAM as FP4 on a 5090, but the 3090 dequantizes to FP16 inside the
     kernel while the 5090 multiplies in 4-bit directly.
 notes_zh:
+  - >-
+    NVFP4 和 MXFP4 不通用。两者都是每权重 4 bit、占显存一样多，
+    但缩放块布局不同，为其一量化好的权重必须重新量化才能给另一边用。
   - >-
     实际用 4bit 时在表上再加 10~15%：量化格式要额外存 scale 和 zero-point，
     所谓 "4bit" 实际接近每参数 4.5 bit。
