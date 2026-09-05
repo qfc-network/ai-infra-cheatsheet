@@ -16,6 +16,7 @@
 - [桌面与本地 AI 主机](#桌面与本地-ai-主机)
 - [消费级与工作站 GPU](#消费级与工作站-gpu)
 - [AMD Radeon 本地 AI 显卡](#amd-radeon-本地-ai-显卡)
+- [Intel Arc Pro 本地 AI 显卡](#intel-arc-pro-本地-ai-显卡)
 
 **NVIDIA 数据中心**
 - [DGX 整机](#dgx-整机)
@@ -29,6 +30,9 @@
 **AMD**
 - [AMD Instinct 加速卡](#amd-instinct-加速卡)
 - [AMD Instinct 整机与机柜](#amd-instinct-整机与机柜)
+
+**Intel**
+- [Intel Gaudi 加速卡](#intel-gaudi-加速卡)
 
 **正面对位**
 - [NVIDIA 与 AMD 逐代对位](#nvidia-与-amd-逐代对位)
@@ -105,6 +109,28 @@ Radeon 在本地推理上的卖点是"每块钱能买到多少显存"：W7900 �
 > - 别把 AMD 给 7900 XTX 标的 "5.3 TB/s" 当带宽。那是 Infinity Cache 的带宽， 真正决定出词速度的 GDDR6 带宽是 960 GB/s。
 > - RDNA 3 没有 FP8 矩阵通路，整条 Radeon 线都没有 FP4，所以这里每一张卡跑 4bit 模型都要软件反量化。只有 RDNA 4（9070 XT、R9700）加了 FP8 WMMA。
 > - Radeon 在任何档位都没有 NVLink 的对应物，多卡只能走 PCIe—— 和 RTX 4090/5090 主机是同一个限制。
+
+### Intel Arc Pro 本地 AI 显卡
+
+Intel 的打法是低功耗下的显存与多卡性价比——B50 用 70 W 就给到 16 GB。 代价是软件栈（oneAPI / OpenVINO / IPEX-LLM）覆盖面远不如 CUDA，且实际精度下限是 INT8。
+
+| 参数 | Arc Pro B50 | Arc Pro B60 | Arc Pro B70 |
+|---|---|---|---|
+| 架构 | Xe2 (Battlemage) | Xe2 (Battlemage) | Xe2-HPG |
+| Xe 核心 / XMX 引擎 | 16 个 Xe 核心 / 128 EU | 20 个 Xe 核心 / 160 EU | 32 个 Xe 核心 / 256 个 XMX |
+| 显存 | 16 GB | 24 GB | 32 GB |
+| 显存位宽 | 128-bit | 192-bit | 256-bit |
+| 显存带宽 | 224 GB/s | 456 GB/s | 608 GB/s |
+| INT8 峰值（稠密） | 170 TOPS | 197 TOPS | 367 TOPS |
+| 多卡 | 仅 PCIe | PCIe，有合作伙伴双芯卡（2 x 24 GB） | PCIe Gen5 x16，Linux 下经 oneAPI 多卡 |
+| 软件栈 | oneAPI / OpenVINO / IPEX-LLM | oneAPI / OpenVINO / IPEX-LLM | oneAPI / OpenVINO / IPEX-LLM |
+| 整卡功耗 | 70 W | 120-200 W | 由板卡厂商决定 |
+| 本地 LLM 大致可跑 | 14B 四位量化 | 约 30B 四位量化 | 约 30B 四位量化 |
+| 上市时间 | 2025 | 2025 | 2026 |
+
+> - Intel 标的是 INT8 TOPS，不是 FP8 或 FP4 的 FLOPS。Arc 有 XMX 矩阵引擎但没有 FP4 通路，4bit 权重要靠软件反量化——和 Radeon 处境相同。
+> - Intel 没有公布 B70 的 TDP，规格书上功耗、供电接口和形态都写"由板卡厂商决定"。 另有 Arc Pro B65，因为查不到公开规格书这里没收录。
+> - 真正要问的是软件栈。OpenVINO 和 IPEX-LLM 对主流模型覆盖不错，llama.cpp 也有 SYCL 后端，但凡是依赖自定义 CUDA 算子的东西都得重新移植。
 
 ## NVIDIA 数据中心
 
@@ -294,6 +320,32 @@ AMD 卖的是 8 卡 OAM 基板（"platform"）给 OEM，而不是 DGX 那样的�
 > - 这才是结构性差异，不是规格表上的差异。一台 MI355X 是 8 卡一个一致性域， 一个 GB300 NVL72 机柜是 72 卡。今天在 AMD 上超过 8 卡就要过网络， 这会直接改变模型怎么切分。
 > - AMD 的答案是 UALink（开放的 scale-up 互联标准）加 Ultra Ethernet 做横向扩展， 随 Helios 一起落地。开放标准 vs NVIDIA 垂直整合的 NVLink，这才是真正的战略分歧。
 > - AMD 没有 DGX 的对应物：它出基板，戴尔、慧与、超微等厂商做整机。 所以机箱功耗和物理规格因 OEM 而异，本表不列。
+
+## Intel
+
+### Intel Gaudi 加速卡
+
+Gaudi 的特点不在算力，而在于横向扩展网络做进了芯片： 每张卡 24 个以太网口，不需要另买网卡，也没有私有互联要买。
+
+| 参数 | Gaudi 2 | Gaudi 3 |
+|---|---|---|
+| 代次 | Gaudi 2 | Gaudi 3 |
+| 显存 | 96 GB HBM2e | 128 GB HBM2e |
+| 显存带宽 | 2.45 TB/s | 3.7 TB/s |
+| BF16 矩阵 | ~432 TFLOPS | 1,678 TFLOPS |
+| FP8 矩阵 | 支持 | 1,678 TFLOPS |
+| FP4 | 不支持 | 不支持 |
+| 片上网络 | 24 x 100 GbE RoCE | 24 x 200 GbE RoCE |
+| scale-up 域 | 单机 8 卡，走片上以太网 | 单机 8 卡，走片上以太网 |
+| 功耗 | 600 W | OAM 900 W，PCIe 卡 600 W |
+| 形态 | OAM | OAM 夹层卡或 PCIe 卡 |
+| 软件栈 | SynapseAI, PyTorch, vLLM | SynapseAI, PyTorch, vLLM |
+| 上市时间 | 2022 | 2024 |
+
+> - Gaudi 3 没有 FP4。跟标 FP4 的 B200 或 MI355X 比时要统一到 FP8，否则对比没有意义。
+> - Intel 宣传口径是 "FP8 与 BF16 各 1.8 PFLOPS"，而白皮书表格里两者都是 1,678 TFLOPS。 本表采用白皮书数字。
+> - 片上以太网是它的架构赌注：横向扩展走标准 RoCE 交换机而不是 InfiniBand 或 NVLink， 更便宜也更通用，但放弃了 GB300 NVL72 那种 72 卡一致性域。
+> - Intel 在 Gaudi 3 之后的路线图改过不止一次，围绕任何后续型号做规划前请先确认它真的在出货。
 
 ## 正面对位
 

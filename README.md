@@ -18,6 +18,7 @@ sizing math that decides what fits. Every table is generated from the YAML in
 - [Desktop & Local AI Systems](#desktop--local-ai-systems)
 - [Consumer & Workstation GPUs](#consumer--workstation-gpus)
 - [AMD Radeon for Local AI](#amd-radeon-for-local-ai)
+- [Intel Arc Pro for Local AI](#intel-arc-pro-for-local-ai)
 
 **NVIDIA data center**
 - [DGX Systems](#dgx-systems)
@@ -31,6 +32,9 @@ sizing math that decides what fits. Every table is generated from the YAML in
 **AMD**
 - [AMD Instinct Accelerators](#amd-instinct-accelerators)
 - [AMD Instinct Platforms & Racks](#amd-instinct-platforms--racks)
+
+**Intel**
+- [Intel Gaudi Accelerators](#intel-gaudi-accelerators)
 
 **Head to head**
 - [NVIDIA vs AMD, Generation by Generation](#nvidia-vs-amd-generation-by-generation)
@@ -107,6 +111,28 @@ Radeon's pitch for local inference is VRAM per dollar: a W7900 carries 48 GB and
 > - Ignore AMD's "5.3 TB/s" figure for the 7900 XTX. That is Infinity Cache bandwidth, not memory bandwidth; the GDDR6 number that governs decode speed is 960 GB/s.
 > - RDNA 3 has no FP8 matrix path and no FP4 anywhere in the Radeon line, so 4-bit models are dequantized in software on every card here. Only RDNA 4 (9070 XT, R9700) adds FP8 WMMA.
 > - Radeon has no NVLink equivalent at any tier. Multi-card is PCIe only, which is the same constraint as an RTX 4090/5090 box.
+
+### Intel Arc Pro for Local AI
+
+Intel's angle is VRAM and multi-GPU per dollar at low power - a B50 does 16 GB in 70 W. The trade is a software stack (oneAPI / OpenVINO / IPEX-LLM) with far less coverage than CUDA, and INT8 as the practical floor.
+
+| Parameter | Arc Pro B50 | Arc Pro B60 | Arc Pro B70 |
+|---|---|---|---|
+| Architecture | Xe2 (Battlemage) | Xe2 (Battlemage) | Xe2-HPG |
+| Xe cores / XMX engines | 16 Xe cores / 128 EU | 20 Xe cores / 160 EU | 32 Xe cores / 256 XMX |
+| VRAM | 16 GB | 24 GB | 32 GB |
+| Memory interface | 128-bit | 192-bit | 256-bit |
+| Memory bandwidth | 224 GB/s | 456 GB/s | 608 GB/s |
+| Peak INT8 (dense) | 170 TOPS | 197 TOPS | 367 TOPS |
+| Multi-GPU | PCIe only | PCIe, dual-GPU partner boards exist (2 x 24 GB) | PCIe Gen5 x16, Linux multi-GPU via oneAPI |
+| Software | oneAPI / OpenVINO / IPEX-LLM | oneAPI / OpenVINO / IPEX-LLM | oneAPI / OpenVINO / IPEX-LLM |
+| Board power | 70 W | 120-200 W | varies by board partner |
+| Rough local LLM fit | 14B at 4-bit | ~30B at 4-bit | ~30B at 4-bit |
+| Launch | 2025 | 2025 | 2026 |
+
+> - Intel quotes INT8 TOPS, not FP8 or FP4 FLOPS. Arc has XMX matrix engines but no FP4 path, so 4-bit weights are dequantized in software - the same situation as Radeon.
+> - Intel does not publish a TDP for the B70; the datasheet lists power, connector and form factor as "varies by partner". An Arc Pro B65 also exists but is not listed here for lack of a published spec sheet.
+> - The software stack is the real question. OpenVINO and IPEX-LLM cover popular models well and llama.cpp has a SYCL backend, but anything depending on a custom CUDA kernel needs porting.
 
 ## NVIDIA data center
 
@@ -296,6 +322,32 @@ AMD sells an 8-GPU OAM baseboard (the "platform") to OEMs rather than a branded 
 > - This is the structural difference, not a spec-sheet one. An MI355X node is 8 GPUs in one coherent domain; a GB300 NVL72 rack is 72. Anything larger than 8 GPUs on AMD crosses the network today, which changes how you shard a model.
 > - AMD's answer is UALink (an open scale-up interconnect standard) plus Ultra Ethernet for scale-out, arriving with Helios. Open standards versus NVIDIA's vertically integrated NVLink is the actual strategic bet.
 > - There is no DGX equivalent: AMD ships baseboards, and Dell, HPE, Supermicro and others build the box. Chassis power and physical specs therefore vary by OEM and are not listed here.
+
+## Intel
+
+### Intel Gaudi Accelerators
+
+Gaudi's distinguishing feature is not the compute, it is that the scale-out network is on the die: 24 Ethernet ports per accelerator, no separate NIC and no proprietary fabric to buy.
+
+| Parameter | Gaudi 2 | Gaudi 3 |
+|---|---|---|
+| Generation | Gaudi 2 | Gaudi 3 |
+| Memory | 96 GB HBM2e | 128 GB HBM2e |
+| Memory bandwidth | 2.45 TB/s | 3.7 TB/s |
+| BF16 matrix | ~432 TFLOPS | 1,678 TFLOPS |
+| FP8 matrix | supported | 1,678 TFLOPS |
+| FP4 | not supported | not supported |
+| On-die networking | 24 x 100 GbE RoCE | 24 x 200 GbE RoCE |
+| Scale-up domain | 8 accelerators per node over on-die Ethernet | 8 accelerators per node over on-die Ethernet |
+| TDP | 600 W | 900 W (OAM), 600 W PCIe card |
+| Form factor | OAM | OAM mezzanine or PCIe card |
+| Software | SynapseAI, PyTorch, vLLM | SynapseAI, PyTorch, vLLM |
+| Launch | 2022 | 2024 |
+
+> - Gaudi 3 has no FP4. Against a B200 or MI355X quoting FP4 numbers, compare at FP8 or the comparison is meaningless.
+> - Intel markets Gaudi 3 as "1.8 PFLOPS FP8 and BF16" while the whitepaper tables list 1,678 TFLOPS for both. The table uses the whitepaper figure.
+> - On-die Ethernet is the architectural bet: scale-out runs on standard RoCE switches instead of InfiniBand or NVLink, which is cheaper and more portable but gives up the coherent 72-GPU domain a GB300 NVL72 rack provides.
+> - Intel's post-Gaudi-3 roadmap has changed more than once. Verify what is actually shipping before planning around any successor part.
 
 ## Head to head
 

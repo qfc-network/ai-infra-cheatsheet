@@ -1,0 +1,108 @@
+id: intel-local-gpus
+title: Intel Arc Pro for Local AI
+title_zh: Intel Arc Pro 本地 AI 显卡
+summary: >-
+  Intel's angle is VRAM and multi-GPU per dollar at low power - a B50 does 16 GB
+  in 70 W. The trade is a software stack (oneAPI / OpenVINO / IPEX-LLM) with far
+  less coverage than CUDA, and INT8 as the practical floor.
+summary_zh: >-
+  Intel 的打法是低功耗下的显存与多卡性价比——B50 用 70 W 就给到 16 GB。
+  代价是软件栈（oneAPI / OpenVINO / IPEX-LLM）覆盖面远不如 CUDA，且实际精度下限是 INT8。
+orientation: columns
+fields:
+  - {key: architecture,  label: Architecture,            label_zh: 架构}
+  - {key: xe_cores,      label: Xe cores / XMX engines,  label_zh: Xe 核心 / XMX 引擎}
+  - {key: vram,          label: VRAM,                    label_zh: 显存}
+  - {key: bus,           label: Memory interface,        label_zh: 显存位宽}
+  - {key: bandwidth,     label: Memory bandwidth,        label_zh: 显存带宽}
+  - {key: int8,          label: Peak INT8 (dense),       label_zh: INT8 峰值（稠密）}
+  - {key: multi_gpu,     label: Multi-GPU,               label_zh: 多卡}
+  - {key: software,      label: Software,                label_zh: 软件栈}
+  - {key: tdp,           label: Board power,             label_zh: 整卡功耗}
+  - {key: llm_fit,       label: Rough local LLM fit,     label_zh: 本地 LLM 大致可跑}
+  - {key: launch,        label: Launch,                  label_zh: 上市时间}
+items:
+  - id: arc-pro-b50
+    name: Arc Pro B50
+    specs:
+      architecture: Xe2 (Battlemage)
+      xe_cores: 16 Xe cores / 128 EU
+      vram: 16 GB
+      bus: 128-bit
+      bandwidth: 224 GB/s
+      int8: 170 TOPS
+      multi_gpu: PCIe only
+      software: oneAPI / OpenVINO / IPEX-LLM
+      tdp: 70 W
+      llm_fit: 14B at 4-bit
+      launch: 2025
+    specs_zh:
+      xe_cores: 16 个 Xe 核心 / 128 EU
+      multi_gpu: 仅 PCIe
+      llm_fit: 14B 四位量化
+    sources:
+      - https://www.intel.com/content/www/us/en/products/sku/242615/intel-arc-pro-b50-graphics/specifications.html
+  - id: arc-pro-b60
+    name: Arc Pro B60
+    specs:
+      architecture: Xe2 (Battlemage)
+      xe_cores: 20 Xe cores / 160 EU
+      vram: 24 GB
+      bus: 192-bit
+      bandwidth: 456 GB/s
+      int8: 197 TOPS
+      multi_gpu: PCIe, dual-GPU partner boards exist (2 x 24 GB)
+      software: oneAPI / OpenVINO / IPEX-LLM
+      tdp: 120-200 W
+      llm_fit: ~30B at 4-bit
+      launch: 2025
+    specs_zh:
+      xe_cores: 20 个 Xe 核心 / 160 EU
+      multi_gpu: PCIe，有合作伙伴双芯卡（2 x 24 GB）
+      llm_fit: 约 30B 四位量化
+    sources:
+      - https://www.intel.com/content/www/us/en/products/sku/243916/intel-arc-pro-b60-graphics/specifications.html
+  - id: arc-pro-b70
+    name: Arc Pro B70
+    specs:
+      architecture: Xe2-HPG
+      xe_cores: 32 Xe cores / 256 XMX
+      vram: 32 GB
+      bus: 256-bit
+      bandwidth: 608 GB/s
+      int8: 367 TOPS
+      multi_gpu: PCIe Gen5 x16, Linux multi-GPU via oneAPI
+      software: oneAPI / OpenVINO / IPEX-LLM
+      tdp: varies by board partner
+      llm_fit: ~30B at 4-bit
+      launch: 2026
+    specs_zh:
+      xe_cores: 32 个 Xe 核心 / 256 个 XMX
+      multi_gpu: PCIe Gen5 x16，Linux 下经 oneAPI 多卡
+      tdp: 由板卡厂商决定
+      llm_fit: 约 30B 四位量化
+    sources:
+      - https://www.intel.com/content/dam/www/central-libraries/us/en/documents/2026-03/datasheet-b70-gpu.pdf
+notes:
+  - >-
+    Intel quotes INT8 TOPS, not FP8 or FP4 FLOPS. Arc has XMX matrix engines but
+    no FP4 path, so 4-bit weights are dequantized in software - the same
+    situation as Radeon.
+  - >-
+    Intel does not publish a TDP for the B70; the datasheet lists power,
+    connector and form factor as "varies by partner". An Arc Pro B65 also exists
+    but is not listed here for lack of a published spec sheet.
+  - >-
+    The software stack is the real question. OpenVINO and IPEX-LLM cover popular
+    models well and llama.cpp has a SYCL backend, but anything depending on a
+    custom CUDA kernel needs porting.
+notes_zh:
+  - >-
+    Intel 标的是 INT8 TOPS，不是 FP8 或 FP4 的 FLOPS。Arc 有 XMX 矩阵引擎但没有
+    FP4 通路，4bit 权重要靠软件反量化——和 Radeon 处境相同。
+  - >-
+    Intel 没有公布 B70 的 TDP，规格书上功耗、供电接口和形态都写"由板卡厂商决定"。
+    另有 Arc Pro B65，因为查不到公开规格书这里没收录。
+  - >-
+    真正要问的是软件栈。OpenVINO 和 IPEX-LLM 对主流模型覆盖不错，llama.cpp 也有
+    SYCL 后端，但凡是依赖自定义 CUDA 算子的东西都得重新移植。

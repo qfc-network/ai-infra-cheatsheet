@@ -1,0 +1,94 @@
+id: intel-accelerators
+title: Intel Gaudi Accelerators
+title_zh: Intel Gaudi 加速卡
+summary: >-
+  Gaudi's distinguishing feature is not the compute, it is that the scale-out
+  network is on the die: 24 Ethernet ports per accelerator, no separate NIC and
+  no proprietary fabric to buy.
+summary_zh: >-
+  Gaudi 的特点不在算力，而在于横向扩展网络做进了芯片：
+  每张卡 24 个以太网口，不需要另买网卡，也没有私有互联要买。
+orientation: columns
+fields:
+  - {key: architecture,  label: Generation,              label_zh: 代次}
+  - {key: memory,        label: Memory,                  label_zh: 显存}
+  - {key: bandwidth,     label: Memory bandwidth,        label_zh: 显存带宽}
+  - {key: bf16,          label: BF16 matrix,             label_zh: BF16 矩阵}
+  - {key: fp8,           label: FP8 matrix,              label_zh: FP8 矩阵}
+  - {key: fp4,           label: FP4,                     label_zh: FP4}
+  - {key: network,       label: On-die networking,       label_zh: 片上网络}
+  - {key: scale_up,      label: Scale-up domain,         label_zh: scale-up 域}
+  - {key: tdp,           label: TDP,                     label_zh: 功耗}
+  - {key: form,          label: Form factor,             label_zh: 形态}
+  - {key: software,      label: Software,                label_zh: 软件栈}
+  - {key: launch,        label: Launch,                  label_zh: 上市时间}
+items:
+  - id: gaudi2
+    name: Gaudi 2
+    specs:
+      architecture: Gaudi 2
+      memory: 96 GB HBM2e
+      bandwidth: 2.45 TB/s
+      bf16: ~432 TFLOPS
+      fp8: supported
+      fp4: not supported
+      network: 24 x 100 GbE RoCE
+      scale_up: 8 accelerators per node over on-die Ethernet
+      tdp: 600 W
+      form: OAM
+      software: SynapseAI, PyTorch, vLLM
+      launch: 2022
+    specs_zh:
+      fp8: 支持
+      fp4: 不支持
+      scale_up: 单机 8 卡，走片上以太网
+    sources:
+      - https://docs.habana.ai/en/latest/Gaudi_Overview/Gaudi_Architecture.html
+  - id: gaudi3
+    name: Gaudi 3
+    specs:
+      architecture: Gaudi 3
+      memory: 128 GB HBM2e
+      bandwidth: 3.7 TB/s
+      bf16: 1,678 TFLOPS
+      fp8: 1,678 TFLOPS
+      fp4: not supported
+      network: 24 x 200 GbE RoCE
+      scale_up: 8 accelerators per node over on-die Ethernet
+      tdp: 900 W (OAM), 600 W PCIe card
+      form: OAM mezzanine or PCIe card
+      software: SynapseAI, PyTorch, vLLM
+      launch: 2024
+    specs_zh:
+      fp4: 不支持
+      scale_up: 单机 8 卡，走片上以太网
+      tdp: OAM 900 W，PCIe 卡 600 W
+      form: OAM 夹层卡或 PCIe 卡
+    sources:
+      - https://cdrdv2-public.intel.com/817486/gaudi-3-ai-accelerator-white-paper.pdf
+      - https://newsroom.intel.com/artificial-intelligence/vision-2024-gaudi-3-ai-accelerator
+notes:
+  - >-
+    Gaudi 3 has no FP4. Against a B200 or MI355X quoting FP4 numbers, compare at
+    FP8 or the comparison is meaningless.
+  - >-
+    Intel markets Gaudi 3 as "1.8 PFLOPS FP8 and BF16" while the whitepaper
+    tables list 1,678 TFLOPS for both. The table uses the whitepaper figure.
+  - >-
+    On-die Ethernet is the architectural bet: scale-out runs on standard RoCE
+    switches instead of InfiniBand or NVLink, which is cheaper and more portable
+    but gives up the coherent 72-GPU domain a GB300 NVL72 rack provides.
+  - >-
+    Intel's post-Gaudi-3 roadmap has changed more than once. Verify what is
+    actually shipping before planning around any successor part.
+notes_zh:
+  - >-
+    Gaudi 3 没有 FP4。跟标 FP4 的 B200 或 MI355X 比时要统一到 FP8，否则对比没有意义。
+  - >-
+    Intel 宣传口径是 "FP8 与 BF16 各 1.8 PFLOPS"，而白皮书表格里两者都是 1,678 TFLOPS。
+    本表采用白皮书数字。
+  - >-
+    片上以太网是它的架构赌注：横向扩展走标准 RoCE 交换机而不是 InfiniBand 或 NVLink，
+    更便宜也更通用，但放弃了 GB300 NVL72 那种 72 卡一致性域。
+  - >-
+    Intel 在 Gaudi 3 之后的路线图改过不止一次，围绕任何后续型号做规划前请先确认它真的在出货。

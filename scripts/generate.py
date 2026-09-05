@@ -34,6 +34,7 @@ ORDER = [
     "local-systems",
     "consumer-gpus",
     "radeon-gpus",
+    "intel-local-gpus",
     # NVIDIA data center
     "dgx-systems",
     "datacenter-gpus",
@@ -45,6 +46,8 @@ ORDER = [
     # AMD
     "amd-gpus",
     "amd-systems",
+    # Intel
+    "intel-accelerators",
     # Cross-vendor
     "head-to-head",
     # Sizing math
