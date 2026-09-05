@@ -1,12 +1,14 @@
 id: dgx-systems
-title: DGX Systems (8-GPU nodes)
-title_zh: DGX 整机（8 卡节点）
+title: DGX Systems
+title_zh: DGX 整机
 summary: >-
-  NVIDIA's own 8-GPU appliance line. One node = 8 SXM GPUs on a single NVSwitch
-  fabric, dual x86 CPUs, and 8-10 network ports for scale-out.
+  NVIDIA's own appliance line, from the 2017 DGX-1 to today's Blackwell Ultra
+  nodes. Every generation since DGX-2 puts all GPUs in the box on one NVSwitch
+  fabric; DGX-1 used a direct NVLink mesh instead.
 summary_zh: >-
-  NVIDIA 官方的 8 卡整机产品线。一台 = 8 张 SXM GPU + 单机内 NVSwitch 全互联 +
-  双路 x86 CPU + 8~10 个横向扩展网口。
+  NVIDIA 官方整机产品线，从 2017 年的 DGX-1 到今天的 Blackwell Ultra 节点。
+  DGX-2 之后每一代都把机内 GPU 挂在同一个 NVSwitch 全互联域上，
+  只有 DGX-1 用的是 NVLink 直连网格。
 orientation: columns
 fields:
   - {key: architecture,       label: Architecture,          label_zh: 架构}
@@ -16,7 +18,7 @@ fields:
   - {key: memory_bandwidth,   label: Memory bandwidth/GPU,  label_zh: 单卡显存带宽}
   - {key: fp4,                label: FP4 (sparse/dense),    label_zh: FP4（稀疏/稠密）}
   - {key: fp8,                label: FP8 (sparse/dense),    label_zh: FP8（稀疏/稠密）}
-  - {key: fp16,               label: FP16/BF16 (sparse),    label_zh: FP16/BF16（稀疏）}
+  - {key: fp16,               label: FP16/BF16 Tensor,      label_zh: FP16/BF16 张量}
   - {key: interconnect,       label: GPU interconnect,      label_zh: GPU 互联}
   - {key: nvlink_bw,          label: NVLink BW per GPU,     label_zh: 单卡 NVLink 带宽}
   - {key: cluster_network,    label: Cluster network,       label_zh: 集群网络}
@@ -28,6 +30,67 @@ fields:
   - {key: cooling,            label: Cooling,               label_zh: 散热}
   - {key: launch,             label: Announced,             label_zh: 发布时间}
 items:
+  - id: dgx-1
+    name: DGX-1 (V100)
+    specs:
+      architecture: Volta
+      gpu: 8 x V100 SXM2
+      memory_per_gpu: 16 GB, later 32 GB HBM2
+      memory_total: 128 GB (256 GB with 32 GB V100)
+      memory_bandwidth: 900 GB/s
+      fp4: not supported
+      fp8: not supported
+      fp16: 1 PFLOPS (dense)
+      interconnect: NVLink 2 hybrid cube mesh (no NVSwitch)
+      nvlink_bw: 300 GB/s
+      cluster_network: 4 x 100 Gbit/s (EDR IB) + 2 x 10 GbE
+      cpu: 2 x Intel Xeon E5-2698 v4 (20C)
+      system_memory: 512 GB DDR4
+      storage: 4 x 1.92 TB SSD (RAID 0)
+      height: 3U
+      power: 3.5 kW
+      cooling: air
+      launch: 2017
+    specs_zh:
+      fp16: 1 PFLOPS（稠密）
+      memory_per_gpu: 16 GB，后期 32 GB HBM2
+      memory_total: 128 GB（32 GB 版 V100 为 256 GB）
+      fp4: 不支持
+      fp8: 不支持
+      interconnect: NVLink 2 立方网格直连（无 NVSwitch）
+      cooling: 风冷
+    sources:
+      - https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/dgx-1/NVIDIA-DGX-1-Volta-AI-Supercomputer-Datasheet.pdf
+      - https://images.nvidia.com/content/pdf/dgx1-v100-system-architecture-whitepaper.pdf
+  - id: dgx-2
+    name: DGX-2
+    specs:
+      architecture: Volta
+      gpu: 16 x V100 SXM3
+      memory_per_gpu: 32 GB HBM2
+      memory_total: 512 GB
+      memory_bandwidth: 900 GB/s
+      fp4: not supported
+      fp8: not supported
+      fp16: 2 PFLOPS (dense)
+      interconnect: NVLink 2 / NVSwitch 1 (12 switches)
+      nvlink_bw: 300 GB/s
+      cluster_network: 8 x 100 Gbit/s (EDR IB)
+      cpu: 2 x Intel Xeon Platinum 8168 (24C)
+      system_memory: 1.5 TB DDR4
+      storage: 8 x 3.84 TB NVMe + 2 x 960 GB (OS)
+      height: 10U
+      power: 10 kW
+      cooling: air
+      launch: 2018
+    specs_zh:
+      fp16: 2 PFLOPS（稠密）
+      fp4: 不支持
+      fp8: 不支持
+      interconnect: NVLink 2 / NVSwitch 1（12 颗）
+      cooling: 风冷
+    sources:
+      - https://images.nvidia.com/content/pdf/dgx-2-datasheet-us-nvidia-848202-r3-web.pdf
   - id: dgx-a100
     name: DGX A100
     specs:
@@ -38,7 +101,7 @@ items:
       memory_bandwidth: 2.0 TB/s
       fp4: not supported
       fp8: not supported
-      fp16: 5 PFLOPS
+      fp16: 5 PFLOPS (sparse)
       interconnect: NVLink 3 / NVSwitch 2
       nvlink_bw: 600 GB/s
       cluster_network: up to 8 x 200 Gbit/s (HDR IB)
@@ -50,6 +113,7 @@ items:
       cooling: air
       launch: 2020
     specs_zh:
+      fp16: 5 PFLOPS（稀疏）
       fp4: 不支持
       fp8: 不支持
       cooling: 风冷
@@ -65,7 +129,7 @@ items:
       memory_bandwidth: 3.35 TB/s
       fp4: no native FP4
       fp8: ~32 / 16 PFLOPS
-      fp16: ~16 PFLOPS
+      fp16: ~16 PFLOPS (sparse)
       interconnect: NVLink 4 / NVSwitch 3
       nvlink_bw: 900 GB/s
       cluster_network: up to 8 x 400 Gbit/s (ConnectX-7)
@@ -77,6 +141,7 @@ items:
       cooling: air
       launch: 2022
     specs_zh:
+      fp16: 约 16 PFLOPS（稀疏）
       fp4: 无原生 FP4
       cooling: 风冷
     sources:
@@ -92,7 +157,7 @@ items:
       memory_bandwidth: 4.8 TB/s
       fp4: no native FP4
       fp8: ~32 / 16 PFLOPS
-      fp16: ~16 PFLOPS
+      fp16: ~16 PFLOPS (sparse)
       interconnect: NVLink 4 / NVSwitch 3
       nvlink_bw: 900 GB/s
       cluster_network: up to 8 x 400 Gbit/s (ConnectX-7)
@@ -104,6 +169,7 @@ items:
       cooling: air
       launch: 2023
     specs_zh:
+      fp16: 约 16 PFLOPS（稀疏）
       fp4: 无原生 FP4
       cooling: 风冷
     sources:
@@ -119,7 +185,7 @@ items:
       memory_bandwidth: 8 TB/s (64 TB/s per node)
       fp4: 144 / 72 PFLOPS
       fp8: 72 / 36 PFLOPS
-      fp16: 36 PFLOPS
+      fp16: 36 PFLOPS (sparse)
       interconnect: NVLink 5 / NVSwitch 4
       nvlink_bw: 1.8 TB/s
       cluster_network: up to 8 x 400 Gbit/s (ConnectX-7)
@@ -131,6 +197,7 @@ items:
       cooling: air
       launch: 2024
     specs_zh:
+      fp16: 36 PFLOPS（稀疏）
       cooling: 风冷
     sources:
       - https://www.nvidia.com/en-us/data-center/dgx-b200/
@@ -145,7 +212,7 @@ items:
       memory_bandwidth: 8 TB/s
       fp4: 144 / 108 PFLOPS
       fp8: 72 / 36 PFLOPS
-      fp16: 36 PFLOPS
+      fp16: 36 PFLOPS (sparse)
       interconnect: NVLink 5 / NVSwitch 4
       nvlink_bw: 1.8 TB/s
       cluster_network: up to 8 x 800 Gbit/s (ConnectX-8)
@@ -157,10 +224,14 @@ items:
       cooling: air
       launch: 2025
     specs_zh:
+      fp16: 36 PFLOPS（稀疏）
       cooling: 风冷
     sources:
       - https://www.nvidia.com/en-us/data-center/dgx-b300/
 notes:
+  - >-
+    DGX-2 is the odd one out at 16 GPUs; every other DGX node here is an 8-GPU
+    system. It was also the debut of NVSwitch.
   - >-
     DGX B300 GPU memory is listed by NVIDIA as 2.1 TB per node; 8 x 288 GB of
     B300 chip capacity would be 2.3 TB, so the shipping configuration reserves
@@ -172,6 +243,8 @@ notes:
     B200 is documented as 192 GB HBM3e at the chip level; DGX B200 ships a
     180 GB per-GPU configuration (1,440 GB per node).
 notes_zh:
+  - >-
+    DGX-2 是唯一的 16 卡机型，其余 DGX 节点都是 8 卡；它也是 NVSwitch 的首发平台。
   - >-
     NVIDIA 官方页面标注 DGX B300 整机显存为 2.1 TB；按 B300 芯片 8 x 288 GB 计算应为
     2.3 TB，说明出厂配置保留了一部分。
