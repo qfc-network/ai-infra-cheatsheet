@@ -57,6 +57,7 @@ ORDER = [
     "local-options",
     # Software
     "inference-engines",
+    "compute-stacks",
     # Sizing math
     "quantization",
     "kv-cache",

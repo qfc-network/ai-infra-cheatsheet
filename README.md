@@ -2,7 +2,7 @@
 
 [![generate](https://github.com/qfc-network/ai-infra-cheatsheet/actions/workflows/generate.yml/badge.svg)](https://github.com/qfc-network/ai-infra-cheatsheet/actions/workflows/generate.yml)
 [![Stars](https://img.shields.io/github/stars/qfc-network/ai-infra-cheatsheet?style=flat&logo=github)](https://github.com/qfc-network/ai-infra-cheatsheet/stargazers)
-[![Tables](https://img.shields.io/badge/tables-22-blue)](#contents)
+[![Tables](https://img.shields.io/badge/tables-23-blue)](#contents)
 [![License: CC BY 4.0](https://img.shields.io/badge/license-CC%20BY%204.0-green)](LICENSE)
 
 Side-by-side spec tables for the hardware people actually run models on — from a
@@ -53,6 +53,7 @@ so a correction is a one-line pull request.
 
 **Software**
 - [Inference Engines & Local Apps](#inference-engines--local-apps)
+- [GPU Compute Stacks](#gpu-compute-stacks)
 
 **Sizing math**
 - [Quantization vs VRAM (weights)](#quantization-vs-vram-weights)
@@ -304,18 +305,18 @@ AMD's data center GPU line. HBM capacity has been AMD's consistent lead over the
 | Compute units | 220 | 304 | 304 | 256 | 256 |
 | Memory | 128 GB HBM2e | 192 GB HBM3 | 256 GB HBM3E | 288 GB HBM3E | 288 GB HBM3E |
 | Memory bandwidth | 3.2 TB/s | 5.3 TB/s | 6 TB/s | 8 TB/s | 8 TB/s |
-| FP64 matrix | 95.7 TFLOPS | 163.4 TFLOPS | 163.4 TFLOPS | ~78.6 TFLOPS | ~78.6 TFLOPS |
-| FP16/BF16 (dense) | 383 TFLOPS | 1.3 PFLOPS | 1.3 PFLOPS | ~2.3 PFLOPS | 2.5 PFLOPS |
-| FP8 (dense) | not supported | 2.6 PFLOPS | 2.6 PFLOPS | 4.6 PFLOPS | 5.0 PFLOPS |
-| FP4 / MXFP4 (dense) | not supported | not supported | not supported | 9.2 PFLOPS | 10 PFLOPS |
-| GPU interconnect | Infinity Fabric 3rd gen | Infinity Fabric, 8-GPU fully connected mesh | Infinity Fabric, 8-GPU fully connected mesh | Infinity Fabric 4th gen, 8-GPU mesh | Infinity Fabric 4th gen, 8-GPU mesh |
+| FP64 matrix | 95.7 TFLOPS | 163.4 TFLOPS | 163.4 TFLOPS | 72.1 TFLOPS (vector and matrix) | 78.6 TFLOPS (vector and matrix) |
+| FP16/BF16 (dense) | 383 TFLOPS | 1.3 PFLOPS | 1.3 PFLOPS | 2.31 PFLOPS | 2.52 PFLOPS |
+| FP8 (dense) | not supported | 2.6 PFLOPS | 2.6 PFLOPS | 4.61 PFLOPS | 5.03 PFLOPS |
+| FP4 / MXFP4 (dense) | not supported | not supported | not supported | 9.23 PFLOPS (MXFP4) | 10.07 PFLOPS (MXFP4) |
+| GPU interconnect | Infinity Fabric 3rd gen | Infinity Fabric, ring of 8, 896 GB/s aggregate | Infinity Fabric, ring of 8, 896 GB/s aggregate | Infinity Fabric, 160 GB/s per GPU pair, 8-GPU mesh | Infinity Fabric, 160 GB/s per GPU pair, 8-GPU mesh |
 | Total board power | 560 W | 750 W | 1,000 W | 1,000 W | 1,400 W |
 | Cooling | air or liquid | air | air | air | direct liquid |
 | Launch | 2021 | 2023 | 2024 | 2025 | 2025 |
 
 > - AMD quotes MXFP4 and MXFP6 (OCP microscaling formats) where NVIDIA quotes NVFP4. They are different 4-bit encodings with different scaling-block layouts; a model quantized for one is not automatically portable.
 > - CDNA 4 traded FP64 away: MI355X FP64 matrix is roughly half MI300X's, after CDNA 3 had been the HPC-friendly choice. Same direction NVIDIA took with Blackwell Ultra.
-> - FP64 and FP16 figures for the MI350 series are derived from AMD's published platform totals divided by eight; check the datasheet PDFs before quoting them in a procurement document.
+> - Sparsity does not apply to the 4-bit formats. AMD's datasheets carry a with-sparsity column for FP16, BF16, INT8 and OCP-FP8 only; MXFP6 and MXFP4 show N/A, so the FP4 figures here are the peak, not half of it.
 
 ### AMD Instinct Platforms & Racks
 
@@ -326,10 +327,10 @@ AMD sells an 8-GPU OAM baseboard (the "platform") to OEMs rather than a branded 
 | GPUs | 8 x MI300X | 8 x MI325X | 8 x MI355X | 72 x MI400-series |
 | Total GPU memory | 1.5 TB HBM3 | 2 TB HBM3E | 2.3 TB HBM3E | TBA |
 | Aggregate bandwidth | 42.4 TB/s | 48 TB/s | 64 TB/s | TBA |
-| FP8 (dense) | 20.8 PFLOPS | 20.8 PFLOPS | 40.3 PFLOPS | TBA |
+| FP8 (dense) | 20.9 PFLOPS | 20.9 PFLOPS | 40.3 PFLOPS | TBA |
 | FP4 / MXFP4 (dense) | not supported | not supported | 80.5 PFLOPS | TBA |
 | Scale-up domain | 8 GPUs, fully connected mesh, no switch | 8 GPUs, fully connected mesh, no switch | 8 GPUs, fully connected mesh, no switch | 72 GPUs over UALink - AMD's answer to NVL72 |
-| Scale-out network | OEM choice, typically 8 x 400 Gb/s | OEM choice, typically 8 x 400 Gb/s | OEM choice, up to 8 x 400 Gb/s | Ultra Ethernet |
+| Scale-out network | 8 x PCIe Gen5 x16 (128 GB/s) per GPU | OEM choice, typically 8 x 400 Gb/s | OEM choice, up to 8 x 400 Gb/s | Ultra Ethernet |
 | Cooling | air | air | air or direct liquid | liquid |
 | Sold as | OCP UBB baseboard for OEM chassis | OCP UBB baseboard for OEM chassis | OCP UBB baseboard for OEM chassis | full rack reference design |
 | Availability | 2023-2024 | 2024-2025 | 2025 | 2026 (roadmap) |
@@ -478,6 +479,27 @@ The layer between model weights and the hardware above. Which engine runs on you
 > - Serving many users needs paged KV cache and continuous batching, which is what vLLM and SGLang exist for. For one user at a time on a laptop, llama.cpp is simpler and gives up little.
 > - Backend support moves fast, especially the plugin backends for Gaudi, Ascend, TPU and Apple Silicon. Check the project's own install docs before assuming a chip is covered; "supported" can mean a community plugin rather than a tested first-class path.
 > - This table is why the software column matters in the hardware tables above. A GPU with no engine targeting it is not usable no matter what its datasheet says.
+
+### GPU Compute Stacks
+
+CUDA's counterparts, one per vendor. Note that every one of them ships a CUDA translation path - that fact is the clearest measure of how much of the ecosystem is written against CUDA rather than against the hardware.
+
+| Parameter | CUDA | ROCm | oneAPI / SYCL | Metal + MLX | CANN | MUSA |
+|---|---|---|---|---|---|---|
+| Vendor | NVIDIA | AMD | Intel | Apple | Huawei | Moore Threads |
+| Runs on | NVIDIA GPUs only | Instinct MI series, some Radeon and Radeon PRO | Arc, Arc Pro, Data Center GPU, Xeon CPU | Apple Silicon | Ascend NPUs | MTT GPUs |
+| Programming model | CUDA C++, PTX | HIP (deliberately CUDA-shaped C++) | SYCL / DPC++ (Khronos open standard) | Metal Shading Language; MLX array framework | Ascend C, AscendCL | MUSA C++ (CUDA-shaped) |
+| CUDA porting path | n/a - this is the target everyone ports to | HIPIFY source translation | SYCLomatic source translation | none - port by hand | none official - port by hand | musify source translation |
+| Core libraries | cuBLAS, cuDNN, CUTLASS | rocBLAS, MIOpen, Composable Kernel | oneDNN, oneMKL | MPS Graph, MLX | vendor kernel libraries | vendor equivalents of cuBLAS/cuDNN |
+| Collectives | NCCL | RCCL | oneCCL | none for multi-node | HCCL | MCCL |
+| PyTorch support | first-class, the reference backend | upstream, ROCm wheels published | upstream XPU backend | MPS backend, narrower op coverage than CUDA | torch_npu plugin, plus vLLM and SGLang backends | torch_musa plugin |
+| Open source | no | yes | yes | MLX yes, Metal no | partially | partially |
+| Since | 2007 | 2016 | 2020 | 2014 / 2023 | 2018 | 2022 |
+
+> - Source translation is not binary compatibility. HIPIFY, SYCLomatic and musify rewrite your source; they do not run an existing CUDA binary, and hand-tuned PTX or a CUTLASS-derived kernel usually needs real work.
+> - Most people never touch any of this. If your models run under vLLM, SGLang or llama.cpp, the engine has already absorbed the porting problem - which is why the inference engine table matters more than this one for most readers.
+> - The gap shows up at the edges: a brand-new attention variant, a custom fused kernel, a paper's reference implementation. Those land on CUDA first and reach other stacks months later, if at all.
+> - Collectives are the quiet dependency. Multi-GPU training needs NCCL or its equivalent to be fast and correct; RCCL and HCCL are real, but the ecosystem's tuning assumptions are written around NCCL.
 
 ## Sizing math
 

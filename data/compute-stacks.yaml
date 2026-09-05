@@ -1,0 +1,164 @@
+id: compute-stacks
+title: GPU Compute Stacks
+title_zh: GPU 计算栈
+summary: >-
+  CUDA's counterparts, one per vendor. Note that every one of them ships a
+  CUDA translation path - that fact is the clearest measure of how much of the
+  ecosystem is written against CUDA rather than against the hardware.
+summary_zh: >-
+  CUDA 在各家的对应物。值得注意的是每一家都做了一条 CUDA 转换路径——
+  这件事本身最能说明：生态是写给 CUDA 的，不是写给硬件的。
+orientation: columns
+fields:
+  - {key: vendor,       label: Vendor,                  label_zh: 厂商}
+  - {key: hardware,     label: Runs on,                 label_zh: 支持硬件}
+  - {key: language,     label: Programming model,       label_zh: 编程模型}
+  - {key: cuda_path,    label: CUDA porting path,       label_zh: CUDA 迁移路径}
+  - {key: libs,         label: Core libraries,          label_zh: 核心库}
+  - {key: collectives,  label: Collectives,             label_zh: 集合通信}
+  - {key: pytorch,      label: PyTorch support,         label_zh: PyTorch 支持}
+  - {key: open,         label: Open source,             label_zh: 是否开源}
+  - {key: since,        label: Since,                   label_zh: 起始年份}
+items:
+  - id: cuda
+    name: CUDA
+    specs:
+      vendor: NVIDIA
+      hardware: NVIDIA GPUs only
+      language: CUDA C++, PTX
+      cuda_path: n/a - this is the target everyone ports to
+      libs: cuBLAS, cuDNN, CUTLASS
+      collectives: NCCL
+      pytorch: first-class, the reference backend
+      open: "no"
+      since: "2007"
+    specs_zh:
+      hardware: 仅 NVIDIA GPU
+      cuda_path: 不适用——它就是别人要迁过来的目标
+      pytorch: 一等公民，参考实现
+      open: 否
+  - id: rocm
+    name: ROCm
+    specs:
+      vendor: AMD
+      hardware: Instinct MI series, some Radeon and Radeon PRO
+      language: HIP (deliberately CUDA-shaped C++)
+      cuda_path: HIPIFY source translation
+      libs: rocBLAS, MIOpen, Composable Kernel
+      collectives: RCCL
+      pytorch: upstream, ROCm wheels published
+      open: "yes"
+      since: "2016"
+    specs_zh:
+      hardware: Instinct MI 系列，部分 Radeon 与 Radeon PRO
+      language: HIP（刻意做成 CUDA 的样子）
+      cuda_path: HIPIFY 源码转换
+      pytorch: 已上游，有官方 ROCm wheel
+      open: 是
+  - id: oneapi
+    name: oneAPI / SYCL
+    specs:
+      vendor: Intel
+      hardware: Arc, Arc Pro, Data Center GPU, Xeon CPU
+      language: SYCL / DPC++ (Khronos open standard)
+      cuda_path: SYCLomatic source translation
+      libs: oneDNN, oneMKL
+      collectives: oneCCL
+      pytorch: upstream XPU backend
+      open: "yes"
+      since: "2020"
+    specs_zh:
+      hardware: Arc、Arc Pro、数据中心 GPU、至强 CPU
+      language: SYCL / DPC++（Khronos 开放标准）
+      cuda_path: SYCLomatic 源码转换
+      pytorch: 已上游的 XPU 后端
+      open: 是
+  - id: metal-mlx
+    name: Metal + MLX
+    specs:
+      vendor: Apple
+      hardware: Apple Silicon
+      language: Metal Shading Language; MLX array framework
+      cuda_path: none - port by hand
+      libs: MPS Graph, MLX
+      collectives: none for multi-node
+      pytorch: MPS backend, narrower op coverage than CUDA
+      open: MLX yes, Metal no
+      since: "2014 / 2023"
+    specs_zh:
+      hardware: Apple Silicon
+      language: Metal Shading Language；MLX 数组框架
+      cuda_path: 没有，只能手工移植
+      collectives: 无多机方案
+      pytorch: MPS 后端，算子覆盖比 CUDA 窄
+      open: MLX 开源，Metal 不开源
+  - id: cann
+    name: CANN
+    specs:
+      vendor: Huawei
+      hardware: Ascend NPUs
+      language: Ascend C, AscendCL
+      cuda_path: none official - port by hand
+      libs: vendor kernel libraries
+      collectives: HCCL
+      pytorch: torch_npu plugin, plus vLLM and SGLang backends
+      open: partially
+      since: "2018"
+    specs_zh:
+      vendor: 华为
+      hardware: 昇腾 NPU
+      language: Ascend C、AscendCL
+      cuda_path: 无官方路径，需手工移植
+      libs: 厂商自有算子库
+      pytorch: torch_npu 插件，另有 vLLM / SGLang 后端
+      open: 部分开源
+  - id: musa
+    name: MUSA
+    specs:
+      vendor: Moore Threads
+      hardware: MTT GPUs
+      language: MUSA C++ (CUDA-shaped)
+      cuda_path: musify source translation
+      libs: vendor equivalents of cuBLAS/cuDNN
+      collectives: MCCL
+      pytorch: torch_musa plugin
+      open: partially
+      since: "2022"
+    specs_zh:
+      vendor: 摩尔线程
+      hardware: MTT 系列 GPU
+      language: MUSA C++（对标 CUDA）
+      cuda_path: musify 源码转换
+      libs: 对标 cuBLAS/cuDNN 的自有库
+      pytorch: torch_musa 插件
+      open: 部分开源
+notes:
+  - >-
+    Source translation is not binary compatibility. HIPIFY, SYCLomatic and
+    musify rewrite your source; they do not run an existing CUDA binary, and
+    hand-tuned PTX or a CUTLASS-derived kernel usually needs real work.
+  - >-
+    Most people never touch any of this. If your models run under vLLM, SGLang
+    or llama.cpp, the engine has already absorbed the porting problem - which is
+    why the inference engine table matters more than this one for most readers.
+  - >-
+    The gap shows up at the edges: a brand-new attention variant, a custom
+    fused kernel, a paper's reference implementation. Those land on CUDA first
+    and reach other stacks months later, if at all.
+  - >-
+    Collectives are the quiet dependency. Multi-GPU training needs NCCL or its
+    equivalent to be fast and correct; RCCL and HCCL are real, but the
+    ecosystem's tuning assumptions are written around NCCL.
+notes_zh:
+  - >-
+    源码转换不等于二进制兼容。HIPIFY、SYCLomatic、musify 改的是你的源码，
+    跑不了现成的 CUDA 二进制；手写 PTX 或基于 CUTLASS 的算子通常还得真动手改。
+  - >-
+    大多数人根本不用碰这一层。只要模型跑在 vLLM、SGLang 或 llama.cpp 上，
+    移植问题已经被引擎吃掉了——所以对多数读者来说，推理引擎那张表比这张更有用。
+  - >-
+    差距体现在边缘地带：全新的注意力变体、自定义融合算子、论文的参考实现。
+    这些都先落在 CUDA 上，几个月后才到别的栈，甚至永远不到。
+  - >-
+    集合通信是容易被忽略的依赖。多卡训练要快且正确就得靠 NCCL 或其对应物；
+    RCCL 和 HCCL 是真实存在的，但整个生态的调优假设是围绕 NCCL 写的。

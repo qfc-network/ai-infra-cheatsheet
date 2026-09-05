@@ -26,10 +26,10 @@ items:
       gpus: 8 x MI300X
       memory_total: 1.5 TB HBM3
       bandwidth: 42.4 TB/s
-      fp8: 20.8 PFLOPS
+      fp8: 20.9 PFLOPS
       fp4: not supported
       scale_up: 8 GPUs, fully connected mesh, no switch
-      scale_out: OEM choice, typically 8 x 400 Gb/s
+      scale_out: 8 x PCIe Gen5 x16 (128 GB/s) per GPU
       cooling: air
       packaging: OCP UBB baseboard for OEM chassis
       launch: 2023-2024
@@ -47,7 +47,7 @@ items:
       gpus: 8 x MI325X
       memory_total: 2 TB HBM3E
       bandwidth: 48 TB/s
-      fp8: 20.8 PFLOPS
+      fp8: 20.9 PFLOPS
       fp4: not supported
       scale_up: 8 GPUs, fully connected mesh, no switch
       scale_out: OEM choice, typically 8 x 400 Gb/s

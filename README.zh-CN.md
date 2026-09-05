@@ -2,7 +2,7 @@
 
 [![generate](https://github.com/qfc-network/ai-infra-cheatsheet/actions/workflows/generate.yml/badge.svg)](https://github.com/qfc-network/ai-infra-cheatsheet/actions/workflows/generate.yml)
 [![Stars](https://img.shields.io/github/stars/qfc-network/ai-infra-cheatsheet?style=flat&logo=github)](https://github.com/qfc-network/ai-infra-cheatsheet/stargazers)
-[![Tables](https://img.shields.io/badge/tables-22-blue)](#目录)
+[![Tables](https://img.shields.io/badge/tables-23-blue)](#目录)
 [![License: CC BY 4.0](https://img.shields.io/badge/license-CC%20BY%204.0-green)](LICENSE)
 
 一份"真正用来跑模型的硬件"对照速查表：从桌上的 Mac mini 到 8,192 卡的 SuperPoD，
@@ -51,6 +51,7 @@
 
 **软件**
 - [推理引擎与本地应用](#推理引擎与本地应用)
+- [GPU 计算栈](#gpu-计算栈)
 
 **容量换算**
 - [量化格式与显存占用（权重）](#量化格式与显存占用权重)
@@ -302,18 +303,18 @@ AMD 的数据中心 GPU 线。相对同期 NVIDIA 产品，AMD 一直在 HBM 容
 | 计算单元 | 220 | 304 | 304 | 256 | 256 |
 | 显存 | 128 GB HBM2e | 192 GB HBM3 | 256 GB HBM3E | 288 GB HBM3E | 288 GB HBM3E |
 | 显存带宽 | 3.2 TB/s | 5.3 TB/s | 6 TB/s | 8 TB/s | 8 TB/s |
-| FP64 矩阵 | 95.7 TFLOPS | 163.4 TFLOPS | 163.4 TFLOPS | ~78.6 TFLOPS | ~78.6 TFLOPS |
-| FP16/BF16（稠密） | 383 TFLOPS | 1.3 PFLOPS | 1.3 PFLOPS | ~2.3 PFLOPS | 2.5 PFLOPS |
-| FP8（稠密） | 不支持 | 2.6 PFLOPS | 2.6 PFLOPS | 4.6 PFLOPS | 5.0 PFLOPS |
-| FP4 / MXFP4（稠密） | 不支持 | 不支持 | 不支持 | 9.2 PFLOPS | 10 PFLOPS |
-| GPU 互联 | Infinity Fabric 3rd gen | Infinity Fabric，8 卡全互联网格 | Infinity Fabric，8 卡全互联网格 | 第 4 代 Infinity Fabric，8 卡网格 | 第 4 代 Infinity Fabric，8 卡网格 |
+| FP64 矩阵 | 95.7 TFLOPS | 163.4 TFLOPS | 163.4 TFLOPS | 72.1 TFLOPS (vector and matrix) | 78.6 TFLOPS (vector and matrix) |
+| FP16/BF16（稠密） | 383 TFLOPS | 1.3 PFLOPS | 1.3 PFLOPS | 2.31 PFLOPS | 2.52 PFLOPS |
+| FP8（稠密） | 不支持 | 2.6 PFLOPS | 2.6 PFLOPS | 4.61 PFLOPS | 5.03 PFLOPS |
+| FP4 / MXFP4（稠密） | 不支持 | 不支持 | 不支持 | 9.23 PFLOPS (MXFP4) | 10.07 PFLOPS (MXFP4) |
+| GPU 互联 | Infinity Fabric 3rd gen | Infinity Fabric，8 卡环形，合计 896 GB/s | Infinity Fabric，8 卡环形，合计 896 GB/s | Infinity Fabric，卡对卡 160 GB/s，8 卡网格 | Infinity Fabric，卡对卡 160 GB/s，8 卡网格 |
 | 整卡功耗 | 560 W | 750 W | 1,000 W | 1,000 W | 1,400 W |
 | 散热 | 风冷或液冷 | 风冷 | 风冷 | 风冷 | 直接液冷 |
 | 上市时间 | 2021 | 2023 | 2024 | 2025 | 2025 |
 
 > - AMD 标的是 MXFP4 / MXFP6（OCP microscaling 格式），NVIDIA 标的是 NVFP4。 两者是不同的 4bit 编码，缩放块布局也不同，为其一量化的模型不能直接搬到另一边。
 > - CDNA 4 砍掉了 FP64：MI355X 的 FP64 矩阵算力大约只有 MI300X 的一半， 而 CDNA 3 本来是 HPC 友好的选择。NVIDIA 在 Blackwell Ultra 上是同一个方向。
-> - MI350 系列的 FP64 与 FP16 数字是用 AMD 公布的整机数据除以 8 推算的， 写进采购文件前请核对官方 datasheet PDF。
+> - 4bit 格式没有稀疏加成。AMD 规格书里只有 FP16、BF16、INT8 和 OCP-FP8 有"含稀疏" 那一列，MXFP6 和 MXFP4 都是 N/A——所以表里的 FP4 数字就是峰值本身，不是峰值的一半。
 
 ### AMD Instinct 整机与机柜
 
@@ -324,7 +325,7 @@ AMD 卖的是 8 卡 OAM 基板（"platform"）给 OEM，而不是 DGX 那样的�
 | GPU 数量 | 8 x MI300X | 8 x MI325X | 8 x MI355X | 72 x MI400-series |
 | 整机显存 | 1.5 TB HBM3 | 2 TB HBM3E | 2.3 TB HBM3E | 未公布 |
 | 总显存带宽 | 42.4 TB/s | 48 TB/s | 64 TB/s | 未公布 |
-| FP8（稠密） | 20.8 PFLOPS | 20.8 PFLOPS | 40.3 PFLOPS | 未公布 |
+| FP8（稠密） | 20.9 PFLOPS | 20.9 PFLOPS | 40.3 PFLOPS | 未公布 |
 | FP4 / MXFP4（稠密） | 不支持 | 不支持 | 80.5 PFLOPS | 未公布 |
 | scale-up 域 | 8 卡全互联网格，无交换芯片 | 8 卡全互联网格，无交换芯片 | 8 卡全互联网格，无交换芯片 | 72 卡经 UALink 互联，对标 NVL72 |
 | 横向扩展网络 | 由 OEM 决定，通常 8 x 400 Gb/s | 由 OEM 决定，通常 8 x 400 Gb/s | 由 OEM 决定，最高 8 x 400 Gb/s | Ultra Ethernet |
@@ -476,6 +477,27 @@ Gaudi 的特点不在算力，而在于横向扩展网络做进了芯片： 每�
 > - 要服务多用户就需要分页 KV cache 和连续批处理，这正是 vLLM 和 SGLang 存在的理由。 笔记本上一次只有一个人用的话，llama.cpp 更简单，也没损失多少。
 > - 后端支持变化很快，尤其是 Gaudi、昇腾、TPU、Apple Silicon 这些插件后端。 判断某颗芯片是否被支持前请查项目自己的安装文档——"支持"有时指社区插件， 而不是经过测试的一等公民路径。
 > - 这张表也解释了上面那些硬件表里"软件栈"那一列为什么重要： 没有引擎做后端的 GPU，规格书写得再好也用不起来。
+
+### GPU 计算栈
+
+CUDA 在各家的对应物。值得注意的是每一家都做了一条 CUDA 转换路径—— 这件事本身最能说明：生态是写给 CUDA 的，不是写给硬件的。
+
+| 参数 | CUDA | ROCm | oneAPI / SYCL | Metal + MLX | CANN | MUSA |
+|---|---|---|---|---|---|---|
+| 厂商 | NVIDIA | AMD | Intel | Apple | 华为 | 摩尔线程 |
+| 支持硬件 | 仅 NVIDIA GPU | Instinct MI 系列，部分 Radeon 与 Radeon PRO | Arc、Arc Pro、数据中心 GPU、至强 CPU | Apple Silicon | 昇腾 NPU | MTT 系列 GPU |
+| 编程模型 | CUDA C++, PTX | HIP（刻意做成 CUDA 的样子） | SYCL / DPC++（Khronos 开放标准） | Metal Shading Language；MLX 数组框架 | Ascend C、AscendCL | MUSA C++（对标 CUDA） |
+| CUDA 迁移路径 | 不适用——它就是别人要迁过来的目标 | HIPIFY 源码转换 | SYCLomatic 源码转换 | 没有，只能手工移植 | 无官方路径，需手工移植 | musify 源码转换 |
+| 核心库 | cuBLAS, cuDNN, CUTLASS | rocBLAS, MIOpen, Composable Kernel | oneDNN, oneMKL | MPS Graph, MLX | 厂商自有算子库 | 对标 cuBLAS/cuDNN 的自有库 |
+| 集合通信 | NCCL | RCCL | oneCCL | 无多机方案 | HCCL | MCCL |
+| PyTorch 支持 | 一等公民，参考实现 | 已上游，有官方 ROCm wheel | 已上游的 XPU 后端 | MPS 后端，算子覆盖比 CUDA 窄 | torch_npu 插件，另有 vLLM / SGLang 后端 | torch_musa 插件 |
+| 是否开源 | 否 | 是 | 是 | MLX 开源，Metal 不开源 | 部分开源 | 部分开源 |
+| 起始年份 | 2007 | 2016 | 2020 | 2014 / 2023 | 2018 | 2022 |
+
+> - 源码转换不等于二进制兼容。HIPIFY、SYCLomatic、musify 改的是你的源码， 跑不了现成的 CUDA 二进制；手写 PTX 或基于 CUTLASS 的算子通常还得真动手改。
+> - 大多数人根本不用碰这一层。只要模型跑在 vLLM、SGLang 或 llama.cpp 上， 移植问题已经被引擎吃掉了——所以对多数读者来说，推理引擎那张表比这张更有用。
+> - 差距体现在边缘地带：全新的注意力变体、自定义融合算子、论文的参考实现。 这些都先落在 CUDA 上，几个月后才到别的栈，甚至永远不到。
+> - 集合通信是容易被忽略的依赖。多卡训练要快且正确就得靠 NCCL 或其对应物； RCCL 和 HCCL 是真实存在的，但整个生态的调优假设是围绕 NCCL 写的。
 
 ## 容量换算
 

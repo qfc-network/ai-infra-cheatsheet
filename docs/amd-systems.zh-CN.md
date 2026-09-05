@@ -7,7 +7,7 @@ AMD 卖的是 8 卡 OAM 基板（"platform"）给 OEM，而不是 DGX 那样的�
 | GPU 数量 | 8 x MI300X | 8 x MI325X | 8 x MI355X | 72 x MI400-series |
 | 整机显存 | 1.5 TB HBM3 | 2 TB HBM3E | 2.3 TB HBM3E | 未公布 |
 | 总显存带宽 | 42.4 TB/s | 48 TB/s | 64 TB/s | 未公布 |
-| FP8（稠密） | 20.8 PFLOPS | 20.8 PFLOPS | 40.3 PFLOPS | 未公布 |
+| FP8（稠密） | 20.9 PFLOPS | 20.9 PFLOPS | 40.3 PFLOPS | 未公布 |
 | FP4 / MXFP4（稠密） | 不支持 | 不支持 | 80.5 PFLOPS | 未公布 |
 | scale-up 域 | 8 卡全互联网格，无交换芯片 | 8 卡全互联网格，无交换芯片 | 8 卡全互联网格，无交换芯片 | 72 卡经 UALink 互联，对标 NVL72 |
 | 横向扩展网络 | 由 OEM 决定，通常 8 x 400 Gb/s | 由 OEM 决定，通常 8 x 400 Gb/s | 由 OEM 决定，最高 8 x 400 Gb/s | Ultra Ethernet |

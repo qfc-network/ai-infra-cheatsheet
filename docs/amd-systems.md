@@ -7,10 +7,10 @@ AMD sells an 8-GPU OAM baseboard (the "platform") to OEMs rather than a branded 
 | GPUs | 8 x MI300X | 8 x MI325X | 8 x MI355X | 72 x MI400-series |
 | Total GPU memory | 1.5 TB HBM3 | 2 TB HBM3E | 2.3 TB HBM3E | TBA |
 | Aggregate bandwidth | 42.4 TB/s | 48 TB/s | 64 TB/s | TBA |
-| FP8 (dense) | 20.8 PFLOPS | 20.8 PFLOPS | 40.3 PFLOPS | TBA |
+| FP8 (dense) | 20.9 PFLOPS | 20.9 PFLOPS | 40.3 PFLOPS | TBA |
 | FP4 / MXFP4 (dense) | not supported | not supported | 80.5 PFLOPS | TBA |
 | Scale-up domain | 8 GPUs, fully connected mesh, no switch | 8 GPUs, fully connected mesh, no switch | 8 GPUs, fully connected mesh, no switch | 72 GPUs over UALink - AMD's answer to NVL72 |
-| Scale-out network | OEM choice, typically 8 x 400 Gb/s | OEM choice, typically 8 x 400 Gb/s | OEM choice, up to 8 x 400 Gb/s | Ultra Ethernet |
+| Scale-out network | 8 x PCIe Gen5 x16 (128 GB/s) per GPU | OEM choice, typically 8 x 400 Gb/s | OEM choice, up to 8 x 400 Gb/s | Ultra Ethernet |
 | Cooling | air | air | air or direct liquid | liquid |
 | Sold as | OCP UBB baseboard for OEM chassis | OCP UBB baseboard for OEM chassis | OCP UBB baseboard for OEM chassis | full rack reference design |
 | Availability | 2023-2024 | 2024-2025 | 2025 | 2026 (roadmap) |
