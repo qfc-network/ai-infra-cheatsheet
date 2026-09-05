@@ -1,0 +1,142 @@
+id: ascend
+title: Huawei Ascend Accelerators
+title_zh: 华为昇腾加速卡
+summary: >-
+  Huawei publishes compute and interconnect figures for the 950 series and later
+  but never released per-chip datasheets for the 910B or 910C, so the older rows
+  are marked as unpublished rather than filled with analyst estimates.
+summary_zh: >-
+  华为公布了 950 系列及以后的算力与互联数字，但从未发布 910B / 910C 的单芯片规格书，
+  所以老型号这几行标注为"未公布"，而不是填分析师的估算值。
+orientation: columns
+fields:
+  - {key: fp8,           label: FP8,                    label_zh: FP8}
+  - {key: fp4,           label: FP4 / MXFP4,            label_zh: FP4 / MXFP4}
+  - {key: memory,        label: Memory,                 label_zh: 显存}
+  - {key: interconnect,  label: Interconnect per chip,  label_zh: 单芯片互联带宽}
+  - {key: used_in,       label: Used in,                label_zh: 用于}
+  - {key: availability,  label: Availability,           label_zh: 可用时间}
+  - {key: sourcing,      label: Spec source,            label_zh: 规格来源}
+items:
+  - id: ascend-910b
+    name: Ascend 910B
+    specs:
+      fp8: not officially published
+      fp4: not supported
+      memory: not officially published
+      interconnect: not officially published
+      used_in: Atlas 800 servers
+      availability: shipping since 2023
+      sourcing: no public datasheet
+    specs_zh:
+      fp8: 未公布
+      fp4: 不支持
+      memory: 未公布
+      interconnect: 未公布
+      used_in: Atlas 800 系列服务器
+      availability: 2023 年起出货
+      sourcing: 无公开规格书
+  - id: ascend-910c
+    name: Ascend 910C
+    specs:
+      fp8: not officially published
+      fp4: not supported
+      memory: not officially published
+      interconnect: Unified Bus (UB)
+      used_in: Atlas 900 A3 SuperPoD
+      availability: shipping since 2025
+      sourcing: no public datasheet
+    specs_zh:
+      fp8: 未公布
+      fp4: 不支持
+      memory: 未公布
+      interconnect: Unified Bus（UB 总线）
+      used_in: Atlas 900 A3 SuperPoD
+      availability: 2025 年起出货
+      sourcing: 无公开规格书
+  - id: ascend-950pr
+    name: Ascend 950PR
+    specs:
+      fp8: 1 PFLOPS
+      fp4: 2 PFLOPS (MXFP4)
+      memory: not stated in the keynote
+      interconnect: 2 TB/s
+      used_in: Atlas 950 SuperPoD
+      availability: Q1 2026
+      sourcing: Huawei Connect 2025 keynote
+    specs_zh:
+      memory: keynote 未提及
+      used_in: Atlas 950 SuperPoD
+      availability: 2026 Q1
+      sourcing: 华为全联接 2025 主题演讲
+    sources:
+      - https://www.huawei.com/en/news/2025/9/hc-xu-keynote-speech
+  - id: ascend-950dt
+    name: Ascend 950DT
+    specs:
+      fp8: 1 PFLOPS
+      fp4: 2 PFLOPS (MXFP4)
+      memory: not stated in the keynote
+      interconnect: 2 TB/s
+      used_in: Atlas 950 SuperPoD
+      availability: Q4 2026
+      sourcing: Huawei Connect 2025 keynote
+    specs_zh:
+      memory: keynote 未提及
+      used_in: Atlas 950 SuperPoD
+      availability: 2026 Q4
+      sourcing: 华为全联接 2025 主题演讲
+    sources:
+      - https://www.huawei.com/en/news/2025/9/hc-xu-keynote-speech
+  - id: ascend-960
+    name: Ascend 960
+    specs:
+      fp8: 2 PFLOPS
+      fp4: 4 PFLOPS
+      memory: not stated in the keynote
+      interconnect: not stated
+      used_in: Atlas 960 SuperPoD
+      availability: Q4 2027
+      sourcing: Huawei Connect 2025 keynote
+    specs_zh:
+      memory: keynote 未提及
+      interconnect: 未提及
+      used_in: Atlas 960 SuperPoD
+      availability: 2027 Q4
+      sourcing: 华为全联接 2025 主题演讲
+    sources:
+      - https://www.huawei.com/en/news/2025/9/hc-xu-keynote-speech
+  - id: ascend-970
+    name: Ascend 970
+    specs:
+      fp8: 4 PFLOPS
+      fp4: 8 PFLOPS
+      memory: not stated in the keynote
+      interconnect: 4 TB/s
+      used_in: TBA
+      availability: Q4 2028
+      sourcing: Huawei Connect 2025 keynote
+    specs_zh:
+      memory: keynote 未提及
+      used_in: 未公布
+      availability: 2028 Q4
+      sourcing: 华为全联接 2025 主题演讲
+    sources:
+      - https://www.huawei.com/en/news/2025/9/hc-xu-keynote-speech
+notes:
+  - >-
+    For scale: an Ascend 950 at 1 PFLOPS FP8 sits near a B200 (4.5 PFLOPS FP8
+    dense) per chip. Huawei's strategy is not per-chip parity - it is putting
+    far more chips in one interconnect domain, which the SuperPoD table shows.
+  - >-
+    Widely circulated 910B and 910C figures (64/128 GB HBM, 376/780 TFLOPS)
+    come from analysts and secondary reporting, not Huawei. They are omitted
+    here rather than presented as specifications.
+notes_zh:
+  - >-
+    对比一下量级：昇腾 950 的 1 PFLOPS FP8，单芯片大致在 B200（稠密 4.5 PFLOPS FP8）
+    的量级之下。华为的策略本来也不是单芯片对标，而是把远多的芯片放进同一个互联域里——
+    这一点看 SuperPoD 那张表更清楚。
+  - >-
+    流传很广的 910B / 910C 数字（64/128 GB HBM、376/780 TFLOPS）来自分析机构和二手报道，
+    不是华为公布的。这里选择留空而不是当作规格写进去。

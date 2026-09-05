@@ -1,0 +1,99 @@
+id: china-other
+title: Other Chinese AI Accelerators
+title_zh: 中国大陆其他 AI 芯片
+summary: >-
+  Cambricon, Moore Threads, Hygon, Biren and Kunlunxin all ship or have shipped
+  training and inference silicon. None of them publish datasheets at the level
+  the rest of this repo relies on, so this table is deliberately coarse.
+summary_zh: >-
+  寒武纪、摩尔线程、海光、壁仞、昆仑芯都有在售或曾经出货的训练/推理芯片。
+  它们都没有本仓库其他部分所依赖的那种公开规格书，所以这张表刻意只写粗粒度信息。
+orientation: rows
+fields:
+  - {key: vendor,    label: Vendor,          label_zh: 厂商}
+  - {key: memory,    label: Memory,          label_zh: 显存}
+  - {key: status,    label: Status,          label_zh: 状态}
+  - {key: note,      label: Note,            label_zh: 说明}
+items:
+  - id: mlu590
+    name: MLU590 (思元590)
+    specs:
+      vendor: Cambricon 寒武纪
+      memory: reported 64 GB
+      status: in volume production
+      note: the most widely deployed non-Huawei domestic training chip
+    specs_zh:
+      vendor: 寒武纪
+      memory: 据报道 64 GB
+      status: 已量产
+      note: 华为之外部署最广的国产训练芯片
+  - id: mtt-s5000
+    name: MTT S5000
+    specs:
+      vendor: Moore Threads 摩尔线程
+      memory: reported 64 GB
+      status: shipping
+      note: full-function GPU line with its own CUDA-compatible stack (MUSA)
+    specs_zh:
+      vendor: 摩尔线程
+      memory: 据报道 64 GB
+      status: 在售
+      note: 全功能 GPU 路线，自有 MUSA 软件栈，主打 CUDA 兼容
+  - id: hygon-dcu
+    name: Hygon DCU (深算系列)
+    specs:
+      vendor: Hygon 海光
+      memory: varies by generation
+      status: shipping
+      note: derived from an AMD GCN license; ROCm-like software stack
+    specs_zh:
+      vendor: 海光
+      memory: 各代不同
+      status: 在售
+      note: 源自 AMD GCN 授权，软件栈与 ROCm 相近
+  - id: br100
+    name: BR100
+    specs:
+      vendor: Biren 壁仞
+      memory: reported 64 GB
+      status: never reached volume
+      note: strong 2022 paper specs; blocked by export controls on its foundry
+    specs_zh:
+      vendor: 壁仞
+      memory: 据报道 64 GB
+      status: 未能量产
+      note: 2022 年纸面规格很强，因代工受出口管制未能落地
+  - id: kunlun-p800
+    name: Kunlun P800
+    specs:
+      vendor: Baidu Kunlunxin 昆仑芯
+      memory: reported 64 GB
+      status: deployed internally at scale
+      note: mostly consumed inside Baidu rather than sold broadly
+    specs_zh:
+      vendor: 百度昆仑芯
+      memory: 据报道 64 GB
+      status: 内部大规模部署
+      note: 主要自用，对外销售有限
+notes:
+  - >-
+    Read this table as a map of who exists, not as specifications. Every value
+    marked "reported" traces to Chinese-language secondary sources and industry
+    aggregators, not vendor datasheets, which is below the sourcing bar the rest
+    of this repo holds to.
+  - >-
+    Pull requests replacing any row with vendor-published figures and a citation
+    are very welcome - that is exactly the gap here.
+  - >-
+    Software is the harder problem than silicon for all of these. Each ships its
+    own stack (MUSA, Cambricon Neuware, Hygon's ROCm fork), and porting effort
+    rather than peak FLOPS usually decides whether a chip is usable.
+notes_zh:
+  - >-
+    这张表请当作"谁在场"的地图，不要当规格书用。凡标注"据报道"的数值都来自
+    中文二手来源和行业汇总站，不是厂商规格书，达不到本仓库其他部分的来源标准。
+  - >-
+    非常欢迎用厂商公布数据加引用来替换其中任何一行——这里正是缺口所在。
+  - >-
+    对这几家来说，软件都比硅片更难。各家有各家的栈（MUSA、寒武纪 Neuware、
+    海光的 ROCm 分支），决定一颗芯片能不能用的通常是移植工作量，而不是峰值算力。

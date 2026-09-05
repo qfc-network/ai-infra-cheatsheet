@@ -36,6 +36,11 @@ sizing math that decides what fits. Every table is generated from the YAML in
 **Intel**
 - [Intel Gaudi Accelerators](#intel-gaudi-accelerators)
 
+**China**
+- [Huawei Ascend Accelerators](#huawei-ascend-accelerators)
+- [Huawei Atlas SuperPoDs](#huawei-atlas-superpods)
+- [Other Chinese AI Accelerators](#other-chinese-ai-accelerators)
+
 **Head to head**
 - [Data Center - NVIDIA vs AMD vs Intel](#data-center---nvidia-vs-amd-vs-intel)
 - [Local Options by Memory Tier](#local-options-by-memory-tier)
@@ -350,6 +355,60 @@ Gaudi's distinguishing feature is not the compute, it is that the scale-out netw
 > - On-die Ethernet is the architectural bet: scale-out runs on standard RoCE switches instead of InfiniBand or NVLink, which is cheaper and more portable but gives up the coherent 72-GPU domain a GB300 NVL72 rack provides.
 > - Intel's post-Gaudi-3 roadmap has changed more than once. Verify what is actually shipping before planning around any successor part.
 
+## China
+
+### Huawei Ascend Accelerators
+
+Huawei publishes compute and interconnect figures for the 950 series and later but never released per-chip datasheets for the 910B or 910C, so the older rows are marked as unpublished rather than filled with analyst estimates.
+
+| Parameter | Ascend 910B | Ascend 910C | Ascend 950PR | Ascend 950DT | Ascend 960 | Ascend 970 |
+|---|---|---|---|---|---|---|
+| FP8 | not officially published | not officially published | 1 PFLOPS | 1 PFLOPS | 2 PFLOPS | 4 PFLOPS |
+| FP4 / MXFP4 | not supported | not supported | 2 PFLOPS (MXFP4) | 2 PFLOPS (MXFP4) | 4 PFLOPS | 8 PFLOPS |
+| Memory | not officially published | not officially published | not stated in the keynote | not stated in the keynote | not stated in the keynote | not stated in the keynote |
+| Interconnect per chip | not officially published | Unified Bus (UB) | 2 TB/s | 2 TB/s | not stated | 4 TB/s |
+| Used in | Atlas 800 servers | Atlas 900 A3 SuperPoD | Atlas 950 SuperPoD | Atlas 950 SuperPoD | Atlas 960 SuperPoD | TBA |
+| Availability | shipping since 2023 | shipping since 2025 | Q1 2026 | Q4 2026 | Q4 2027 | Q4 2028 |
+| Spec source | no public datasheet | no public datasheet | Huawei Connect 2025 keynote | Huawei Connect 2025 keynote | Huawei Connect 2025 keynote | Huawei Connect 2025 keynote |
+
+> - For scale: an Ascend 950 at 1 PFLOPS FP8 sits near a B200 (4.5 PFLOPS FP8 dense) per chip. Huawei's strategy is not per-chip parity - it is putting far more chips in one interconnect domain, which the SuperPoD table shows.
+> - Widely circulated 910B and 910C figures (64/128 GB HBM, 376/780 TFLOPS) come from analysts and secondary reporting, not Huawei. They are omitted here rather than presented as specifications.
+
+### Huawei Atlas SuperPoDs
+
+Huawei's answer to NVL72 is not a better chip, it is a much larger coherent domain. Where a GB300 NVL72 rack holds 72 GPUs, an Atlas 950 puts 8,192 accelerators on one interconnect.
+
+| Parameter | Atlas 900 A3 (CloudMatrix 384) | Atlas 950 SuperPoD | Atlas 960 SuperPoD |
+|---|---|---|---|
+| Accelerators | 384 x Ascend 910C | 8,192 x Ascend 950DT | 15,488 x Ascend 960 |
+| Total memory | not officially published | 1,152 TB | 4,460 TB |
+| Interconnect BW | Unified Bus, all-to-all non-blocking | 16 PB/s | 34 PB/s |
+| FP8 compute | not officially published | 8 EFLOPS | 30 EFLOPS |
+| FP4 compute | not supported | 16 EFLOPS | 60 EFLOPS |
+| Cabinets | 16 | 160 (128 compute + 32 comms) | 220 (176 compute + 44 comms) |
+| NVIDIA counterpart | GB200 NVL72 | beyond NVL72 scale - compare at cluster level | beyond NVL72 scale - compare at cluster level |
+| Availability | March 2025, 300+ deployed | Q4 2026 | Q4 2027 |
+
+> - Compare like with like. A GB300 NVL72 is one rack; an Atlas 950 is 160 cabinets. Huawei is trading power and floor space for domain size because per-chip it cannot match Blackwell on process node.
+> - Everything here is from Huawei's own Huawei Connect 2025 keynote. Widely quoted CloudMatrix figures such as "48 TB HBM" and "300 PFLOPS dense BF16" come from analyst teardowns, not Huawei, and are left out.
+> - Power draw is the number Huawei does not headline and NVIDIA does. Treat any performance-per-watt comparison against NVL72 with suspicion until someone publishes measured rack power.
+
+### Other Chinese AI Accelerators
+
+Cambricon, Moore Threads, Hygon, Biren and Kunlunxin all ship or have shipped training and inference silicon. None of them publish datasheets at the level the rest of this repo relies on, so this table is deliberately coarse.
+
+| Name | Vendor | Memory | Status | Note |
+|---|---|---|---|---|
+| MLU590 (思元590) | Cambricon 寒武纪 | reported 64 GB | in volume production | the most widely deployed non-Huawei domestic training chip |
+| MTT S5000 | Moore Threads 摩尔线程 | reported 64 GB | shipping | full-function GPU line with its own CUDA-compatible stack (MUSA) |
+| Hygon DCU (深算系列) | Hygon 海光 | varies by generation | shipping | derived from an AMD GCN license; ROCm-like software stack |
+| BR100 | Biren 壁仞 | reported 64 GB | never reached volume | strong 2022 paper specs; blocked by export controls on its foundry |
+| Kunlun P800 | Baidu Kunlunxin 昆仑芯 | reported 64 GB | deployed internally at scale | mostly consumed inside Baidu rather than sold broadly |
+
+> - Read this table as a map of who exists, not as specifications. Every value marked "reported" traces to Chinese-language secondary sources and industry aggregators, not vendor datasheets, which is below the sourcing bar the rest of this repo holds to.
+> - Pull requests replacing any row with vendor-published figures and a citation are very welcome - that is exactly the gap here.
+> - Software is the harder problem than silicon for all of these. Each ships its own stack (MUSA, Cambricon Neuware, Hygon's ROCm fork), and porting effort rather than peak FLOPS usually decides whether a chip is usable.
+
 ## Head to head
 
 ### Data Center - NVIDIA vs AMD vs Intel
@@ -435,6 +494,10 @@ KV bytes per token = 2 x layers x kv_heads x head_dim x bytes_per_element. Figur
 - **Vendor AI figures are not comparable.** NVIDIA quotes FP8 for Ada and FP4
   for Blackwell; AMD quotes MXFP4; Apple does not publish an equivalent at all.
 - **Roadmap entries** come from keynotes and press releases, not datasheets.
+- **Sourcing is uneven by vendor.** NVIDIA, AMD, Intel and Apple publish
+  datasheets; Huawei publishes keynote figures for the 950 series and nothing
+  per-chip for the 910 series; other Chinese vendors publish little. Cells say
+  "not officially published" rather than borrowing analyst estimates.
 
 ## Contributing
 

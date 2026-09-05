@@ -48,6 +48,10 @@ ORDER = [
     "amd-systems",
     # Intel
     "intel-accelerators",
+    # China
+    "ascend",
+    "ascend-superpods",
+    "china-other",
     # Cross-vendor
     "head-to-head",
     "local-options",
