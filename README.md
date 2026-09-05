@@ -7,6 +7,11 @@ sizing math that decides what fits. Every table is generated from the YAML in
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
+> **Companion repo:** [qfc-network/ai-infra](https://github.com/qfc-network/ai-infra) —
+> deep dives into the papers and open-source systems behind these numbers
+> (FlashAttention, PagedAttention, GQA, quantization, NVLink and more).
+> This repo holds the hardware numbers; that one explains the mechanisms.
+
 ## Contents
 
 **Desktop and local**

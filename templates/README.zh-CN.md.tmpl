@@ -6,6 +6,10 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
+> **姊妹项目：**[qfc-network/ai-infra](https://github.com/qfc-network/ai-infra) ——
+> 这些数字背后的论文与开源系统深度解析（FlashAttention、PagedAttention、GQA、
+> 量化、NVLink 等）。本仓库管硬件数字，那边讲原理。
+
 ## 目录
 
 **桌面与本地**
