@@ -15,6 +15,7 @@
 **桌面与本地**
 - [桌面与本地 AI 主机](#桌面与本地-ai-主机)
 - [消费级与工作站 GPU](#消费级与工作站-gpu)
+- [AMD Radeon 本地 AI 显卡](#amd-radeon-本地-ai-显卡)
 
 **NVIDIA 数据中心**
 - [DGX 整机](#dgx-整机)
@@ -42,19 +43,20 @@
 
 能摆在桌上直接跑模型的机器，分两条路线：统一内存（容量大、带宽中等） 和独立显卡（容量小、带宽极高）。能装下多大模型看容量，出词多快看带宽。
 
-| 参数 | NVIDIA DGX Spark | GB10 OEM boxes | Mac mini (M5 Pro) | Mac Studio (M5 Max) | Mac Studio (M5 Ultra) | RTX 5090 desktop |
-|---|---|---|---|---|---|---|
-| 芯片 | GB10 Grace Blackwell（20 核 Arm） | GB10 Grace Blackwell（同一颗芯片） | Apple M5 Pro | Apple M5 Max | Apple M5 Ultra | GB202 独立显卡 |
-| 可用于模型的内存 | 128 GB LPDDR5X 统一内存 | 128 GB LPDDR5X 统一内存 | 24 / 48 / 64 GB 统一内存 | 36 / 48 / 64 / 128 GB 统一内存 | 96 / 256 / 512 GB 统一内存 | 32 GB GDDR7（仅显存） |
-| 内存带宽 | 273 GB/s | 273 GB/s | 307 GB/s | 460-614 GB/s | 1.2 TB/s | 1,792 GB/s |
-| 厂商标称算力 | 1 PFLOP FP4（稀疏） | 1 PFLOP FP4（稀疏） | 官方未给出可比口径 | 官方未给出可比口径 | 官方未给出可比口径 | 3,352 AI TOPS FP4（稀疏） |
-| 低精度支持 | 原生 FP4 / FP8（Blackwell 张量核） | 原生 FP4 / FP8 | 无 FP4/FP8 张量通路，走 GPU + 神经引擎 | 无 FP4/FP8 张量通路 | 无 FP4/FP8 张量通路 | 原生 FP4 / FP8 |
-| 网络 | ConnectX-7 200 GbE + 10 GbE | ConnectX-7 200 GbE + 10 GbE | 10 GbE, Thunderbolt 5 | 10 GbE, Thunderbolt 5 | 10 GbE, Thunderbolt 5 | 取决于主板 |
-| 多机互联 | 最多 4 台互联，约 700B 参数 | 与 DGX Spark 相同 | 只有雷雳，算不上互联网络 | 只有雷雳 | 只有雷雳 | 只有 PCIe，无 NVLink |
-| 整机功耗 | 240 W 电源（芯片 TDP 140 W） | ~240 W | 最大持续 155 W | 最大持续 480 W | 最大持续 480 W | 显卡 575 W，整机约 1 kW |
-| 大致能跑到多大 | 单机 70B 四位量化 | 单机 70B 四位量化 | 64 GB 版可跑 32B 四位量化 | 128 GB 版可跑 70B 四位量化 | 512 GB 版可跑 400B+ 四位量化 | 30B 四位量化，32 GB 是硬上限 |
-| 上市时间 | 2025 | 2025 | 2026 | 2026 | 2026 | 2025 |
+| 参数 | NVIDIA DGX Spark | GB10 OEM boxes | Ryzen AI Max+ 395 box | Mac mini (M5 Pro) | Mac Studio (M5 Max) | Mac Studio (M5 Ultra) | RTX 5090 desktop |
+|---|---|---|---|---|---|---|---|
+| 芯片 | GB10 Grace Blackwell（20 核 Arm） | GB10 Grace Blackwell（同一颗芯片） | AMD Ryzen AI Max+ 395（16 核 Zen 5 + Radeon 8060S） | Apple M5 Pro | Apple M5 Max | Apple M5 Ultra | GB202 独立显卡 |
+| 可用于模型的内存 | 128 GB LPDDR5X 统一内存 | 128 GB LPDDR5X 统一内存 | 最高 128 GB 统一内存，其中最多 96 GB 可划为显存 | 24 / 48 / 64 GB 统一内存 | 36 / 48 / 64 / 128 GB 统一内存 | 96 / 256 / 512 GB 统一内存 | 32 GB GDDR7（仅显存） |
+| 内存带宽 | 273 GB/s | 273 GB/s | 256 GB/s | 307 GB/s | 460-614 GB/s | 1.2 TB/s | 1,792 GB/s |
+| 厂商标称算力 | 1 PFLOP FP4（稀疏） | 1 PFLOP FP4（稀疏） | NPU 50+ TOPS（INT8）；GPU 侧无可比的 FLOPS 口径 | 官方未给出可比口径 | 官方未给出可比口径 | 官方未给出可比口径 | 3,352 AI TOPS FP4（稀疏） |
+| 低精度支持 | 原生 FP4 / FP8（Blackwell 张量核） | 原生 FP4 / FP8 | FP16 / INT8（RDNA 3.5，无 FP8 与 FP4） | 无 FP4/FP8 张量通路，走 GPU + 神经引擎 | 无 FP4/FP8 张量通路 | 无 FP4/FP8 张量通路 | 原生 FP4 / FP8 |
+| 网络 | ConnectX-7 200 GbE + 10 GbE | ConnectX-7 200 GbE + 10 GbE | 2.5~10 GbE，视机型而定 | 10 GbE, Thunderbolt 5 | 10 GbE, Thunderbolt 5 | 10 GbE, Thunderbolt 5 | 取决于主板 |
+| 多机互联 | 最多 4 台互联，约 700B 参数 | 与 DGX Spark 相同 | 无 | 只有雷雳，算不上互联网络 | 只有雷雳 | 只有雷雳 | 只有 PCIe，无 NVLink |
+| 整机功耗 | 240 W 电源（芯片 TDP 140 W） | ~240 W | 芯片约 120 W，整机视机型 | 最大持续 155 W | 最大持续 480 W | 最大持续 480 W | 显卡 575 W，整机约 1 kW |
+| 大致能跑到多大 | 单机 70B 四位量化 | 单机 70B 四位量化 | 在 96 GB 显存划分内可跑 70B 四位量化 | 64 GB 版可跑 32B 四位量化 | 128 GB 版可跑 70B 四位量化 | 512 GB 版可跑 400B+ 四位量化 | 30B 四位量化，32 GB 是硬上限 |
+| 上市时间 | 2025 | 2025 | 2025 | 2026 | 2026 | 2026 | 2025 |
 
+> - Ryzen AI Max+ 395 用在 Framework Desktop、GMKtec EVO-X2、HP ZBook Ultra G1a 以及 AMD 自己的 Ryzen AI Halo 开发平台上。它是 AMD 对标 DGX Spark 和 Mac Studio 的方案：统一内存、无 FP4、无集群网络。
 > - "GB10 OEM 机型" 就是同一颗 GB10 换了个壳：华硕 Ascent GX10、戴尔 Pro Max with GB10、 惠普 ZGX Nano、联想和微星都有。差别在存储、机箱和价格，算力与带宽完全一样。
 > - 看出词速度就看带宽。5090 的带宽是 DGX Spark 的 6.6 倍，但内存只有四分之一： Spark 能跑 5090 根本装不下的模型，而装得下的模型 5090 快得多。
 > - 苹果没有公布可与 NVIDIA AI TOPS 对比的算力口径，且 Apple Silicon 没有 FP4/FP8 张量通路，4bit 模型要靠软件反量化。容量和带宽才是能诚实对比的两项。
@@ -81,6 +83,28 @@
 > - RTX 3090 之后 GeForce 就没有 NVLink 了。4090/5090 多卡做张量并行只能走 PCIe， 比 DGX 机内 1.8 TB/s 的 NVLink 慢一个数量级左右——跑流水线并行或每卡一个副本没问题， 跑张量并行会很难受。
 > - GeForce 没有 ECC、没有 MIG，而且 NVIDIA 的 GeForce 驱动许可协议对数据中心部署有限制。 要对外出租算力前请自己读一遍许可条款；这也是各家托管商买 RTX PRO 或数据中心卡的主要原因。
 > - "本地 LLM 大致可跑" 按权重加少量 KV cache 估算。长上下文、批量推理或不量化都会显著拉低上限。
+
+### AMD Radeon 本地 AI 显卡
+
+Radeon 在本地推理上的卖点是"每块钱能买到多少显存"：W7900 有 48 GB、R9700 有 32 GB， 而 NVIDIA 消费级的天花板是 32 GB。代价是 ROCm 到底支持哪些卡。
+
+| 参数 | RX 7900 XTX | RX 9070 XT | Radeon AI PRO R9700 | Radeon PRO W7900 |
+|---|---|---|---|---|
+| 架构 | RDNA 3 | RDNA 4 | RDNA 4 | RDNA 3 |
+| 计算单元 | 96 | 64 | 64 | 96 |
+| 显存 | 24 GB GDDR6 | 16 GB GDDR6 | 32 GB GDDR6 | 48 GB GDDR6 |
+| 显存带宽 | 960 GB/s | 645 GB/s | 645 GB/s | 864 GB/s |
+| 最低矩阵精度 | FP16 / INT8 / INT4 (WMMA) | FP8（RDNA 4 新增 FP8 WMMA） | FP8 | FP16 / INT8 / INT4 (WMMA) |
+| ROCm 支持 | 官方支持 | ROCm 7.0 起支持 | 官方支持，面向 AI 的型号 | 官方支持 |
+| 卡间互联 | 仅 PCIe | 仅 PCIe | 仅 PCIe | 仅 PCIe |
+| 整卡功耗 | 355 W | 304 W | 300 W | 295 W |
+| 本地 LLM 大致可跑 | 约 30B 四位量化 | 14B 四位量化 | 约 30B 四位量化，70B 很勉强 | 单卡 70B 四位量化 |
+| 上市时间 | 2022 | 2025 | 2025 | 2023 |
+
+> - 买之前查 ROCm 兼容性矩阵，别看营销页。AMD 官方支持的消费卡名单很短， 而且和 ROCm 版本绑定，不在名单里的卡往往只能靠社区编译版本跑。
+> - 别把 AMD 给 7900 XTX 标的 "5.3 TB/s" 当带宽。那是 Infinity Cache 的带宽， 真正决定出词速度的 GDDR6 带宽是 960 GB/s。
+> - RDNA 3 没有 FP8 矩阵通路，整条 Radeon 线都没有 FP4，所以这里每一张卡跑 4bit 模型都要软件反量化。只有 RDNA 4（9070 XT、R9700）加了 FP8 WMMA。
+> - Radeon 在任何档位都没有 NVLink 的对应物，多卡只能走 PCIe—— 和 RTX 4090/5090 主机是同一个限制。
 
 ## NVIDIA 数据中心
 

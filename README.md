@@ -17,6 +17,7 @@ sizing math that decides what fits. Every table is generated from the YAML in
 **Desktop and local**
 - [Desktop & Local AI Systems](#desktop--local-ai-systems)
 - [Consumer & Workstation GPUs](#consumer--workstation-gpus)
+- [AMD Radeon for Local AI](#amd-radeon-for-local-ai)
 
 **NVIDIA data center**
 - [DGX Systems](#dgx-systems)
@@ -44,19 +45,20 @@ sizing math that decides what fits. Every table is generated from the YAML in
 
 Boxes you can put on a desk and run a model on. Two different bets: unified memory (lots of capacity, moderate bandwidth) versus a discrete GPU (little capacity, huge bandwidth). Decode speed tracks bandwidth; what fits at all tracks capacity.
 
-| Parameter | NVIDIA DGX Spark | GB10 OEM boxes | Mac mini (M5 Pro) | Mac Studio (M5 Max) | Mac Studio (M5 Ultra) | RTX 5090 desktop |
-|---|---|---|---|---|---|---|
-| Chip | GB10 Grace Blackwell (20-core Arm) | GB10 Grace Blackwell (same silicon) | Apple M5 Pro | Apple M5 Max | Apple M5 Ultra | GB202 discrete GPU |
-| Memory for the model | 128 GB LPDDR5X unified | 128 GB LPDDR5X unified | 24 / 48 / 64 GB unified | 36 / 48 / 64 / 128 GB unified | 96 / 256 / 512 GB unified | 32 GB GDDR7 (VRAM only) |
-| Memory bandwidth | 273 GB/s | 273 GB/s | 307 GB/s | 460-614 GB/s | 1.2 TB/s | 1,792 GB/s |
-| Vendor AI figure | 1 PFLOP FP4 (sparse) | 1 PFLOP FP4 (sparse) | not published in comparable terms | not published in comparable terms | not published in comparable terms | 3,352 AI TOPS FP4 (sparse) |
-| Low precision support | FP4 / FP8 native (Blackwell tensor cores) | FP4 / FP8 native | no FP4/FP8 tensor path; GPU + Neural Engine | no FP4/FP8 tensor path | no FP4/FP8 tensor path | FP4 / FP8 native |
-| Networking | ConnectX-7 200 GbE + 10 GbE | ConnectX-7 200 GbE + 10 GbE | 10 GbE, Thunderbolt 5 | 10 GbE, Thunderbolt 5 | 10 GbE, Thunderbolt 5 | whatever the motherboard has |
-| Multi-box linking | up to 4 units, ~700B params | same as DGX Spark | Thunderbolt only, not a real fabric | Thunderbolt only | Thunderbolt only | PCIe only, no NVLink |
-| System power | 240 W PSU (140 W chip TDP) | ~240 W | 155 W max continuous | 480 W max continuous | 480 W max continuous | 575 W card, ~1 kW system |
-| Rough model ceiling | 70B at 4-bit on one box | 70B at 4-bit on one box | 32B at 4-bit on 64 GB | 70B at 4-bit on 128 GB | 400B+ at 4-bit on 512 GB | 30B at 4-bit, hard ceiling at 32 GB |
-| Launch | 2025 | 2025 | 2026 | 2026 | 2026 | 2025 |
+| Parameter | NVIDIA DGX Spark | GB10 OEM boxes | Ryzen AI Max+ 395 box | Mac mini (M5 Pro) | Mac Studio (M5 Max) | Mac Studio (M5 Ultra) | RTX 5090 desktop |
+|---|---|---|---|---|---|---|---|
+| Chip | GB10 Grace Blackwell (20-core Arm) | GB10 Grace Blackwell (same silicon) | AMD Ryzen AI Max+ 395 (16 x Zen 5 + Radeon 8060S) | Apple M5 Pro | Apple M5 Max | Apple M5 Ultra | GB202 discrete GPU |
+| Memory for the model | 128 GB LPDDR5X unified | 128 GB LPDDR5X unified | up to 128 GB unified, up to 96 GB as VRAM | 24 / 48 / 64 GB unified | 36 / 48 / 64 / 128 GB unified | 96 / 256 / 512 GB unified | 32 GB GDDR7 (VRAM only) |
+| Memory bandwidth | 273 GB/s | 273 GB/s | 256 GB/s | 307 GB/s | 460-614 GB/s | 1.2 TB/s | 1,792 GB/s |
+| Vendor AI figure | 1 PFLOP FP4 (sparse) | 1 PFLOP FP4 (sparse) | 50+ NPU TOPS (INT8); no comparable GPU FLOPS figure | not published in comparable terms | not published in comparable terms | not published in comparable terms | 3,352 AI TOPS FP4 (sparse) |
+| Low precision support | FP4 / FP8 native (Blackwell tensor cores) | FP4 / FP8 native | FP16 / INT8 (RDNA 3.5, no FP8 or FP4) | no FP4/FP8 tensor path; GPU + Neural Engine | no FP4/FP8 tensor path | no FP4/FP8 tensor path | FP4 / FP8 native |
+| Networking | ConnectX-7 200 GbE + 10 GbE | ConnectX-7 200 GbE + 10 GbE | 2.5-10 GbE depending on the box | 10 GbE, Thunderbolt 5 | 10 GbE, Thunderbolt 5 | 10 GbE, Thunderbolt 5 | whatever the motherboard has |
+| Multi-box linking | up to 4 units, ~700B params | same as DGX Spark | none | Thunderbolt only, not a real fabric | Thunderbolt only | Thunderbolt only | PCIe only, no NVLink |
+| System power | 240 W PSU (140 W chip TDP) | ~240 W | ~120 W chip, box dependent | 155 W max continuous | 480 W max continuous | 480 W max continuous | 575 W card, ~1 kW system |
+| Rough model ceiling | 70B at 4-bit on one box | 70B at 4-bit on one box | 70B at 4-bit inside a 96 GB VRAM allocation | 32B at 4-bit on 64 GB | 70B at 4-bit on 128 GB | 400B+ at 4-bit on 512 GB | 30B at 4-bit, hard ceiling at 32 GB |
+| Launch | 2025 | 2025 | 2025 | 2026 | 2026 | 2026 | 2025 |
 
+> - Ryzen AI Max+ 395 ships in the Framework Desktop, GMKtec EVO-X2, HP ZBook Ultra G1a and AMD's own Ryzen AI Halo developer platform. It is AMD's answer to DGX Spark and the Mac Studio: unified memory, no FP4, no cluster fabric.
 > - "GB10 OEM boxes" are the same GB10 superchip in someone else's case - ASUS Ascent GX10, Dell Pro Max with GB10, HP ZGX Nano, Lenovo and MSI all ship one. They differ in storage, chassis and price, not in compute or bandwidth.
 > - Bandwidth is the number to watch for token generation. A 5090 has 6.6x the bandwidth of a DGX Spark but a quarter of the memory: the Spark runs models the 5090 cannot load at all, and the 5090 runs the models that fit far faster.
 > - Apple does not publish FLOPS in a form comparable to NVIDIA's AI TOPS, and Apple Silicon has no FP4/FP8 tensor path, so 4-bit models are dequantized in software. Capacity and bandwidth are the honest comparison points.
@@ -83,6 +85,28 @@ What people actually run local LLMs on. For inference the binding constraint is 
 > - NVLink is gone from GeForce after the RTX 3090. On a 4090/5090 box, multi-GPU tensor parallelism runs over PCIe, which is roughly an order of magnitude slower than the 1.8 TB/s NVLink inside a DGX node — fine for pipeline-parallel or per-GPU replicas, painful for tensor parallelism.
 > - GeForce cards have no ECC and no MIG, and NVIDIA's GeForce driver licence restricts data center deployment. Read the licence yourself before renting them out; this is the main reason hosting providers buy RTX PRO or data center SKUs.
 > - "Rough local LLM fit" assumes weights plus a modest KV cache. Long context, batching, or unquantized weights all move the ceiling down sharply.
+
+### AMD Radeon for Local AI
+
+Radeon's pitch for local inference is VRAM per dollar: a W7900 carries 48 GB and an R9700 32 GB where NVIDIA's consumer ceiling is 32 GB. The catch is which cards ROCm actually supports.
+
+| Parameter | RX 7900 XTX | RX 9070 XT | Radeon AI PRO R9700 | Radeon PRO W7900 |
+|---|---|---|---|---|
+| Architecture | RDNA 3 | RDNA 4 | RDNA 4 | RDNA 3 |
+| Compute units | 96 | 64 | 64 | 96 |
+| VRAM | 24 GB GDDR6 | 16 GB GDDR6 | 32 GB GDDR6 | 48 GB GDDR6 |
+| Memory bandwidth | 960 GB/s | 645 GB/s | 645 GB/s | 864 GB/s |
+| Lowest matrix precision | FP16 / INT8 / INT4 (WMMA) | FP8 (RDNA 4 adds FP8 WMMA) | FP8 | FP16 / INT8 / INT4 (WMMA) |
+| ROCm support | officially supported | supported from ROCm 7.0 | officially supported, AI-targeted SKU | officially supported |
+| GPU-to-GPU link | PCIe only | PCIe only | PCIe only | PCIe only |
+| Board power | 355 W | 304 W | 300 W | 295 W |
+| Rough local LLM fit | ~30B at 4-bit | 14B at 4-bit | ~30B at 4-bit, 70B is tight | 70B at 4-bit on one card |
+| Launch | 2022 | 2025 | 2025 | 2023 |
+
+> - Check the ROCm compatibility matrix before buying, not the marketing page. AMD's officially supported consumer list is short and version-dependent, and unsupported cards often work only through community builds.
+> - Ignore AMD's "5.3 TB/s" figure for the 7900 XTX. That is Infinity Cache bandwidth, not memory bandwidth; the GDDR6 number that governs decode speed is 960 GB/s.
+> - RDNA 3 has no FP8 matrix path and no FP4 anywhere in the Radeon line, so 4-bit models are dequantized in software on every card here. Only RDNA 4 (9070 XT, R9700) adds FP8 WMMA.
+> - Radeon has no NVLink equivalent at any tier. Multi-card is PCIe only, which is the same constraint as an RTX 4090/5090 box.
 
 ## NVIDIA data center
 

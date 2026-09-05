@@ -1,0 +1,131 @@
+id: radeon-gpus
+title: AMD Radeon for Local AI
+title_zh: AMD Radeon 本地 AI 显卡
+summary: >-
+  Radeon's pitch for local inference is VRAM per dollar: a W7900 carries 48 GB
+  and an R9700 32 GB where NVIDIA's consumer ceiling is 32 GB. The catch is
+  which cards ROCm actually supports.
+summary_zh: >-
+  Radeon 在本地推理上的卖点是"每块钱能买到多少显存"：W7900 有 48 GB、R9700 有 32 GB，
+  而 NVIDIA 消费级的天花板是 32 GB。代价是 ROCm 到底支持哪些卡。
+orientation: columns
+fields:
+  - {key: architecture,   label: Architecture,              label_zh: 架构}
+  - {key: cu,             label: Compute units,             label_zh: 计算单元}
+  - {key: vram,           label: VRAM,                      label_zh: 显存}
+  - {key: bandwidth,      label: Memory bandwidth,          label_zh: 显存带宽}
+  - {key: precision,      label: Lowest matrix precision,   label_zh: 最低矩阵精度}
+  - {key: rocm,           label: ROCm support,              label_zh: ROCm 支持}
+  - {key: multi_gpu,      label: GPU-to-GPU link,           label_zh: 卡间互联}
+  - {key: tdp,            label: Board power,               label_zh: 整卡功耗}
+  - {key: llm_fit,        label: Rough local LLM fit,       label_zh: 本地 LLM 大致可跑}
+  - {key: launch,         label: Launch,                    label_zh: 上市时间}
+items:
+  - id: rx-7900-xtx
+    name: RX 7900 XTX
+    specs:
+      architecture: RDNA 3
+      cu: 96
+      vram: 24 GB GDDR6
+      bandwidth: 960 GB/s
+      precision: FP16 / INT8 / INT4 (WMMA)
+      rocm: officially supported
+      multi_gpu: PCIe only
+      tdp: 355 W
+      llm_fit: ~30B at 4-bit
+      launch: 2022
+    specs_zh:
+      rocm: 官方支持
+      multi_gpu: 仅 PCIe
+      llm_fit: 约 30B 四位量化
+    sources:
+      - https://www.amd.com/en/products/graphics/desktops/radeon/7000-series/amd-radeon-rx-7900xtx.html
+      - https://rocm.docs.amd.com/en/latest/reference/gpu-specs.html
+  - id: rx-9070-xt
+    name: RX 9070 XT
+    specs:
+      architecture: RDNA 4
+      cu: 64
+      vram: 16 GB GDDR6
+      bandwidth: 645 GB/s
+      precision: FP8 (RDNA 4 adds FP8 WMMA)
+      rocm: supported from ROCm 7.0
+      multi_gpu: PCIe only
+      tdp: 304 W
+      llm_fit: 14B at 4-bit
+      launch: 2025
+    specs_zh:
+      precision: FP8（RDNA 4 新增 FP8 WMMA）
+      rocm: ROCm 7.0 起支持
+      multi_gpu: 仅 PCIe
+      llm_fit: 14B 四位量化
+    sources:
+      - https://www.amd.com/en/products/graphics/desktops/radeon/9000-series/amd-radeon-rx-9070xt.html
+      - https://rocm.docs.amd.com/en/latest/reference/gpu-specs.html
+  - id: r9700
+    name: Radeon AI PRO R9700
+    specs:
+      architecture: RDNA 4
+      cu: 64
+      vram: 32 GB GDDR6
+      bandwidth: 645 GB/s
+      precision: FP8
+      rocm: officially supported, AI-targeted SKU
+      multi_gpu: PCIe only
+      tdp: 300 W
+      llm_fit: ~30B at 4-bit, 70B is tight
+      launch: 2025
+    specs_zh:
+      rocm: 官方支持，面向 AI 的型号
+      multi_gpu: 仅 PCIe
+      llm_fit: 约 30B 四位量化，70B 很勉强
+    sources:
+      - https://www.amd.com/en/products/graphics/workstations/radeon-ai-pro/ai-9000-series/amd-radeon-ai-pro-r9700.html
+  - id: w7900
+    name: Radeon PRO W7900
+    specs:
+      architecture: RDNA 3
+      cu: 96
+      vram: 48 GB GDDR6
+      bandwidth: 864 GB/s
+      precision: FP16 / INT8 / INT4 (WMMA)
+      rocm: officially supported
+      multi_gpu: PCIe only
+      tdp: 295 W
+      llm_fit: 70B at 4-bit on one card
+      launch: 2023
+    specs_zh:
+      rocm: 官方支持
+      multi_gpu: 仅 PCIe
+      llm_fit: 单卡 70B 四位量化
+    sources:
+      - https://rocm.docs.amd.com/en/latest/reference/gpu-specs.html
+notes:
+  - >-
+    Check the ROCm compatibility matrix before buying, not the marketing page.
+    AMD's officially supported consumer list is short and version-dependent, and
+    unsupported cards often work only through community builds.
+  - >-
+    Ignore AMD's "5.3 TB/s" figure for the 7900 XTX. That is Infinity Cache
+    bandwidth, not memory bandwidth; the GDDR6 number that governs decode speed
+    is 960 GB/s.
+  - >-
+    RDNA 3 has no FP8 matrix path and no FP4 anywhere in the Radeon line, so
+    4-bit models are dequantized in software on every card here. Only RDNA 4
+    (9070 XT, R9700) adds FP8 WMMA.
+  - >-
+    Radeon has no NVLink equivalent at any tier. Multi-card is PCIe only, which
+    is the same constraint as an RTX 4090/5090 box.
+notes_zh:
+  - >-
+    买之前查 ROCm 兼容性矩阵，别看营销页。AMD 官方支持的消费卡名单很短，
+    而且和 ROCm 版本绑定，不在名单里的卡往往只能靠社区编译版本跑。
+  - >-
+    别把 AMD 给 7900 XTX 标的 "5.3 TB/s" 当带宽。那是 Infinity Cache 的带宽，
+    真正决定出词速度的 GDDR6 带宽是 960 GB/s。
+  - >-
+    RDNA 3 没有 FP8 矩阵通路，整条 Radeon 线都没有 FP4，所以这里每一张卡跑 4bit
+    模型都要软件反量化。只有 RDNA 4（9070 XT、R9700）加了 FP8 WMMA。
+  - >-
+    Radeon 在任何档位都没有 NVLink 的对应物，多卡只能走 PCIe——
+    和 RTX 4090/5090 主机是同一个限制。

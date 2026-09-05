@@ -33,6 +33,7 @@ ORDER = [
     # Desktop / local
     "local-systems",
     "consumer-gpus",
+    "radeon-gpus",
     # NVIDIA data center
     "dgx-systems",
     "datacenter-gpus",

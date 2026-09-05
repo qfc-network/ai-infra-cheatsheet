@@ -65,6 +65,30 @@ items:
       precision: 原生 FP4 / FP8
       clustering: 与 DGX Spark 相同
       fits: 单机 70B 四位量化
+  - id: strix-halo
+    name: Ryzen AI Max+ 395 box
+    specs:
+      chip: AMD Ryzen AI Max+ 395 (16 x Zen 5 + Radeon 8060S)
+      memory: up to 128 GB unified, up to 96 GB as VRAM
+      bandwidth: 256 GB/s
+      ai_perf: 50+ NPU TOPS (INT8); no comparable GPU FLOPS figure
+      precision: FP16 / INT8 (RDNA 3.5, no FP8 or FP4)
+      network: 2.5-10 GbE depending on the box
+      clustering: none
+      power: ~120 W chip, box dependent
+      fits: 70B at 4-bit inside a 96 GB VRAM allocation
+      launch: 2025
+    specs_zh:
+      chip: AMD Ryzen AI Max+ 395（16 核 Zen 5 + Radeon 8060S）
+      memory: 最高 128 GB 统一内存，其中最多 96 GB 可划为显存
+      ai_perf: NPU 50+ TOPS（INT8）；GPU 侧无可比的 FLOPS 口径
+      precision: FP16 / INT8（RDNA 3.5，无 FP8 与 FP4）
+      network: 2.5~10 GbE，视机型而定
+      clustering: 无
+      power: 芯片约 120 W，整机视机型
+      fits: 在 96 GB 显存划分内可跑 70B 四位量化
+    sources:
+      - https://www.amd.com/en/products/processors/desktops/ryzen/ryzen-ai-halo/ryzen-ai-max-plus-395.html
   - id: mac-mini
     name: Mac mini (M5 Pro)
     specs:
@@ -157,6 +181,10 @@ items:
       - https://www.nvidia.com/en-us/geforce/graphics-cards/50-series/rtx-5090/
 notes:
   - >-
+    Ryzen AI Max+ 395 ships in the Framework Desktop, GMKtec EVO-X2, HP ZBook
+    Ultra G1a and AMD's own Ryzen AI Halo developer platform. It is AMD's answer
+    to DGX Spark and the Mac Studio: unified memory, no FP4, no cluster fabric.
+  - >-
     "GB10 OEM boxes" are the same GB10 superchip in someone else's case - ASUS
     Ascent GX10, Dell Pro Max with GB10, HP ZGX Nano, Lenovo and MSI all ship
     one. They differ in storage, chassis and price, not in compute or bandwidth.
@@ -174,6 +202,10 @@ notes:
     fabric here, and it tops out at 4 boxes; Thunderbolt between Macs is not
     comparable to NVLink or InfiniBand.
 notes_zh:
+  - >-
+    Ryzen AI Max+ 395 用在 Framework Desktop、GMKtec EVO-X2、HP ZBook Ultra G1a
+    以及 AMD 自己的 Ryzen AI Halo 开发平台上。它是 AMD 对标 DGX Spark 和 Mac Studio
+    的方案：统一内存、无 FP4、无集群网络。
   - >-
     "GB10 OEM 机型" 就是同一颗 GB10 换了个壳：华硕 Ascent GX10、戴尔 Pro Max with GB10、
     惠普 ZGX Nano、联想和微星都有。差别在存储、机箱和价格，算力与带宽完全一样。
