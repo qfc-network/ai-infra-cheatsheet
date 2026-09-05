@@ -93,6 +93,11 @@ items:
       takeaway: 双方都上机柜级；AMD 押注开放的 UALink + Ultra Ethernet 对抗 NVLink
 notes:
   - >-
+    Google TPU and AWS Trainium are absent because they are not sold. They
+    compete for the same workloads at comparable scale - see the cloud-only
+    accelerators table - but you cannot put one in a purchase order, so a
+    generation-by-generation matchup against buyable parts would mislead.
+  - >-
     Gaudi 3 has no FP4 and no successor shipping, so it competes on FP8 against
     Hopper-class parts on price and on not needing InfiniBand, not on peak
     numbers against Blackwell.
@@ -115,6 +120,10 @@ notes:
     use different scaling-block layouts, so a checkpoint quantized for one needs
     requantizing for the other.
 notes_zh:
+  - >-
+    这张表没有 Google TPU 和 AWS Trainium，因为它们不对外销售。
+    它们抢的是同样的工作负载、规模也可比（见"只能租用的云端加速器"表），
+    但你没法把它写进采购单——和能买到的产品做逐代对位会误导人。
   - >-
     Gaudi 3 没有 FP4，也没有后继型号在售，所以它是拿 FP8 在 Hopper 这一档比价格、
     比"不需要 InfiniBand"，而不是拿峰值去和 Blackwell 硬碰。

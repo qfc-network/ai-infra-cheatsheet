@@ -2,7 +2,7 @@
 
 [![generate](https://github.com/qfc-network/ai-infra-cheatsheet/actions/workflows/generate.yml/badge.svg)](https://github.com/qfc-network/ai-infra-cheatsheet/actions/workflows/generate.yml)
 [![Stars](https://img.shields.io/github/stars/qfc-network/ai-infra-cheatsheet?style=flat&logo=github)](https://github.com/qfc-network/ai-infra-cheatsheet/stargazers)
-[![Tables](https://img.shields.io/badge/tables-26-blue)](#目录)
+[![Tables](https://img.shields.io/badge/tables-27-blue)](#目录)
 [![License: CC BY 4.0](https://img.shields.io/badge/license-CC%20BY%204.0-green)](LICENSE)
 
 一份"真正用来跑模型的硬件"对照速查表：从桌上的 Mac mini 到 8,192 卡的 SuperPoD，
@@ -26,11 +26,11 @@
 ├────────────────────────────────────────────────────────────────────────────────────────────┤
 │ Framework  PyTorch · JAX · Keras · MLX · MindSpore · Paddle       where models are written │
 ├────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Compute    CUDA · ROCm · oneAPI · Metal · CANN · MUSA             kernels and compilers    │
+│ Compute    CUDA · ROCm · oneAPI · Metal · CANN · MUSA · XLA       kernels and compilers    │
 ├────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Silicon    B300 · MI355X · Gaudi 3 · M5 Ultra · Ascend 950        HBM, FLOPS, watts        │
+│ Silicon    B300 · MI355X · Gaudi 3 · TPU7x · Trainium3 · 950      HBM, FLOPS, watts        │
 ├────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Scale-up   NVLink 72 · Infinity Fabric 8 · UB 8,192               one coherent domain      │
+│ Scale-up   NVLink 72 · IF 8 · UB 8,192 · ICI 9,216                one coherent domain      │
 ├────────────────────────────────────────────────────────────────────────────────────────────┤
 │ Scale-out  InfiniBand · Spectrum-X · RoCE · Ultra Ethernet        across the network       │
 └────────────────────────────────────────────────────────────────────────────────────────────┘
@@ -67,6 +67,9 @@
 - [华为昇腾加速卡](#华为昇腾加速卡)
 - [华为 Atlas SuperPoD](#华为-atlas-superpod)
 - [中国大陆其他 AI 芯片](#中国大陆其他-ai-芯片)
+
+**云端**
+- [只能租用的云端加速器](#只能租用的云端加速器)
 
 **正面对位**
 - [数据中心 - NVIDIA / AMD / Intel 对位](#数据中心---nvidia--amd--intel-对位)
@@ -465,6 +468,31 @@ Gaudi 的特点不在算力，而在于横向扩展网络做进了芯片： 每�
 > - 非常欢迎用厂商公布数据加引用来替换其中任何一行——这里正是缺口所在。
 > - 对这几家来说，软件都比硅片更难。各家有各家的栈（MUSA、寒武纪 Neuware、 海光的 ROCm 分支），决定一颗芯片能不能用的通常是移植工作量，而不是峰值算力。
 
+## 云端
+
+### 只能租用的云端加速器
+
+Google TPU 和 AWS Trainium 是两支买不到的大规模加速器集群。 本仓库其他所有硬件都有报价单和采购流程，这两家只有按小时计费和可用区。 真正的差异在这里，不在规格。
+
+| 参数 | TPU v5e | TPU v5p | TPU v6e (Trillium) | TPU7x (Ironwood) | Trainium2 | Trainium3 |
+|---|---|---|---|---|---|---|
+| 厂商 | Google | Google | Google | Google | AWS | AWS |
+| 单芯片内存 | 16 GB HBM | 95 GiB HBM | 32 GB HBM | 192 GiB HBM | 96 GiB | 144 GB HBM3e |
+| 内存带宽 | 800 GB/s | 2,765 GB/s | 1,638 GB/s | 7,380 GB/s | 2.9 TB/s | 4.9 TB/s |
+| 低精度算力 | 393 TOPS (INT8) | 459 TFLOPS (FP8) | 1,836 TOPS (INT8) | 4,614 TFLOPS (FP8) | FP8 稠密 1,299 TFLOPS，稀疏 2,563 | MXFP8 约为 Trainium2 的 2 倍 |
+| BF16 算力 | 197 TFLOPS | 459 TFLOPS | 918 TFLOPS | 2,307 TFLOPS | 667 TFLOPS（稠密） | 未单独公布 |
+| 单芯片互联 | 400 GB/s ICI | 1,200 GB/s ICI | 800 GB/s ICI | ICI 1,200 GB/s，3D 环面 | 1.28 TB/s NeuronLink | NeuronSwitch，约为 Trainium2 的 2 倍 |
+| 最大互联规模 | 单 pod 256 芯片 | 单 pod 8,960 芯片 | 单 pod 256 芯片 | 单 pod 9,216 芯片 | 单 Trn2 UltraServer 64 芯片 | 单 UltraServer 144 芯片，20.7 TB HBM3e，362 MXFP8 PFLOPS |
+| 软件栈 | 首选 JAX + XLA；PyTorch 需经 PyTorch/XLA | 首选 JAX + XLA；PyTorch 需经 PyTorch/XLA | 首选 JAX + XLA；PyTorch 需经 PyTorch/XLA | 首选 JAX + XLA；PyTorch 需经 PyTorch/XLA | AWS Neuron SDK；PyTorch 需经 torch-neuronx | AWS Neuron SDK；PyTorch 需经 torch-neuronx |
+| 获取方式 | 仅 Google Cloud | 仅 Google Cloud | 仅 Google Cloud | 仅 Google Cloud | 仅 AWS | 仅 AWS |
+| 上市时间 | 2023 | 2023 | 2024 | 2025-2026 | 2024 | 2025-2026 |
+
+> - 两家都不跑 CUDA，也都不是 GPU 机群的即插即用替代。TPU 是 XLA 的地盘—— JAX 原生，PyTorch 要经 PyTorch/XLA。Trainium 要用 Neuron SDK 和 torch-neuronx。 决定值不值得上的通常是移植工作量，不是峰值算力。
+> - pod 规模一直是 TPU 最特别的地方。一个 TPU7x pod 把 9,216 颗芯片挂在同一套 ICI 上， 对比 GB300 NVL72 一柜 72 卡、华为 Atlas 950 的 8,192 卡。要比互联域，不是比芯片。
+> - Trainium3 标的是 MXFP8（AMD 也在用的 OCP microscaling 格式）， TPU 标普通 FP8 和 INT8，NVIDIA 标 NVFP4。四家厂商，三套互不兼容的低精度格式。
+> - AWS 没有公布 Trainium3 的 BF16 数字，也没有单芯片算力，只给了 UltraServer 总量 和相对 Trainium2 的倍数。这些单元格按公布口径原样保留，没有反推单芯片值。
+> - Inferentia2 因为找不到现行规格页没有收录；它是 Trainium 线上只做推理的兄弟型号。
+
 ## 正面对位
 
 ### 数据中心 - NVIDIA / AMD / Intel 对位
@@ -479,6 +507,7 @@ Gaudi 的特点不在算力，而在于横向扩展网络做进了芯片： 每�
 | Blackwell Ultra vs CDNA 4 | 2025 | B300 SXM | 288 GB | MI355X | 288 GB | Gaudi 3（无后继在售） | 128 GB | 显存首次持平，差距完全转移到机柜级（NVL72 对 8 卡节点） |
 | Rubin vs MI400 | 2026（路线图） | Rubin / VR200 NVL144 | 288 GB HBM4 | MI400 series / Helios | 未公布 | 路线图未定 | 未公布 | 双方都上机柜级；AMD 押注开放的 UALink + Ultra Ethernet 对抗 NVLink |
 
+> - 这张表没有 Google TPU 和 AWS Trainium，因为它们不对外销售。 它们抢的是同样的工作负载、规模也可比（见"只能租用的云端加速器"表）， 但你没法把它写进采购单——和能买到的产品做逐代对位会误导人。
 > - Gaudi 3 没有 FP4，也没有后继型号在售，所以它是拿 FP8 在 Hopper 这一档比价格、 比"不需要 InfiniBand"，而不是拿峰值去和 Blackwell 硬碰。
 > - 显存容量决定"能不能跑"，而在 B300 之前 AMD 每一代都领先。 如果一个模型单张 MI300X 装得下、却要两张 H100，那还没跑分 AMD 就已经赢了这一局。
 > - scale-up 域的规模决定"怎么切模型"。NVIDIA 把 NVLink 扩到了单柜 72 卡， 而 Helios 之前 AMD 的一致性域是 8 卡。超过 8 卡做张量并行时， 这是结构性差异，不是调优能解决的问题。

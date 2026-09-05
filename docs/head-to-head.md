@@ -10,6 +10,7 @@ Which part competes with which, and what actually separates them. AMD's lever is
 | Blackwell Ultra vs CDNA 4 | 2025 | B300 SXM | 288 GB | MI355X | 288 GB | Gaudi 3 (no successor shipping) | 128 GB | memory parity for the first time; the gap moves entirely to rack scale (NVL72 vs 8-GPU nodes) |
 | Rubin vs MI400 | 2026 (roadmap) | Rubin / VR200 NVL144 | 288 GB HBM4 | MI400 series / Helios | TBA | roadmap unsettled | TBA | both go rack-scale; AMD bets on open UALink + Ultra Ethernet against NVLink |
 
+> - Google TPU and AWS Trainium are absent because they are not sold. They compete for the same workloads at comparable scale - see the cloud-only accelerators table - but you cannot put one in a purchase order, so a generation-by-generation matchup against buyable parts would mislead.
 > - Gaudi 3 has no FP4 and no successor shipping, so it competes on FP8 against Hopper-class parts on price and on not needing InfiniBand, not on peak numbers against Blackwell.
 > - Memory capacity decides what you can run at all, and AMD has led on it every generation until B300. If a model fits on one MI300X but needs two H100s, AMD wins that comparison before any benchmark runs.
 > - Scale-up domain size decides how you shard. NVIDIA extended NVLink to 72 GPUs in one rack; AMD's coherent domain is 8 GPUs until Helios ships. For tensor parallelism across more than 8 GPUs that difference is structural, not a tuning problem.

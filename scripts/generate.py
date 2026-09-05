@@ -53,6 +53,8 @@ ORDER = [
     "ascend",
     "ascend-superpods",
     "china-other",
+    # Cloud
+    "cloud-accelerators",
     # Cross-vendor
     "head-to-head",
     "local-options",

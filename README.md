@@ -2,7 +2,7 @@
 
 [![generate](https://github.com/qfc-network/ai-infra-cheatsheet/actions/workflows/generate.yml/badge.svg)](https://github.com/qfc-network/ai-infra-cheatsheet/actions/workflows/generate.yml)
 [![Stars](https://img.shields.io/github/stars/qfc-network/ai-infra-cheatsheet?style=flat&logo=github)](https://github.com/qfc-network/ai-infra-cheatsheet/stargazers)
-[![Tables](https://img.shields.io/badge/tables-26-blue)](#contents)
+[![Tables](https://img.shields.io/badge/tables-27-blue)](#contents)
 [![License: CC BY 4.0](https://img.shields.io/badge/license-CC%20BY%204.0-green)](LICENSE)
 
 Side-by-side spec tables for the hardware people actually run models on — from a
@@ -28,11 +28,11 @@ so a correction is a one-line pull request.
 ├────────────────────────────────────────────────────────────────────────────────────────────┤
 │ Framework  PyTorch · JAX · Keras · MLX · MindSpore · Paddle       where models are written │
 ├────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Compute    CUDA · ROCm · oneAPI · Metal · CANN · MUSA             kernels and compilers    │
+│ Compute    CUDA · ROCm · oneAPI · Metal · CANN · MUSA · XLA       kernels and compilers    │
 ├────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Silicon    B300 · MI355X · Gaudi 3 · M5 Ultra · Ascend 950        HBM, FLOPS, watts        │
+│ Silicon    B300 · MI355X · Gaudi 3 · TPU7x · Trainium3 · 950      HBM, FLOPS, watts        │
 ├────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Scale-up   NVLink 72 · Infinity Fabric 8 · UB 8,192               one coherent domain      │
+│ Scale-up   NVLink 72 · IF 8 · UB 8,192 · ICI 9,216                one coherent domain      │
 ├────────────────────────────────────────────────────────────────────────────────────────────┤
 │ Scale-out  InfiniBand · Spectrum-X · RoCE · Ultra Ethernet        across the network       │
 └────────────────────────────────────────────────────────────────────────────────────────────┘
@@ -70,6 +70,9 @@ hardware. The tables below are grouped along these layers.
 - [Huawei Ascend Accelerators](#huawei-ascend-accelerators)
 - [Huawei Atlas SuperPoDs](#huawei-atlas-superpods)
 - [Other Chinese AI Accelerators](#other-chinese-ai-accelerators)
+
+**Cloud**
+- [Cloud-Only Accelerators](#cloud-only-accelerators)
 
 **Head to head**
 - [Data Center - NVIDIA vs AMD vs Intel](#data-center---nvidia-vs-amd-vs-intel)
@@ -468,6 +471,31 @@ Cambricon, Moore Threads, Hygon, Biren and Kunlunxin all ship or have shipped tr
 > - Pull requests replacing any row with vendor-published figures and a citation are very welcome - that is exactly the gap here.
 > - Software is the harder problem than silicon for all of these. Each ships its own stack (MUSA, Cambricon Neuware, Hygon's ROCm fork), and porting effort rather than peak FLOPS usually decides whether a chip is usable.
 
+## Cloud
+
+### Cloud-Only Accelerators
+
+Google TPU and AWS Trainium are the two largest accelerator fleets you cannot buy. Everything else in this repo has a price and a purchase order; these have an hourly rate and a region. That is the structural difference, not the specs.
+
+| Parameter | TPU v5e | TPU v5p | TPU v6e (Trillium) | TPU7x (Ironwood) | Trainium2 | Trainium3 |
+|---|---|---|---|---|---|---|
+| Vendor | Google | Google | Google | Google | AWS | AWS |
+| Memory per chip | 16 GB HBM | 95 GiB HBM | 32 GB HBM | 192 GiB HBM | 96 GiB | 144 GB HBM3e |
+| Memory bandwidth | 800 GB/s | 2,765 GB/s | 1,638 GB/s | 7,380 GB/s | 2.9 TB/s | 4.9 TB/s |
+| Low-precision compute | 393 TOPS (INT8) | 459 TFLOPS (FP8) | 1,836 TOPS (INT8) | 4,614 TFLOPS (FP8) | 1,299 TFLOPS FP8 dense, 2,563 sparse | about 2x Trainium2 on MXFP8 |
+| BF16 compute | 197 TFLOPS | 459 TFLOPS | 918 TFLOPS | 2,307 TFLOPS | 667 TFLOPS (dense) | not separately published |
+| Interconnect per chip | 400 GB/s ICI | 1,200 GB/s ICI | 800 GB/s ICI | 1,200 GB/s ICI, 3D torus | 1.28 TB/s NeuronLink | NeuronSwitch, about 2x Trainium2 |
+| Max domain | 256 chips per pod | 8,960 chips per pod | 256 chips per pod | 9,216 chips per pod | 64 chips per Trn2 UltraServer | 144 chips per UltraServer, 20.7 TB HBM3e, 362 MXFP8 PFLOPS |
+| Software | JAX and XLA first; PyTorch via PyTorch/XLA | JAX and XLA first; PyTorch via PyTorch/XLA | JAX and XLA first; PyTorch via PyTorch/XLA | JAX and XLA first; PyTorch via PyTorch/XLA | AWS Neuron SDK; PyTorch via torch-neuronx | AWS Neuron SDK; PyTorch via torch-neuronx |
+| How you get it | Google Cloud only | Google Cloud only | Google Cloud only | Google Cloud only | AWS only | AWS only |
+| Availability | 2023 | 2023 | 2024 | 2025-2026 | 2024 | 2025-2026 |
+
+> - Neither runs CUDA, and neither is a drop-in for a GPU fleet. TPU is XLA territory - JAX natively, PyTorch through PyTorch/XLA. Trainium needs the Neuron SDK and torch-neuronx. Porting effort, not peak FLOPS, is what usually decides whether either is worth it.
+> - Pod scale is where TPU has always been unusual. A TPU7x pod puts 9,216 chips on one ICI fabric, against 72 GPUs in a GB300 NVL72 rack and 8,192 accelerators in a Huawei Atlas 950. Compare domains, not chips.
+> - Trainium3 quotes MXFP8, the OCP microscaling format AMD also uses, while TPU quotes plain FP8 and INT8 and NVIDIA quotes NVFP4. Four vendors, three incompatible low-precision families.
+> - AWS does not publish a BF16 figure for Trainium3 or a per-chip compute number, only UltraServer totals and multipliers against Trainium2. Those cells are left as published rather than divided out.
+> - Inferentia2 is not tabled here for lack of a current spec page; it is the inference-only sibling of the Trainium line.
+
 ## Head to head
 
 ### Data Center - NVIDIA vs AMD vs Intel
@@ -482,6 +510,7 @@ Which part competes with which, and what actually separates them. AMD's lever is
 | Blackwell Ultra vs CDNA 4 | 2025 | B300 SXM | 288 GB | MI355X | 288 GB | Gaudi 3 (no successor shipping) | 128 GB | memory parity for the first time; the gap moves entirely to rack scale (NVL72 vs 8-GPU nodes) |
 | Rubin vs MI400 | 2026 (roadmap) | Rubin / VR200 NVL144 | 288 GB HBM4 | MI400 series / Helios | TBA | roadmap unsettled | TBA | both go rack-scale; AMD bets on open UALink + Ultra Ethernet against NVLink |
 
+> - Google TPU and AWS Trainium are absent because they are not sold. They compete for the same workloads at comparable scale - see the cloud-only accelerators table - but you cannot put one in a purchase order, so a generation-by-generation matchup against buyable parts would mislead.
 > - Gaudi 3 has no FP4 and no successor shipping, so it competes on FP8 against Hopper-class parts on price and on not needing InfiniBand, not on peak numbers against Blackwell.
 > - Memory capacity decides what you can run at all, and AMD has led on it every generation until B300. If a model fits on one MI300X but needs two H100s, AMD wins that comparison before any benchmark runs.
 > - Scale-up domain size decides how you shard. NVIDIA extended NVLink to 72 GPUs in one rack; AMD's coherent domain is 8 GPUs until Helios ships. For tensor parallelism across more than 8 GPUs that difference is structural, not a tuning problem.

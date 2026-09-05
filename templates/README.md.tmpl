@@ -28,11 +28,11 @@ so a correction is a one-line pull request.
 ├────────────────────────────────────────────────────────────────────────────────────────────┤
 │ Framework  PyTorch · JAX · Keras · MLX · MindSpore · Paddle       where models are written │
 ├────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Compute    CUDA · ROCm · oneAPI · Metal · CANN · MUSA             kernels and compilers    │
+│ Compute    CUDA · ROCm · oneAPI · Metal · CANN · MUSA · XLA       kernels and compilers    │
 ├────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Silicon    B300 · MI355X · Gaudi 3 · M5 Ultra · Ascend 950        HBM, FLOPS, watts        │
+│ Silicon    B300 · MI355X · Gaudi 3 · TPU7x · Trainium3 · 950      HBM, FLOPS, watts        │
 ├────────────────────────────────────────────────────────────────────────────────────────────┤
-│ Scale-up   NVLink 72 · Infinity Fabric 8 · UB 8,192               one coherent domain      │
+│ Scale-up   NVLink 72 · IF 8 · UB 8,192 · ICI 9,216                one coherent domain      │
 ├────────────────────────────────────────────────────────────────────────────────────────────┤
 │ Scale-out  InfiniBand · Spectrum-X · RoCE · Ultra Ethernet        across the network       │
 └────────────────────────────────────────────────────────────────────────────────────────────┘
@@ -70,6 +70,9 @@ hardware. The tables below are grouped along these layers.
 - [Huawei Ascend Accelerators](#huawei-ascend-accelerators)
 - [Huawei Atlas SuperPoDs](#huawei-atlas-superpods)
 - [Other Chinese AI Accelerators](#other-chinese-ai-accelerators)
+
+**Cloud**
+- [Cloud-Only Accelerators](#cloud-only-accelerators)
 
 **Head to head**
 - [Data Center - NVIDIA vs AMD vs Intel](#data-center---nvidia-vs-amd-vs-intel)
@@ -130,6 +133,10 @@ hardware. The tables below are grouped along these layers.
 {{section3:ascend-superpods}}
 
 {{section3:china-other}}
+
+## Cloud
+
+{{section3:cloud-accelerators}}
 
 ## Head to head
 

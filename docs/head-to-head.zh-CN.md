@@ -10,6 +10,7 @@
 | Blackwell Ultra vs CDNA 4 | 2025 | B300 SXM | 288 GB | MI355X | 288 GB | Gaudi 3（无后继在售） | 128 GB | 显存首次持平，差距完全转移到机柜级（NVL72 对 8 卡节点） |
 | Rubin vs MI400 | 2026（路线图） | Rubin / VR200 NVL144 | 288 GB HBM4 | MI400 series / Helios | 未公布 | 路线图未定 | 未公布 | 双方都上机柜级；AMD 押注开放的 UALink + Ultra Ethernet 对抗 NVLink |
 
+> - 这张表没有 Google TPU 和 AWS Trainium，因为它们不对外销售。 它们抢的是同样的工作负载、规模也可比（见"只能租用的云端加速器"表）， 但你没法把它写进采购单——和能买到的产品做逐代对位会误导人。
 > - Gaudi 3 没有 FP4，也没有后继型号在售，所以它是拿 FP8 在 Hopper 这一档比价格、 比"不需要 InfiniBand"，而不是拿峰值去和 Blackwell 硬碰。
 > - 显存容量决定"能不能跑"，而在 B300 之前 AMD 每一代都领先。 如果一个模型单张 MI300X 装得下、却要两张 H100，那还没跑分 AMD 就已经赢了这一局。
 > - scale-up 域的规模决定"怎么切模型"。NVIDIA 把 NVLink 扩到了单柜 72 卡， 而 Helios 之前 AMD 的一致性域是 8 卡。超过 8 卡做张量并行时， 这是结构性差异，不是调优能解决的问题。

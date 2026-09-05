@@ -1,0 +1,181 @@
+id: cloud-accelerators
+title: Cloud-Only Accelerators
+title_zh: 只能租用的云端加速器
+summary: >-
+  Google TPU and AWS Trainium are the two largest accelerator fleets you cannot
+  buy. Everything else in this repo has a price and a purchase order; these have
+  an hourly rate and a region. That is the structural difference, not the specs.
+summary_zh: >-
+  Google TPU 和 AWS Trainium 是两支买不到的大规模加速器集群。
+  本仓库其他所有硬件都有报价单和采购流程，这两家只有按小时计费和可用区。
+  真正的差异在这里，不在规格。
+orientation: columns
+fields:
+  - {key: vendor,        label: Vendor,                   label_zh: 厂商}
+  - {key: memory,        label: Memory per chip,          label_zh: 单芯片内存}
+  - {key: bandwidth,     label: Memory bandwidth,         label_zh: 内存带宽}
+  - {key: low_precision, label: Low-precision compute,    label_zh: 低精度算力}
+  - {key: bf16,          label: BF16 compute,             label_zh: BF16 算力}
+  - {key: interconnect,  label: Interconnect per chip,    label_zh: 单芯片互联}
+  - {key: domain,        label: Max domain,               label_zh: 最大互联规模}
+  - {key: software,      label: Software,                 label_zh: 软件栈}
+  - {key: access,        label: How you get it,           label_zh: 获取方式}
+  - {key: launch,        label: Availability,             label_zh: 上市时间}
+items:
+  - id: tpu-v5e
+    name: TPU v5e
+    specs:
+      vendor: Google
+      memory: 16 GB HBM
+      bandwidth: 800 GB/s
+      low_precision: 393 TOPS (INT8)
+      bf16: 197 TFLOPS
+      interconnect: 400 GB/s ICI
+      domain: 256 chips per pod
+      software: JAX and XLA first; PyTorch via PyTorch/XLA
+      access: Google Cloud only
+      launch: 2023
+    specs_zh:
+      software: 首选 JAX + XLA；PyTorch 需经 PyTorch/XLA
+      access: 仅 Google Cloud
+      domain: 单 pod 256 芯片
+    sources:
+      - https://docs.cloud.google.com/tpu/docs/v5e
+  - id: tpu-v5p
+    name: TPU v5p
+    specs:
+      vendor: Google
+      memory: 95 GiB HBM
+      bandwidth: 2,765 GB/s
+      low_precision: 459 TFLOPS (FP8)
+      bf16: 459 TFLOPS
+      interconnect: 1,200 GB/s ICI
+      domain: 8,960 chips per pod
+      software: JAX and XLA first; PyTorch via PyTorch/XLA
+      access: Google Cloud only
+      launch: 2023
+    specs_zh:
+      software: 首选 JAX + XLA；PyTorch 需经 PyTorch/XLA
+      access: 仅 Google Cloud
+      domain: 单 pod 8,960 芯片
+    sources:
+      - https://docs.cloud.google.com/tpu/docs/v5p
+  - id: tpu-v6e
+    name: TPU v6e (Trillium)
+    specs:
+      vendor: Google
+      memory: 32 GB HBM
+      bandwidth: 1,638 GB/s
+      low_precision: 1,836 TOPS (INT8)
+      bf16: 918 TFLOPS
+      interconnect: 800 GB/s ICI
+      domain: 256 chips per pod
+      software: JAX and XLA first; PyTorch via PyTorch/XLA
+      access: Google Cloud only
+      launch: 2024
+    specs_zh:
+      software: 首选 JAX + XLA；PyTorch 需经 PyTorch/XLA
+      access: 仅 Google Cloud
+      domain: 单 pod 256 芯片
+    sources:
+      - https://docs.cloud.google.com/tpu/docs/v6e
+  - id: tpu7x
+    name: TPU7x (Ironwood)
+    specs:
+      vendor: Google
+      memory: 192 GiB HBM
+      bandwidth: 7,380 GB/s
+      low_precision: 4,614 TFLOPS (FP8)
+      bf16: 2,307 TFLOPS
+      interconnect: 1,200 GB/s ICI, 3D torus
+      domain: 9,216 chips per pod
+      software: JAX and XLA first; PyTorch via PyTorch/XLA
+      access: Google Cloud only
+      launch: 2025-2026
+    specs_zh:
+      software: 首选 JAX + XLA；PyTorch 需经 PyTorch/XLA
+      access: 仅 Google Cloud
+      interconnect: ICI 1,200 GB/s，3D 环面
+      domain: 单 pod 9,216 芯片
+    sources:
+      - https://docs.cloud.google.com/tpu/docs/tpu7x
+  - id: trainium2
+    name: Trainium2
+    specs:
+      vendor: AWS
+      memory: 96 GiB
+      bandwidth: 2.9 TB/s
+      low_precision: 1,299 TFLOPS FP8 dense, 2,563 sparse
+      bf16: 667 TFLOPS (dense)
+      interconnect: 1.28 TB/s NeuronLink
+      domain: 64 chips per Trn2 UltraServer
+      software: AWS Neuron SDK; PyTorch via torch-neuronx
+      access: AWS only
+      launch: 2024
+    specs_zh:
+      low_precision: FP8 稠密 1,299 TFLOPS，稀疏 2,563
+      bf16: 667 TFLOPS（稠密）
+      domain: 单 Trn2 UltraServer 64 芯片
+      software: AWS Neuron SDK；PyTorch 需经 torch-neuronx
+      access: 仅 AWS
+    sources:
+      - https://awsdocs-neuron.readthedocs-hosted.com/en/latest/general/arch/neuron-hardware/trainium2.html
+  - id: trainium3
+    name: Trainium3
+    specs:
+      vendor: AWS
+      memory: 144 GB HBM3e
+      bandwidth: 4.9 TB/s
+      low_precision: about 2x Trainium2 on MXFP8
+      bf16: not separately published
+      interconnect: NeuronSwitch, about 2x Trainium2
+      domain: 144 chips per UltraServer, 20.7 TB HBM3e, 362 MXFP8 PFLOPS
+      software: AWS Neuron SDK; PyTorch via torch-neuronx
+      access: AWS only
+      launch: 2025-2026
+    specs_zh:
+      low_precision: MXFP8 约为 Trainium2 的 2 倍
+      bf16: 未单独公布
+      interconnect: NeuronSwitch，约为 Trainium2 的 2 倍
+      domain: 单 UltraServer 144 芯片，20.7 TB HBM3e，362 MXFP8 PFLOPS
+      software: AWS Neuron SDK；PyTorch 需经 torch-neuronx
+      access: 仅 AWS
+    sources:
+      - https://aws.amazon.com/ai/machine-learning/trainium/
+notes:
+  - >-
+    Neither runs CUDA, and neither is a drop-in for a GPU fleet. TPU is XLA
+    territory - JAX natively, PyTorch through PyTorch/XLA. Trainium needs the
+    Neuron SDK and torch-neuronx. Porting effort, not peak FLOPS, is what
+    usually decides whether either is worth it.
+  - >-
+    Pod scale is where TPU has always been unusual. A TPU7x pod puts 9,216 chips
+    on one ICI fabric, against 72 GPUs in a GB300 NVL72 rack and 8,192
+    accelerators in a Huawei Atlas 950. Compare domains, not chips.
+  - >-
+    Trainium3 quotes MXFP8, the OCP microscaling format AMD also uses, while
+    TPU quotes plain FP8 and INT8 and NVIDIA quotes NVFP4. Four vendors, three
+    incompatible low-precision families.
+  - >-
+    AWS does not publish a BF16 figure for Trainium3 or a per-chip compute
+    number, only UltraServer totals and multipliers against Trainium2. Those
+    cells are left as published rather than divided out.
+  - >-
+    Inferentia2 is not tabled here for lack of a current spec page; it is the
+    inference-only sibling of the Trainium line.
+notes_zh:
+  - >-
+    两家都不跑 CUDA，也都不是 GPU 机群的即插即用替代。TPU 是 XLA 的地盘——
+    JAX 原生，PyTorch 要经 PyTorch/XLA。Trainium 要用 Neuron SDK 和 torch-neuronx。
+    决定值不值得上的通常是移植工作量，不是峰值算力。
+  - >-
+    pod 规模一直是 TPU 最特别的地方。一个 TPU7x pod 把 9,216 颗芯片挂在同一套 ICI 上，
+    对比 GB300 NVL72 一柜 72 卡、华为 Atlas 950 的 8,192 卡。要比互联域，不是比芯片。
+  - >-
+    Trainium3 标的是 MXFP8（AMD 也在用的 OCP microscaling 格式），
+    TPU 标普通 FP8 和 INT8，NVIDIA 标 NVFP4。四家厂商，三套互不兼容的低精度格式。
+  - >-
+    AWS 没有公布 Trainium3 的 BF16 数字，也没有单芯片算力，只给了 UltraServer 总量
+    和相对 Trainium2 的倍数。这些单元格按公布口径原样保留，没有反推单芯片值。
+  - >-
+    Inferentia2 因为找不到现行规格页没有收录；它是 Trainium 线上只做推理的兄弟型号。
