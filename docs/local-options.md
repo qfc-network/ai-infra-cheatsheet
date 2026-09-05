@@ -9,10 +9,10 @@ The practical way to shop: pick the capacity your model needs, then see who sell
 | 32 GB | RTX 5090 | Radeon AI PRO R9700 | Mac mini M6 (32 GB) | Arc Pro B70 | 170-1,792 GB/s | 30B at 4-bit with real context |
 | 48 GB | RTX 6000 Ada | Radeon PRO W7900 | Mac Studio M5 Max (48 GB) | nothing at this tier | 460-960 GB/s | 70B at 4-bit |
 | 96-128 GB | RTX PRO 6000 (96 GB VRAM), DGX Spark (128 GB unified) | Ryzen AI Max+ 395 (128 GB unified) | Mac Studio M5 Max 128 GB / M5 Ultra 96 GB | nothing at this tier | 256 GB/s unified, 1,792 GB/s on the RTX PRO card | 70B at 8-bit, 120B+ at 4-bit |
-| 256-512 GB | nothing at this tier | nothing at this tier | Mac Studio M5 Ultra | nothing at this tier | 1.2 TB/s | 400B+ at 4-bit |
+| 256 GB and up | DGX Station (748 GB coherent, 252 GB of it HBM3e) | nothing at this tier | Mac Studio M5 Ultra (256 or 512 GB) | nothing at this tier | 1.2 TB/s on the Mac; 7.1 TB/s HBM plus 396 GB/s LPDDR5X on DGX Station | 400B+ at 4-bit |
 
 > - Read the 96-128 GB row as two different products, not one tier. The 96 GB RTX PRO 6000 is dedicated VRAM at 1,792 GB/s; a 128 GB DGX Spark or Strix Halo box is unified memory at 256-273 GB/s. Same tier on paper, roughly 7x apart on decode speed.
-> - Apple is the only vendor selling 256-512 GB to one machine, and the M5 Ultra holds 1.2 TB/s while doing it - but with no FP4 path and no cluster fabric.
+> - Two very different machines sit at the top tier. A Mac Studio M5 Ultra gives 512 GB of uniform unified memory at 1.2 TB/s, no FP4 path, no cluster fabric, 480 W. A DGX Station gives 748 GB coherent but tiered - 252 GB of HBM3e at 7.1 TB/s over 496 GB of LPDDR5X - with native FP4 and a 800 Gb/s NIC, at 1,600 W. Capacity alone does not tell you which one you want.
 > - Intel stops at 32 GB. Above that tier its answer is multiple B60 or B70 cards over PCIe, not a bigger card.
 > - Parts named here that have no row of their own elsewhere in this repo (RTX 5060 Ti, RTX 6000 Ada) are listed for orientation only; no specs are claimed for them beyond the memory tier.
 

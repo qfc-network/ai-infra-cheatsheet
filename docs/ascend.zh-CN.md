@@ -5,7 +5,7 @@
 | 参数 | Ascend 910B | Ascend 910C | Ascend 950PR | Ascend 950DT | Ascend 960 | Ascend 970 |
 |---|---|---|---|---|---|---|
 | FP8 | 未公布 | 未公布 | 1 PFLOPS | 1 PFLOPS | 2 PFLOPS | 4 PFLOPS |
-| FP4 / MXFP4 | 不支持 | 不支持 | 2 PFLOPS (MXFP4) | 2 PFLOPS (MXFP4) | 4 PFLOPS | 8 PFLOPS |
+| FP4 / MXFP4 | 华为未提及；MXFP4 自 950 系列才出现 | 华为未提及；MXFP4 自 950 系列才出现 | 2 PFLOPS (MXFP4) | 2 PFLOPS (MXFP4) | 4 PFLOPS | 8 PFLOPS |
 | 显存 | 未公布 | 未公布 | keynote 未提及 | keynote 未提及 | keynote 未提及 | keynote 未提及 |
 | 单芯片互联带宽 | 未公布 | Unified Bus（UB 总线） | 2 TB/s | 2 TB/s | 未提及 | 4 TB/s |
 | 用于 | Atlas 800 系列服务器 | Atlas 900 A3 SuperPoD | Atlas 950 SuperPoD | Atlas 950 SuperPoD | Atlas 960 SuperPoD | 未公布 |

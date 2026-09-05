@@ -45,6 +45,30 @@ items:
       fits: 单机 70B 四位量化
     sources:
       - https://www.nvidia.com/en-us/products/workstations/dgx-spark/
+  - id: dgx-station
+    name: NVIDIA DGX Station
+    specs:
+      chip: GB300 Grace Blackwell Ultra Desktop Superchip
+      memory: 748 GB coherent - 252 GB HBM3e plus 496 GB LPDDR5X
+      bandwidth: 7.1 TB/s on HBM, 396 GB/s on LPDDR5X
+      ai_perf: 20 PFLOPS FP4, 10 PFLOPS FP8, 5 PFLOPS FP16
+      precision: FP4 / FP8 native (Blackwell Ultra tensor cores)
+      network: ConnectX-8 SuperNIC, up to 800 Gb/s
+      clustering: 800 Gb/s Ethernet; MIG splits one box up to 7 ways
+      power: 1,600 W
+      fits: 400B+ at 4-bit, and it is HBM rather than unified memory
+      launch: 2025
+    specs_zh:
+      chip: GB300 Grace Blackwell Ultra 桌面超级芯片
+      memory: 748 GB 一致性内存——252 GB HBM3e + 496 GB LPDDR5X
+      bandwidth: HBM 7.1 TB/s，LPDDR5X 396 GB/s
+      ai_perf: FP4 20 PFLOPS，FP8 10 PFLOPS，FP16 5 PFLOPS
+      precision: 原生 FP4 / FP8（Blackwell Ultra 张量核）
+      network: ConnectX-8 SuperNIC，最高 800 Gb/s
+      clustering: 800 Gb/s 以太网；MIG 可把单机切成最多 7 份
+      fits: 400B+ 四位量化，而且是 HBM 不是统一内存
+    sources:
+      - https://www.nvidia.com/en-us/products/workstations/dgx-station/
   - id: gb10-oem
     name: GB10 OEM boxes
     specs:
@@ -198,9 +222,13 @@ notes:
     Apple Silicon has no FP4/FP8 tensor path, so 4-bit models are dequantized in
     software. Capacity and bandwidth are the honest comparison points.
   - >-
-    None of these are cluster hardware. DGX Spark's ConnectX-7 is the only real
-    fabric here, and it tops out at 4 boxes; Thunderbolt between Macs is not
-    comparable to NVLink or InfiniBand.
+    DGX Station is the outlier on memory: 748 GB coherent, but read the split.
+    Only 252 GB of that is HBM3e at 7.1 TB/s; the other 496 GB is LPDDR5X at
+    396 GB/s. It is not 748 GB at HBM speed, and it draws 1,600 W.
+  - >-
+    Cluster networking is thin here. DGX Spark's ConnectX-7 and DGX Station's
+    ConnectX-8 are the only real fabrics, and Spark tops out at four boxes;
+    Thunderbolt between Macs is not comparable to NVLink or InfiniBand.
 notes_zh:
   - >-
     Ryzen AI Max+ 395 用在 Framework Desktop、GMKtec EVO-X2、HP ZBook Ultra G1a
@@ -216,5 +244,10 @@ notes_zh:
     苹果没有公布可与 NVIDIA AI TOPS 对比的算力口径，且 Apple Silicon 没有 FP4/FP8
     张量通路，4bit 模型要靠软件反量化。容量和带宽才是能诚实对比的两项。
   - >-
-    这些都不是集群硬件。这里只有 DGX Spark 的 ConnectX-7 算真正的互联网络，且最多 4 台；
-    Mac 之间的雷雳连接和 NVLink、InfiniBand 不是一个量级。
+    DGX Station 是容量上的异类：748 GB 一致性内存，但要看清拆分——
+    其中只有 252 GB 是 7.1 TB/s 的 HBM3e，另外 496 GB 是 396 GB/s 的 LPDDR5X。
+    不是 748 GB 都跑在 HBM 速度上，而且整机 1,600 W。
+  - >-
+    这里的集群网络很薄。只有 DGX Spark 的 ConnectX-7 和 DGX Station 的 ConnectX-8
+    算真正的互联网络，且 Spark 最多 4 台；Mac 之间的雷雳连接和 NVLink、InfiniBand
+    不是一个量级。

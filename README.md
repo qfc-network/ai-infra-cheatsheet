@@ -94,24 +94,25 @@ hardware. The tables below are grouped along these layers.
 
 Boxes you can put on a desk and run a model on. Two different bets: unified memory (lots of capacity, moderate bandwidth) versus a discrete GPU (little capacity, huge bandwidth). Decode speed tracks bandwidth; what fits at all tracks capacity.
 
-| Parameter | NVIDIA DGX Spark | GB10 OEM boxes | Ryzen AI Max+ 395 box | Mac mini (M5 Pro) | Mac Studio (M5 Max) | Mac Studio (M5 Ultra) | RTX 5090 desktop |
-|---|---|---|---|---|---|---|---|
-| Chip | GB10 Grace Blackwell (20-core Arm) | GB10 Grace Blackwell (same silicon) | AMD Ryzen AI Max+ 395 (16 x Zen 5 + Radeon 8060S) | Apple M5 Pro | Apple M5 Max | Apple M5 Ultra | GB202 discrete GPU |
-| Memory for the model | 128 GB LPDDR5X unified | 128 GB LPDDR5X unified | up to 128 GB unified, up to 96 GB as VRAM | 24 / 48 / 64 GB unified | 36 / 48 / 64 / 128 GB unified | 96 / 256 / 512 GB unified | 32 GB GDDR7 (VRAM only) |
-| Memory bandwidth | 273 GB/s | 273 GB/s | 256 GB/s | 307 GB/s | 460-614 GB/s | 1.2 TB/s | 1,792 GB/s |
-| Vendor AI figure | 1 PFLOP FP4 (sparse) | 1 PFLOP FP4 (sparse) | 50+ NPU TOPS (INT8); no comparable GPU FLOPS figure | not published in comparable terms | not published in comparable terms | not published in comparable terms | 3,352 AI TOPS FP4 (sparse) |
-| Low precision support | FP4 / FP8 native (Blackwell tensor cores) | FP4 / FP8 native | FP16 / INT8 (RDNA 3.5, no FP8 or FP4) | no FP4/FP8 tensor path; GPU + Neural Engine | no FP4/FP8 tensor path | no FP4/FP8 tensor path | FP4 / FP8 native |
-| Networking | ConnectX-7 200 GbE + 10 GbE | ConnectX-7 200 GbE + 10 GbE | 2.5-10 GbE depending on the box | 10 GbE, Thunderbolt 5 | 10 GbE, Thunderbolt 5 | 10 GbE, Thunderbolt 5 | whatever the motherboard has |
-| Multi-box linking | up to 4 units, ~700B params | same as DGX Spark | none | Thunderbolt only, not a real fabric | Thunderbolt only | Thunderbolt only | PCIe only, no NVLink |
-| System power | 240 W PSU (140 W chip TDP) | ~240 W | ~120 W chip, box dependent | 155 W max continuous | 480 W max continuous | 480 W max continuous | 575 W card, ~1 kW system |
-| Rough model ceiling | 70B at 4-bit on one box | 70B at 4-bit on one box | 70B at 4-bit inside a 96 GB VRAM allocation | 32B at 4-bit on 64 GB | 70B at 4-bit on 128 GB | 400B+ at 4-bit on 512 GB | 30B at 4-bit, hard ceiling at 32 GB |
-| Launch | 2025 | 2025 | 2025 | 2026 | 2026 | 2026 | 2025 |
+| Parameter | NVIDIA DGX Spark | NVIDIA DGX Station | GB10 OEM boxes | Ryzen AI Max+ 395 box | Mac mini (M5 Pro) | Mac Studio (M5 Max) | Mac Studio (M5 Ultra) | RTX 5090 desktop |
+|---|---|---|---|---|---|---|---|---|
+| Chip | GB10 Grace Blackwell (20-core Arm) | GB300 Grace Blackwell Ultra Desktop Superchip | GB10 Grace Blackwell (same silicon) | AMD Ryzen AI Max+ 395 (16 x Zen 5 + Radeon 8060S) | Apple M5 Pro | Apple M5 Max | Apple M5 Ultra | GB202 discrete GPU |
+| Memory for the model | 128 GB LPDDR5X unified | 748 GB coherent - 252 GB HBM3e plus 496 GB LPDDR5X | 128 GB LPDDR5X unified | up to 128 GB unified, up to 96 GB as VRAM | 24 / 48 / 64 GB unified | 36 / 48 / 64 / 128 GB unified | 96 / 256 / 512 GB unified | 32 GB GDDR7 (VRAM only) |
+| Memory bandwidth | 273 GB/s | 7.1 TB/s on HBM, 396 GB/s on LPDDR5X | 273 GB/s | 256 GB/s | 307 GB/s | 460-614 GB/s | 1.2 TB/s | 1,792 GB/s |
+| Vendor AI figure | 1 PFLOP FP4 (sparse) | 20 PFLOPS FP4, 10 PFLOPS FP8, 5 PFLOPS FP16 | 1 PFLOP FP4 (sparse) | 50+ NPU TOPS (INT8); no comparable GPU FLOPS figure | not published in comparable terms | not published in comparable terms | not published in comparable terms | 3,352 AI TOPS FP4 (sparse) |
+| Low precision support | FP4 / FP8 native (Blackwell tensor cores) | FP4 / FP8 native (Blackwell Ultra tensor cores) | FP4 / FP8 native | FP16 / INT8 (RDNA 3.5, no FP8 or FP4) | no FP4/FP8 tensor path; GPU + Neural Engine | no FP4/FP8 tensor path | no FP4/FP8 tensor path | FP4 / FP8 native |
+| Networking | ConnectX-7 200 GbE + 10 GbE | ConnectX-8 SuperNIC, up to 800 Gb/s | ConnectX-7 200 GbE + 10 GbE | 2.5-10 GbE depending on the box | 10 GbE, Thunderbolt 5 | 10 GbE, Thunderbolt 5 | 10 GbE, Thunderbolt 5 | whatever the motherboard has |
+| Multi-box linking | up to 4 units, ~700B params | 800 Gb/s Ethernet; MIG splits one box up to 7 ways | same as DGX Spark | none | Thunderbolt only, not a real fabric | Thunderbolt only | Thunderbolt only | PCIe only, no NVLink |
+| System power | 240 W PSU (140 W chip TDP) | 1,600 W | ~240 W | ~120 W chip, box dependent | 155 W max continuous | 480 W max continuous | 480 W max continuous | 575 W card, ~1 kW system |
+| Rough model ceiling | 70B at 4-bit on one box | 400B+ at 4-bit, and it is HBM rather than unified memory | 70B at 4-bit on one box | 70B at 4-bit inside a 96 GB VRAM allocation | 32B at 4-bit on 64 GB | 70B at 4-bit on 128 GB | 400B+ at 4-bit on 512 GB | 30B at 4-bit, hard ceiling at 32 GB |
+| Launch | 2025 | 2025 | 2025 | 2025 | 2026 | 2026 | 2026 | 2025 |
 
 > - Ryzen AI Max+ 395 ships in the Framework Desktop, GMKtec EVO-X2, HP ZBook Ultra G1a and AMD's own Ryzen AI Halo developer platform. It is AMD's answer to DGX Spark and the Mac Studio: unified memory, no FP4, no cluster fabric.
 > - "GB10 OEM boxes" are the same GB10 superchip in someone else's case - ASUS Ascent GX10, Dell Pro Max with GB10, HP ZGX Nano, Lenovo and MSI all ship one. They differ in storage, chassis and price, not in compute or bandwidth.
 > - Bandwidth is the number to watch for token generation. A 5090 has 6.6x the bandwidth of a DGX Spark but a quarter of the memory: the Spark runs models the 5090 cannot load at all, and the 5090 runs the models that fit far faster.
 > - Apple does not publish FLOPS in a form comparable to NVIDIA's AI TOPS, and Apple Silicon has no FP4/FP8 tensor path, so 4-bit models are dequantized in software. Capacity and bandwidth are the honest comparison points.
-> - None of these are cluster hardware. DGX Spark's ConnectX-7 is the only real fabric here, and it tops out at 4 boxes; Thunderbolt between Macs is not comparable to NVLink or InfiniBand.
+> - DGX Station is the outlier on memory: 748 GB coherent, but read the split. Only 252 GB of that is HBM3e at 7.1 TB/s; the other 496 GB is LPDDR5X at 396 GB/s. It is not 748 GB at HBM speed, and it draws 1,600 W.
+> - Cluster networking is thin here. DGX Spark's ConnectX-7 and DGX Station's ConnectX-8 are the only real fabrics, and Spark tops out at four boxes; Thunderbolt between Macs is not comparable to NVLink or InfiniBand.
 
 ### Consumer & Workstation GPUs
 
@@ -426,7 +427,7 @@ Huawei publishes compute and interconnect figures for the 950 series and later b
 | Parameter | Ascend 910B | Ascend 910C | Ascend 950PR | Ascend 950DT | Ascend 960 | Ascend 970 |
 |---|---|---|---|---|---|---|
 | FP8 | not officially published | not officially published | 1 PFLOPS | 1 PFLOPS | 2 PFLOPS | 4 PFLOPS |
-| FP4 / MXFP4 | not supported | not supported | 2 PFLOPS (MXFP4) | 2 PFLOPS (MXFP4) | 4 PFLOPS | 8 PFLOPS |
+| FP4 / MXFP4 | not cited by Huawei; MXFP4 first appears with the 950 series | not cited by Huawei; MXFP4 first appears with the 950 series | 2 PFLOPS (MXFP4) | 2 PFLOPS (MXFP4) | 4 PFLOPS | 8 PFLOPS |
 | Memory | not officially published | not officially published | not stated in the keynote | not stated in the keynote | not stated in the keynote | not stated in the keynote |
 | Interconnect per chip | not officially published | Unified Bus (UB) | 2 TB/s | 2 TB/s | not stated | 4 TB/s |
 | Used in | Atlas 800 servers | Atlas 900 A3 SuperPoD | Atlas 950 SuperPoD | Atlas 950 SuperPoD | Atlas 960 SuperPoD | TBA |
@@ -446,7 +447,7 @@ Huawei's answer to NVL72 is not a better chip, it is a much larger coherent doma
 | Total memory | not officially published | 1,152 TB | 4,460 TB |
 | Interconnect BW | Unified Bus, all-to-all non-blocking | 16 PB/s | 34 PB/s |
 | FP8 compute | not officially published | 8 EFLOPS | 30 EFLOPS |
-| FP4 compute | not supported | 16 EFLOPS | 60 EFLOPS |
+| FP4 compute | not cited by Huawei; MXFP4 first appears with the 950 series | 16 EFLOPS | 60 EFLOPS |
 | Cabinets | 16 | 160 (128 compute + 32 comms) | 220 (176 compute + 44 comms) |
 | NVIDIA counterpart | GB200 NVL72 | beyond NVL72 scale - compare at cluster level | beyond NVL72 scale - compare at cluster level |
 | Availability | March 2025, 300+ deployed | Q4 2026 | Q4 2027 |
@@ -528,10 +529,10 @@ The practical way to shop: pick the capacity your model needs, then see who sell
 | 32 GB | RTX 5090 | Radeon AI PRO R9700 | Mac mini M6 (32 GB) | Arc Pro B70 | 170-1,792 GB/s | 30B at 4-bit with real context |
 | 48 GB | RTX 6000 Ada | Radeon PRO W7900 | Mac Studio M5 Max (48 GB) | nothing at this tier | 460-960 GB/s | 70B at 4-bit |
 | 96-128 GB | RTX PRO 6000 (96 GB VRAM), DGX Spark (128 GB unified) | Ryzen AI Max+ 395 (128 GB unified) | Mac Studio M5 Max 128 GB / M5 Ultra 96 GB | nothing at this tier | 256 GB/s unified, 1,792 GB/s on the RTX PRO card | 70B at 8-bit, 120B+ at 4-bit |
-| 256-512 GB | nothing at this tier | nothing at this tier | Mac Studio M5 Ultra | nothing at this tier | 1.2 TB/s | 400B+ at 4-bit |
+| 256 GB and up | DGX Station (748 GB coherent, 252 GB of it HBM3e) | nothing at this tier | Mac Studio M5 Ultra (256 or 512 GB) | nothing at this tier | 1.2 TB/s on the Mac; 7.1 TB/s HBM plus 396 GB/s LPDDR5X on DGX Station | 400B+ at 4-bit |
 
 > - Read the 96-128 GB row as two different products, not one tier. The 96 GB RTX PRO 6000 is dedicated VRAM at 1,792 GB/s; a 128 GB DGX Spark or Strix Halo box is unified memory at 256-273 GB/s. Same tier on paper, roughly 7x apart on decode speed.
-> - Apple is the only vendor selling 256-512 GB to one machine, and the M5 Ultra holds 1.2 TB/s while doing it - but with no FP4 path and no cluster fabric.
+> - Two very different machines sit at the top tier. A Mac Studio M5 Ultra gives 512 GB of uniform unified memory at 1.2 TB/s, no FP4 path, no cluster fabric, 480 W. A DGX Station gives 748 GB coherent but tiered - 252 GB of HBM3e at 7.1 TB/s over 496 GB of LPDDR5X - with native FP4 and a 800 Gb/s NIC, at 1,600 W. Capacity alone does not tell you which one you want.
 > - Intel stops at 32 GB. Above that tier its answer is multiple B60 or B70 cards over PCIe, not a bigger card.
 > - Parts named here that have no row of their own elsewhere in this repo (RTX 5060 Ti, RTX 6000 Ada) are listed for orientation only; no specs are claimed for them beyond the memory tier.
 

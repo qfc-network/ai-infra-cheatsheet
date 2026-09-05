@@ -80,18 +80,20 @@ items:
       bandwidth: 统一内存 256 GB/s，RTX PRO 卡 1,792 GB/s
       runs: 70B 八位量化，120B+ 四位量化
   - id: t256
-    name: 256-512 GB
+    name: 256 GB and up
     specs:
-      nvidia: nothing at this tier
+      nvidia: DGX Station (748 GB coherent, 252 GB of it HBM3e)
       amd: nothing at this tier
-      apple: Mac Studio M5 Ultra
+      apple: Mac Studio M5 Ultra (256 or 512 GB)
       intel: nothing at this tier
-      bandwidth: 1.2 TB/s
+      bandwidth: 1.2 TB/s on the Mac; 7.1 TB/s HBM plus 396 GB/s LPDDR5X on DGX Station
       runs: 400B+ at 4-bit
     specs_zh:
-      nvidia: 该档位无产品
+      nvidia: DGX Station（748 GB 一致性内存，其中 252 GB 为 HBM3e）
       amd: 该档位无产品
+      apple: Mac Studio M5 Ultra（256 或 512 GB）
       intel: 该档位无产品
+      bandwidth: Mac 为 1.2 TB/s；DGX Station 为 HBM 7.1 TB/s + LPDDR5X 396 GB/s
       runs: 400B+ 四位量化
 notes:
   - >-
@@ -100,8 +102,11 @@ notes:
     Halo box is unified memory at 256-273 GB/s. Same tier on paper, roughly 7x
     apart on decode speed.
   - >-
-    Apple is the only vendor selling 256-512 GB to one machine, and the M5 Ultra
-    holds 1.2 TB/s while doing it - but with no FP4 path and no cluster fabric.
+    Two very different machines sit at the top tier. A Mac Studio M5 Ultra gives
+    512 GB of uniform unified memory at 1.2 TB/s, no FP4 path, no cluster
+    fabric, 480 W. A DGX Station gives 748 GB coherent but tiered - 252 GB of
+    HBM3e at 7.1 TB/s over 496 GB of LPDDR5X - with native FP4 and a 800 Gb/s
+    NIC, at 1,600 W. Capacity alone does not tell you which one you want.
   - >-
     Intel stops at 32 GB. Above that tier its answer is multiple B60 or B70
     cards over PCIe, not a bigger card.
@@ -115,8 +120,10 @@ notes_zh:
     1,792 GB/s；128 GB 的 DGX Spark 或 Strix Halo 是统一内存，256~273 GB/s。
     纸面上同一档，出词速度差约 7 倍。
   - >-
-    只有苹果卖单机 256~512 GB，而且 M5 Ultra 在这个容量下还有 1.2 TB/s——
-    代价是没有 FP4 通路，也没有集群网络。
+    最高一档上坐着两台完全不同的机器。Mac Studio M5 Ultra 是 512 GB 均质统一内存、
+    1.2 TB/s、无 FP4 通路、无集群网络、480 W。DGX Station 是 748 GB 一致性内存但分层——
+    252 GB 的 7.1 TB/s HBM3e 之上叠 496 GB 的 LPDDR5X——有原生 FP4 和 800 Gb/s 网卡，
+    整机 1,600 W。光看容量判断不出该要哪台。
   - >-
     Intel 到 32 GB 为止。再往上它的答案是多张 B60 或 B70 走 PCIe，而不是更大的单卡。
   - >-

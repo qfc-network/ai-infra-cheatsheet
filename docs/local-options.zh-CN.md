@@ -9,10 +9,10 @@
 | 32 GB | RTX 5090 | Radeon AI PRO R9700 | Mac mini M6 (32 GB) | Arc Pro B70 | 170-1,792 GB/s | 30B 四位量化且能带像样的上下文 |
 | 48 GB | RTX 6000 Ada | Radeon PRO W7900 | Mac Studio M5 Max (48 GB) | 该档位无产品 | 460-960 GB/s | 70B 四位量化 |
 | 96-128 GB | RTX PRO 6000（96 GB 显存）、DGX Spark（128 GB 统一内存） | Ryzen AI Max+ 395（128 GB 统一内存） | Mac Studio M5 Max 128 GB / M5 Ultra 96 GB | 该档位无产品 | 统一内存 256 GB/s，RTX PRO 卡 1,792 GB/s | 70B 八位量化，120B+ 四位量化 |
-| 256-512 GB | 该档位无产品 | 该档位无产品 | Mac Studio M5 Ultra | 该档位无产品 | 1.2 TB/s | 400B+ 四位量化 |
+| 256 GB and up | DGX Station（748 GB 一致性内存，其中 252 GB 为 HBM3e） | 该档位无产品 | Mac Studio M5 Ultra（256 或 512 GB） | 该档位无产品 | Mac 为 1.2 TB/s；DGX Station 为 HBM 7.1 TB/s + LPDDR5X 396 GB/s | 400B+ 四位量化 |
 
 > - 96~128 GB 那一行要当成两类产品看，不是同一档。96 GB 的 RTX PRO 6000 是板载独显， 1,792 GB/s；128 GB 的 DGX Spark 或 Strix Halo 是统一内存，256~273 GB/s。 纸面上同一档，出词速度差约 7 倍。
-> - 只有苹果卖单机 256~512 GB，而且 M5 Ultra 在这个容量下还有 1.2 TB/s—— 代价是没有 FP4 通路，也没有集群网络。
+> - 最高一档上坐着两台完全不同的机器。Mac Studio M5 Ultra 是 512 GB 均质统一内存、 1.2 TB/s、无 FP4 通路、无集群网络、480 W。DGX Station 是 748 GB 一致性内存但分层—— 252 GB 的 7.1 TB/s HBM3e 之上叠 496 GB 的 LPDDR5X——有原生 FP4 和 800 Gb/s 网卡， 整机 1,600 W。光看容量判断不出该要哪台。
 > - Intel 到 32 GB 为止。再往上它的答案是多张 B60 或 B70 走 PCIe，而不是更大的单卡。
 > - 表中提到但本仓库没有独立条目的型号（RTX 5060 Ti、RTX 6000 Ada）仅用于定位， 除显存档位外不对其规格作任何声明。
 

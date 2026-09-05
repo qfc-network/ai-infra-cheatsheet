@@ -8,7 +8,7 @@ Huawei's answer to NVL72 is not a better chip, it is a much larger coherent doma
 | Total memory | not officially published | 1,152 TB | 4,460 TB |
 | Interconnect BW | Unified Bus, all-to-all non-blocking | 16 PB/s | 34 PB/s |
 | FP8 compute | not officially published | 8 EFLOPS | 30 EFLOPS |
-| FP4 compute | not supported | 16 EFLOPS | 60 EFLOPS |
+| FP4 compute | not cited by Huawei; MXFP4 first appears with the 950 series | 16 EFLOPS | 60 EFLOPS |
 | Cabinets | 16 | 160 (128 compute + 32 comms) | 220 (176 compute + 44 comms) |
 | NVIDIA counterpart | GB200 NVL72 | beyond NVL72 scale - compare at cluster level | beyond NVL72 scale - compare at cluster level |
 | Availability | March 2025, 300+ deployed | Q4 2026 | Q4 2027 |

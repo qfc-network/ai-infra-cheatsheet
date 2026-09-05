@@ -8,6 +8,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 from pathlib import Path
 
@@ -204,6 +205,34 @@ def render_readme(cats: dict, lang: str) -> str:
     return template
 
 
+def slugify(heading: str) -> str:
+    """Approximate GitHub's heading-anchor algorithm.
+
+    Lowercase, drop anything that is not a word character, space or hyphen
+    (CJK survives because \\w is unicode-aware), then spaces to hyphens.
+    """
+    s = re.sub(r"[^\w\s-]", "", heading.strip().lower(), flags=re.UNICODE)
+    return re.sub(r"\s", "-", s)
+
+
+def check_links(path: Path, content: str) -> list:
+    """Return a list of broken in-page anchors and relative file links."""
+    problems = []
+    anchors = {slugify(h) for h in re.findall(r"^#{1,6}\s+(.+?)\s*$", content, re.M)}
+    for target in re.findall(r"\]\(#([^)]+)\)", content):
+        if target not in anchors:
+            problems.append(f"{path.name}: anchor #{target} matches no heading")
+    for target in re.findall(r"\]\(([^)#][^)]*)\)", content):
+        if target.startswith(("http://", "https://", "mailto:")):
+            continue
+        target = target.split("#", 1)[0]
+        if not target:
+            continue
+        if not (path.parent / target).exists():
+            problems.append(f"{path.name}: link to {target} does not exist")
+    return problems
+
+
 def write(path: Path, content: str, check: bool, stale: list) -> None:
     current = path.read_text(encoding="utf-8") if path.exists() else None
     if current == content:
@@ -221,21 +250,32 @@ def main() -> int:
     ap.add_argument("--check", action="store_true", help="fail if generated files are out of date")
     args = ap.parse_args()
     stale: list = []
+    broken: list = []
     try:
         cats = load_categories()
         for lang, cfg in LANGS.items():
-            write(ROOT / cfg["readme"], render_readme(cats, lang), args.check, stale)
+            readme = ROOT / cfg["readme"]
+            content = render_readme(cats, lang)
+            broken += check_links(readme, content)
+            write(readme, content, args.check, stale)
             for cid in ORDER:
-                write(DOCS_DIR / f"{cid}{cfg['doc_suffix']}", render_doc(cats[cid], lang), args.check, stale)
+                doc = DOCS_DIR / f"{cid}{cfg['doc_suffix']}"
+                content = render_doc(cats[cid], lang)
+                broken += check_links(doc, content)
+                write(doc, content, args.check, stale)
     except DataError as exc:
         print(f"data error: {exc}", file=sys.stderr)
+        return 1
+    if broken:
+        for problem in broken:
+            print(f"broken link: {problem}", file=sys.stderr)
         return 1
     if stale:
         print("out of date: " + ", ".join(str(p) for p in stale), file=sys.stderr)
         print("run: python scripts/generate.py", file=sys.stderr)
         return 1
     if args.check:
-        print("all generated files are up to date")
+        print("all generated files are up to date; links resolve")
     return 0
 
 

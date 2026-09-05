@@ -26,7 +26,7 @@ items:
       memory: not officially published
       interconnect: Unified Bus, all-to-all non-blocking
       fp8: not officially published
-      fp4: not supported
+      fp4: not cited by Huawei; MXFP4 first appears with the 950 series
       cabinets: 16
       nvidia_peer: GB200 NVL72
       availability: March 2025, 300+ deployed
@@ -34,7 +34,7 @@ items:
       memory: 未公布
       interconnect: Unified Bus，全互联无阻塞
       fp8: 未公布
-      fp4: 不支持
+      fp4: 华为未提及；MXFP4 自 950 系列才出现
       nvidia_peer: GB200 NVL72
       availability: 2025 年 3 月，已部署 300+ 套
     sources:

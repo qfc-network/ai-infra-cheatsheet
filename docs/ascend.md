@@ -5,7 +5,7 @@ Huawei publishes compute and interconnect figures for the 950 series and later b
 | Parameter | Ascend 910B | Ascend 910C | Ascend 950PR | Ascend 950DT | Ascend 960 | Ascend 970 |
 |---|---|---|---|---|---|---|
 | FP8 | not officially published | not officially published | 1 PFLOPS | 1 PFLOPS | 2 PFLOPS | 4 PFLOPS |
-| FP4 / MXFP4 | not supported | not supported | 2 PFLOPS (MXFP4) | 2 PFLOPS (MXFP4) | 4 PFLOPS | 8 PFLOPS |
+| FP4 / MXFP4 | not cited by Huawei; MXFP4 first appears with the 950 series | not cited by Huawei; MXFP4 first appears with the 950 series | 2 PFLOPS (MXFP4) | 2 PFLOPS (MXFP4) | 4 PFLOPS | 8 PFLOPS |
 | Memory | not officially published | not officially published | not stated in the keynote | not stated in the keynote | not stated in the keynote | not stated in the keynote |
 | Interconnect per chip | not officially published | Unified Bus (UB) | 2 TB/s | 2 TB/s | not stated | 4 TB/s |
 | Used in | Atlas 800 servers | Atlas 900 A3 SuperPoD | Atlas 950 SuperPoD | Atlas 950 SuperPoD | Atlas 960 SuperPoD | TBA |

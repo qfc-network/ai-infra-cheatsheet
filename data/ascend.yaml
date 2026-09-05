@@ -22,7 +22,7 @@ items:
     name: Ascend 910B
     specs:
       fp8: not officially published
-      fp4: not supported
+      fp4: not cited by Huawei; MXFP4 first appears with the 950 series
       memory: not officially published
       interconnect: not officially published
       used_in: Atlas 800 servers
@@ -30,7 +30,7 @@ items:
       sourcing: no public datasheet
     specs_zh:
       fp8: 未公布
-      fp4: 不支持
+      fp4: 华为未提及；MXFP4 自 950 系列才出现
       memory: 未公布
       interconnect: 未公布
       used_in: Atlas 800 系列服务器
@@ -40,7 +40,7 @@ items:
     name: Ascend 910C
     specs:
       fp8: not officially published
-      fp4: not supported
+      fp4: not cited by Huawei; MXFP4 first appears with the 950 series
       memory: not officially published
       interconnect: Unified Bus (UB)
       used_in: Atlas 900 A3 SuperPoD
@@ -48,7 +48,7 @@ items:
       sourcing: no public datasheet
     specs_zh:
       fp8: 未公布
-      fp4: 不支持
+      fp4: 华为未提及；MXFP4 自 950 系列才出现
       memory: 未公布
       interconnect: Unified Bus（UB 总线）
       used_in: Atlas 900 A3 SuperPoD
