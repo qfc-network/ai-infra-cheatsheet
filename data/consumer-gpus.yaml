@@ -1,0 +1,155 @@
+id: consumer-gpus
+title: Consumer & Workstation GPUs
+title_zh: 消费级与工作站 GPU
+summary: >-
+  What people actually run local LLMs on. For inference the binding constraint is
+  VRAM first and memory bandwidth second — peak FLOPS rarely decides anything.
+summary_zh: >-
+  大部分人本地跑 LLM 用的其实是这些卡。推理阶段的瓶颈依次是显存容量和显存带宽，
+  峰值算力基本不是决定因素。
+orientation: columns
+fields:
+  - {key: architecture,   label: Architecture,              label_zh: 架构}
+  - {key: vram,           label: VRAM,                      label_zh: 显存}
+  - {key: bandwidth,      label: Memory bandwidth,          label_zh: 显存带宽}
+  - {key: precision,      label: Lowest native precision,   label_zh: 最低原生精度}
+  - {key: tensor_perf,    label: NVIDIA tensor figure,      label_zh: NVIDIA 标称算力}
+  - {key: multi_gpu,      label: GPU-to-GPU link,           label_zh: 卡间互联}
+  - {key: ecc,            label: ECC memory,                label_zh: ECC 显存}
+  - {key: tdp,            label: Board power,               label_zh: 整卡功耗}
+  - {key: llm_fit,        label: Rough local LLM fit,       label_zh: 本地 LLM 大致可跑}
+  - {key: launch,         label: Launch,                    label_zh: 上市时间}
+items:
+  - id: rtx-2080-ti
+    name: RTX 2080 Ti
+    specs:
+      architecture: Turing (TU102)
+      vram: 11 GB GDDR6
+      bandwidth: 616 GB/s
+      precision: FP16 / INT8 (no BF16)
+      tensor_perf: ~108 TFLOPS FP16 (FP16 accumulate)
+      multi_gpu: NVLink 2 bridge, 100 GB/s (2 GPUs)
+      ecc: "no"
+      tdp: 250-260 W
+      llm_fit: 7-8B at 4-bit
+      launch: 2018
+    specs_zh:
+      precision: FP16 / INT8（无 BF16）
+      multi_gpu: NVLink 2 桥接，100 GB/s（限 2 卡）
+      ecc: 无
+      llm_fit: 7~8B 四位量化
+    sources:
+      - https://www.nvidia.com/content/geforce-gtx/GEFORCE_RTX_2080Ti_User_Guide.pdf
+      - https://developer.nvidia.com/blog/nvidia-turing-architecture-in-depth/
+  - id: rtx-3090
+    name: RTX 3090
+    specs:
+      architecture: Ampere (GA102)
+      vram: 24 GB GDDR6X
+      bandwidth: 936 GB/s
+      precision: BF16 / INT8
+      tensor_perf: 285 TFLOPS FP16 (sparse)
+      multi_gpu: NVLink 3 bridge, 112.5 GB/s (2 GPUs)
+      ecc: "no"
+      tdp: 350 W
+      llm_fit: ~30B at 4-bit, 14B at 8-bit
+      launch: 2020
+    specs_zh:
+      multi_gpu: NVLink 3 桥接，112.5 GB/s（限 2 卡）
+      ecc: 无
+      llm_fit: 约 30B 四位量化，14B 八位量化
+      tensor_perf: 285 TFLOPS FP16（稀疏）
+    sources:
+      - https://www.nvidia.com/en-us/geforce/graphics-cards/30-series/rtx-3090-3090ti/
+      - https://www.nvidia.com/content/PDF/nvidia-ampere-ga-102-gpu-architecture-whitepaper-v2.1.pdf
+  - id: rtx-4090
+    name: RTX 4090
+    specs:
+      architecture: Ada Lovelace (AD102)
+      vram: 24 GB GDDR6X
+      bandwidth: 1,008 GB/s
+      precision: FP8
+      tensor_perf: 1,321 AI TOPS (FP8, sparse)
+      multi_gpu: PCIe 4.0 x16 only - no NVLink
+      ecc: "no"
+      tdp: 450 W
+      llm_fit: ~30B at 4-bit, 14B at 8-bit
+      launch: 2022
+    specs_zh:
+      multi_gpu: 仅 PCIe 4.0 x16，无 NVLink
+      ecc: 无
+      llm_fit: 约 30B 四位量化，14B 八位量化
+      tensor_perf: 1,321 AI TOPS（FP8，稀疏）
+    sources:
+      - https://www.nvidia.com/en-us/geforce/graphics-cards/40-series/rtx-4090/
+  - id: rtx-5090
+    name: RTX 5090
+    specs:
+      architecture: Blackwell (GB202)
+      vram: 32 GB GDDR7
+      bandwidth: 1,792 GB/s
+      precision: FP4
+      tensor_perf: 3,352 AI TOPS (FP4, sparse)
+      multi_gpu: PCIe 5.0 x16 only - no NVLink
+      ecc: "no"
+      tdp: 575 W
+      llm_fit: ~30B at 4-bit with long context, 32B comfortable
+      launch: 2025
+    specs_zh:
+      multi_gpu: 仅 PCIe 5.0 x16，无 NVLink
+      ecc: 无
+      llm_fit: 约 30B 四位量化且能带长上下文
+      tensor_perf: 3,352 AI TOPS（FP4，稀疏）
+    sources:
+      - https://www.nvidia.com/en-us/geforce/graphics-cards/50-series/rtx-5090/
+  - id: rtx-pro-6000
+    name: RTX PRO 6000 Blackwell
+    specs:
+      architecture: Blackwell (GB202)
+      vram: 96 GB GDDR7
+      bandwidth: 1,792 GB/s
+      precision: FP4
+      tensor_perf: 4,000 AI TOPS (FP4, sparse)
+      multi_gpu: PCIe 5.0 x16 only - no NVLink
+      ecc: "yes"
+      tdp: 600 W
+      llm_fit: 70B at 8-bit, 120B+ at 4-bit
+      launch: 2025
+    specs_zh:
+      multi_gpu: 仅 PCIe 5.0 x16，无 NVLink
+      ecc: 有
+      llm_fit: 70B 八位量化，120B+ 四位量化
+      tensor_perf: 4,000 AI TOPS（FP4，稀疏）
+    sources:
+      - https://www.nvidia.com/en-us/products/workstations/professional-desktop-gpus/rtx-pro-6000/
+notes:
+  - >-
+    The "NVIDIA tensor figure" row is NOT comparable across generations: NVIDIA
+    quotes FP16 for Turing/Ampere, FP8 for Ada and FP4 for Blackwell, all with
+    sparsity from Ampere on. A 5090 is not 2.5x a 4090 at the same precision.
+  - >-
+    NVLink is gone from GeForce after the RTX 3090. On a 4090/5090 box,
+    multi-GPU tensor parallelism runs over PCIe, which is roughly an order of
+    magnitude slower than the 1.8 TB/s NVLink inside a DGX node — fine for
+    pipeline-parallel or per-GPU replicas, painful for tensor parallelism.
+  - >-
+    GeForce cards have no ECC and no MIG, and NVIDIA's GeForce driver licence
+    restricts data center deployment. Read the licence yourself before renting
+    them out; this is the main reason hosting providers buy RTX PRO or data
+    center SKUs.
+  - >-
+    "Rough local LLM fit" assumes weights plus a modest KV cache. Long context,
+    batching, or unquantized weights all move the ceiling down sharply.
+notes_zh:
+  - >-
+    "NVIDIA 标称算力" 这一行跨代不可比：Turing/Ampere 报的是 FP16，Ada 报 FP8，
+    Blackwell 报 FP4，且 Ampere 之后都是稀疏值。同精度下 5090 并不是 4090 的 2.5 倍。
+  - >-
+    RTX 3090 之后 GeForce 就没有 NVLink 了。4090/5090 多卡做张量并行只能走 PCIe，
+    比 DGX 机内 1.8 TB/s 的 NVLink 慢一个数量级左右——跑流水线并行或每卡一个副本没问题，
+    跑张量并行会很难受。
+  - >-
+    GeForce 没有 ECC、没有 MIG，而且 NVIDIA 的 GeForce 驱动许可协议对数据中心部署有限制。
+    要对外出租算力前请自己读一遍许可条款；这也是各家托管商买 RTX PRO 或数据中心卡的主要原因。
+  - >-
+    "本地 LLM 大致可跑" 按权重加少量 KV cache 估算。长上下文、批量推理或不量化都会显著拉低上限。

@@ -32,6 +32,7 @@ STRINGS = {
 ORDER = [
     "dgx-systems",
     "datacenter-gpus",
+    "consumer-gpus",
     "superchips",
     "rack-scale",
     "interconnect",
