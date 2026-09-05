@@ -1,0 +1,109 @@
+id: head-to-head
+title: NVIDIA vs AMD, Generation by Generation
+title_zh: NVIDIA 与 AMD 逐代对位
+summary: >-
+  Which AMD part competes with which NVIDIA part, and what actually separates
+  them. Memory capacity has been AMD's lever; domain size and software have been
+  NVIDIA's.
+summary_zh: >-
+  哪张 AMD 卡对标哪张 NVIDIA 卡，以及真正拉开差距的是什么。
+  AMD 的杠杆一直是显存容量，NVIDIA 的是互联域规模和软件。
+orientation: rows
+fields:
+  - {key: year,      label: Era,               label_zh: 时期}
+  - {key: nvidia,    label: NVIDIA,            label_zh: NVIDIA}
+  - {key: nv_mem,    label: NVIDIA HBM,        label_zh: NVIDIA 显存}
+  - {key: amd,       label: AMD,               label_zh: AMD}
+  - {key: amd_mem,   label: AMD HBM,           label_zh: AMD 显存}
+  - {key: takeaway,  label: What decides it,   label_zh: 决定因素}
+items:
+  - id: hopper-cdna3
+    name: Hopper vs CDNA 3
+    specs:
+      year: "2023"
+      nvidia: H100 SXM
+      nv_mem: 80 GB
+      amd: MI300X
+      amd_mem: 192 GB
+      takeaway: AMD fits models H100 cannot; NVIDIA wins on software maturity and a 256-GPU NVLink domain
+    specs_zh:
+      takeaway: AMD 装得下 H100 装不下的模型；NVIDIA 赢在软件成熟度和 256 卡 NVLink 域
+  - id: hopper-refresh
+    name: Hopper refresh vs CDNA 3 refresh
+    specs:
+      year: "2024"
+      nvidia: H200 SXM
+      nv_mem: 141 GB
+      amd: MI325X
+      amd_mem: 256 GB
+      takeaway: same matchup, both sides added HBM; AMD still ~1.8x the capacity
+    specs_zh:
+      takeaway: 同一组对位，双方都加了 HBM；AMD 容量仍约为 1.8 倍
+  - id: blackwell-cdna4
+    name: Blackwell vs CDNA 4
+    specs:
+      year: "2025"
+      nvidia: B200 SXM
+      nv_mem: 180 GB
+      amd: MI355X
+      amd_mem: 288 GB
+      takeaway: first generation where both have native 4-bit, but in incompatible formats (NVFP4 vs MXFP4)
+    specs_zh:
+      takeaway: 双方第一次都有原生 4bit，但格式互不兼容（NVFP4 与 MXFP4）
+  - id: blackwell-ultra-cdna4
+    name: Blackwell Ultra vs CDNA 4
+    specs:
+      year: "2025"
+      nvidia: B300 SXM
+      nv_mem: 288 GB
+      amd: MI355X
+      amd_mem: 288 GB
+      takeaway: memory parity for the first time; the gap moves entirely to rack scale (NVL72 vs 8-GPU nodes)
+    specs_zh:
+      takeaway: 显存首次持平，差距完全转移到机柜级（NVL72 对 8 卡节点）
+  - id: rubin-mi400
+    name: Rubin vs MI400
+    specs:
+      year: 2026 (roadmap)
+      nvidia: Rubin / VR200 NVL144
+      nv_mem: 288 GB HBM4
+      amd: MI400 series / Helios
+      amd_mem: TBA
+      takeaway: both go rack-scale; AMD bets on open UALink + Ultra Ethernet against NVLink
+    specs_zh:
+      year: 2026（路线图）
+      amd_mem: 未公布
+      takeaway: 双方都上机柜级；AMD 押注开放的 UALink + Ultra Ethernet 对抗 NVLink
+notes:
+  - >-
+    Memory capacity decides what you can run at all, and AMD has led on it every
+    generation until B300. If a model fits on one MI300X but needs two H100s,
+    AMD wins that comparison before any benchmark runs.
+  - >-
+    Scale-up domain size decides how you shard. NVIDIA extended NVLink to 72
+    GPUs in one rack; AMD's coherent domain is 8 GPUs until Helios ships. For
+    tensor parallelism across more than 8 GPUs that difference is structural,
+    not a tuning problem.
+  - >-
+    Software is the part no spec table shows. CUDA has a decade-plus lead in
+    kernels, libraries and framework defaults. ROCm has closed much of the gap
+    for mainstream inference and training on popular models, and much less of it
+    for anything custom or new.
+  - >-
+    The 4-bit formats are not interchangeable. NVIDIA's NVFP4 and AMD's MXFP4
+    use different scaling-block layouts, so a checkpoint quantized for one needs
+    requantizing for the other.
+notes_zh:
+  - >-
+    显存容量决定"能不能跑"，而在 B300 之前 AMD 每一代都领先。
+    如果一个模型单张 MI300X 装得下、却要两张 H100，那还没跑分 AMD 就已经赢了这一局。
+  - >-
+    scale-up 域的规模决定"怎么切模型"。NVIDIA 把 NVLink 扩到了单柜 72 卡，
+    而 Helios 之前 AMD 的一致性域是 8 卡。超过 8 卡做张量并行时，
+    这是结构性差异，不是调优能解决的问题。
+  - >-
+    软件是规格表里看不到的那部分。CUDA 在算子、库和框架默认路径上领先十年以上。
+    ROCm 在主流模型的推理和训练上已经追上不少，但一旦涉及自定义或全新的东西差距依然明显。
+  - >-
+    两家的 4bit 格式不通用。NVIDIA 的 NVFP4 和 AMD 的 MXFP4 缩放块布局不同，
+    为其一量化好的权重要重新量化才能给另一边用。

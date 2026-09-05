@@ -30,16 +30,25 @@ STRINGS = {
 
 # Order in which categories appear in the README.
 ORDER = [
+    # Desktop / local
+    "local-systems",
+    "consumer-gpus",
+    # NVIDIA data center
     "dgx-systems",
     "datacenter-gpus",
-    "consumer-gpus",
-    "quantization",
-    "kv-cache",
     "superchips",
     "rack-scale",
     "interconnect",
     "networking",
     "roadmap",
+    # AMD
+    "amd-gpus",
+    "amd-systems",
+    # Cross-vendor
+    "head-to-head",
+    # Sizing math
+    "quantization",
+    "kv-cache",
 ]
 
 
@@ -169,6 +178,7 @@ def render_readme(cats: dict, lang: str) -> str:
     for cid in ORDER:
         cat = cats[cid]
         template = template.replace(f"{{{{section:{cid}}}}}", render_section(cat, lang).rstrip())
+        template = template.replace(f"{{{{section3:{cid}}}}}", render_section(cat, lang, heading="###").rstrip())
         template = template.replace(f"{{{{table:{cid}}}}}", render_table(cat, lang))
     if "{{" in template:
         leftover = template[template.index("{{"): template.index("{{") + 40]

@@ -1,26 +1,87 @@
-# NVIDIA AI Infrastructure Cheat Sheet
+# AI Infrastructure Cheat Sheet
 
-Side-by-side spec tables for NVIDIA's AI data center stack — GPUs, DGX systems,
-Grace superchips, rack-scale NVLink systems, and the networking that ties them
-together. Every table is generated from the YAML files in [`data/`](data/), so
-corrections are a one-line pull request.
+Side-by-side spec tables for the hardware people actually run models on — from a
+Mac mini on a desk to a 72-GPU NVLink rack. NVIDIA, AMD and Apple, plus the
+sizing math that decides what fits. Every table is generated from the YAML in
+[`data/`](data/), so a correction is a one-line pull request.
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
 ## Contents
 
+**Desktop and local**
+- [Desktop & Local AI Systems](#desktop--local-ai-systems)
+- [Consumer & Workstation GPUs](#consumer--workstation-gpus)
+
+**NVIDIA data center**
 - [DGX Systems](#dgx-systems)
 - [Flagship Data Center GPUs (SXM)](#flagship-data-center-gpus-sxm)
-- [Consumer & Workstation GPUs](#consumer--workstation-gpus)
-- [Quantization vs VRAM (weights)](#quantization-vs-vram-weights)
-- [KV Cache vs Context Length](#kv-cache-vs-context-length)
 - [Grace-based Superchips](#grace-based-superchips)
 - [Rack-Scale NVLink Systems](#rack-scale-nvlink-systems)
 - [NVLink & NVSwitch Generations](#nvlink--nvswitch-generations)
 - [Scale-Out Networking](#scale-out-networking)
 - [Platform Roadmap](#platform-roadmap)
 
-## DGX Systems
+**AMD**
+- [AMD Instinct Accelerators](#amd-instinct-accelerators)
+- [AMD Instinct Platforms & Racks](#amd-instinct-platforms--racks)
+
+**Head to head**
+- [NVIDIA vs AMD, Generation by Generation](#nvidia-vs-amd-generation-by-generation)
+
+**Sizing math**
+- [Quantization vs VRAM (weights)](#quantization-vs-vram-weights)
+- [KV Cache vs Context Length](#kv-cache-vs-context-length)
+
+## Desktop and local
+
+### Desktop & Local AI Systems
+
+Boxes you can put on a desk and run a model on. Two different bets: unified memory (lots of capacity, moderate bandwidth) versus a discrete GPU (little capacity, huge bandwidth). Decode speed tracks bandwidth; what fits at all tracks capacity.
+
+| Parameter | NVIDIA DGX Spark | GB10 OEM boxes | Mac mini (M5 Pro) | Mac Studio (M5 Max) | Mac Studio (M5 Ultra) | RTX 5090 desktop |
+|---|---|---|---|---|---|---|
+| Chip | GB10 Grace Blackwell (20-core Arm) | GB10 Grace Blackwell (same silicon) | Apple M5 Pro | Apple M5 Max | Apple M5 Ultra | GB202 discrete GPU |
+| Memory for the model | 128 GB LPDDR5X unified | 128 GB LPDDR5X unified | 24 / 48 / 64 GB unified | 36 / 48 / 64 / 128 GB unified | 96 / 256 / 512 GB unified | 32 GB GDDR7 (VRAM only) |
+| Memory bandwidth | 273 GB/s | 273 GB/s | 307 GB/s | 460-614 GB/s | 1.2 TB/s | 1,792 GB/s |
+| Vendor AI figure | 1 PFLOP FP4 (sparse) | 1 PFLOP FP4 (sparse) | not published in comparable terms | not published in comparable terms | not published in comparable terms | 3,352 AI TOPS FP4 (sparse) |
+| Low precision support | FP4 / FP8 native (Blackwell tensor cores) | FP4 / FP8 native | no FP4/FP8 tensor path; GPU + Neural Engine | no FP4/FP8 tensor path | no FP4/FP8 tensor path | FP4 / FP8 native |
+| Networking | ConnectX-7 200 GbE + 10 GbE | ConnectX-7 200 GbE + 10 GbE | 10 GbE, Thunderbolt 5 | 10 GbE, Thunderbolt 5 | 10 GbE, Thunderbolt 5 | whatever the motherboard has |
+| Multi-box linking | up to 4 units, ~700B params | same as DGX Spark | Thunderbolt only, not a real fabric | Thunderbolt only | Thunderbolt only | PCIe only, no NVLink |
+| System power | 240 W PSU (140 W chip TDP) | ~240 W | 155 W max continuous | 480 W max continuous | 480 W max continuous | 575 W card, ~1 kW system |
+| Rough model ceiling | 70B at 4-bit on one box | 70B at 4-bit on one box | 32B at 4-bit on 64 GB | 70B at 4-bit on 128 GB | 400B+ at 4-bit on 512 GB | 30B at 4-bit, hard ceiling at 32 GB |
+| Launch | 2025 | 2025 | 2026 | 2026 | 2026 | 2025 |
+
+> - "GB10 OEM boxes" are the same GB10 superchip in someone else's case - ASUS Ascent GX10, Dell Pro Max with GB10, HP ZGX Nano, Lenovo and MSI all ship one. They differ in storage, chassis and price, not in compute or bandwidth.
+> - Bandwidth is the number to watch for token generation. A 5090 has 6.6x the bandwidth of a DGX Spark but a quarter of the memory: the Spark runs models the 5090 cannot load at all, and the 5090 runs the models that fit far faster.
+> - Apple does not publish FLOPS in a form comparable to NVIDIA's AI TOPS, and Apple Silicon has no FP4/FP8 tensor path, so 4-bit models are dequantized in software. Capacity and bandwidth are the honest comparison points.
+> - None of these are cluster hardware. DGX Spark's ConnectX-7 is the only real fabric here, and it tops out at 4 boxes; Thunderbolt between Macs is not comparable to NVLink or InfiniBand.
+
+### Consumer & Workstation GPUs
+
+What people actually run local LLMs on. For inference the binding constraint is VRAM first and memory bandwidth second — peak FLOPS rarely decides anything.
+
+| Parameter | RTX 2080 Ti | RTX 3090 | RTX 4090 | RTX 5090 | RTX PRO 6000 Blackwell |
+|---|---|---|---|---|---|
+| Architecture | Turing (TU102) | Ampere (GA102) | Ada Lovelace (AD102) | Blackwell (GB202) | Blackwell (GB202) |
+| VRAM | 11 GB GDDR6 | 24 GB GDDR6X | 24 GB GDDR6X | 32 GB GDDR7 | 96 GB GDDR7 |
+| Memory bandwidth | 616 GB/s | 936 GB/s | 1,008 GB/s | 1,792 GB/s | 1,792 GB/s |
+| Lowest native precision | FP16 / INT8 (no BF16) | BF16 / INT8 | FP8 | FP4 | FP4 |
+| NVIDIA tensor figure | ~108 TFLOPS FP16 (FP16 accumulate) | 285 TFLOPS FP16 (sparse) | 1,321 AI TOPS (FP8, sparse) | 3,352 AI TOPS (FP4, sparse) | 4,000 AI TOPS (FP4, sparse) |
+| GPU-to-GPU link | NVLink 2 bridge, 100 GB/s (2 GPUs) | NVLink 3 bridge, 112.5 GB/s (2 GPUs) | PCIe 4.0 x16 only - no NVLink | PCIe 5.0 x16 only - no NVLink | PCIe 5.0 x16 only - no NVLink |
+| ECC memory | no | no | no | no | yes |
+| Board power | 250-260 W | 350 W | 450 W | 575 W | 600 W |
+| Rough local LLM fit | 7-8B at 4-bit | ~30B at 4-bit, 14B at 8-bit | ~30B at 4-bit, 14B at 8-bit | ~30B at 4-bit with long context, 32B comfortable | 70B at 8-bit, 120B+ at 4-bit |
+| Launch | 2018 | 2020 | 2022 | 2025 | 2025 |
+
+> - The "NVIDIA tensor figure" row is NOT comparable across generations: NVIDIA quotes FP16 for Turing/Ampere, FP8 for Ada and FP4 for Blackwell, all with sparsity from Ampere on. A 5090 is not 2.5x a 4090 at the same precision.
+> - NVLink is gone from GeForce after the RTX 3090. On a 4090/5090 box, multi-GPU tensor parallelism runs over PCIe, which is roughly an order of magnitude slower than the 1.8 TB/s NVLink inside a DGX node — fine for pipeline-parallel or per-GPU replicas, painful for tensor parallelism.
+> - GeForce cards have no ECC and no MIG, and NVIDIA's GeForce driver licence restricts data center deployment. Read the licence yourself before renting them out; this is the main reason hosting providers buy RTX PRO or data center SKUs.
+> - "Rough local LLM fit" assumes weights plus a modest KV cache. Long context, batching, or unquantized weights all move the ceiling down sharply.
+
+## NVIDIA data center
+
+### DGX Systems
 
 NVIDIA's own appliance line, from the 2017 DGX-1 to today's Blackwell Ultra nodes. Every generation since DGX-2 puts all GPUs in the box on one NVSwitch fabric; DGX-1 used a direct NVLink mesh instead.
 
@@ -50,7 +111,7 @@ NVIDIA's own appliance line, from the 2017 DGX-1 to today's Blackwell Ultra node
 > - Peak FLOPS are dense unless a sparse/dense pair is given; NVIDIA marketing numbers usually quote the sparse (2:4 structured sparsity) figure.
 > - B200 is documented as 192 GB HBM3e at the chip level; DGX B200 ships a 180 GB per-GPU configuration (1,440 GB per node).
 
-## Flagship Data Center GPUs (SXM)
+### Flagship Data Center GPUs (SXM)
 
 Chip-level comparison of the SXM parts that go into HGX baseboards and DGX nodes. Numbers are per single GPU.
 
@@ -76,62 +137,7 @@ Chip-level comparison of the SXM parts that go into HGX baseboards and DGX nodes
 > - Multiply the dense numbers by 2 for the sparse (2:4 structured sparsity) figures NVIDIA quotes in marketing material.
 > - The same die ships in different power/memory bins: HGX/DGX air-cooled parts are clocked lower than the liquid-cooled superchip variants.
 
-## Consumer & Workstation GPUs
-
-What people actually run local LLMs on. For inference the binding constraint is VRAM first and memory bandwidth second — peak FLOPS rarely decides anything.
-
-| Parameter | RTX 2080 Ti | RTX 3090 | RTX 4090 | RTX 5090 | RTX PRO 6000 Blackwell |
-|---|---|---|---|---|---|
-| Architecture | Turing (TU102) | Ampere (GA102) | Ada Lovelace (AD102) | Blackwell (GB202) | Blackwell (GB202) |
-| VRAM | 11 GB GDDR6 | 24 GB GDDR6X | 24 GB GDDR6X | 32 GB GDDR7 | 96 GB GDDR7 |
-| Memory bandwidth | 616 GB/s | 936 GB/s | 1,008 GB/s | 1,792 GB/s | 1,792 GB/s |
-| Lowest native precision | FP16 / INT8 (no BF16) | BF16 / INT8 | FP8 | FP4 | FP4 |
-| NVIDIA tensor figure | ~108 TFLOPS FP16 (FP16 accumulate) | 285 TFLOPS FP16 (sparse) | 1,321 AI TOPS (FP8, sparse) | 3,352 AI TOPS (FP4, sparse) | 4,000 AI TOPS (FP4, sparse) |
-| GPU-to-GPU link | NVLink 2 bridge, 100 GB/s (2 GPUs) | NVLink 3 bridge, 112.5 GB/s (2 GPUs) | PCIe 4.0 x16 only - no NVLink | PCIe 5.0 x16 only - no NVLink | PCIe 5.0 x16 only - no NVLink |
-| ECC memory | no | no | no | no | yes |
-| Board power | 250-260 W | 350 W | 450 W | 575 W | 600 W |
-| Rough local LLM fit | 7-8B at 4-bit | ~30B at 4-bit, 14B at 8-bit | ~30B at 4-bit, 14B at 8-bit | ~30B at 4-bit with long context, 32B comfortable | 70B at 8-bit, 120B+ at 4-bit |
-| Launch | 2018 | 2020 | 2022 | 2025 | 2025 |
-
-> - The "NVIDIA tensor figure" row is NOT comparable across generations: NVIDIA quotes FP16 for Turing/Ampere, FP8 for Ada and FP4 for Blackwell, all with sparsity from Ampere on. A 5090 is not 2.5x a 4090 at the same precision.
-> - NVLink is gone from GeForce after the RTX 3090. On a 4090/5090 box, multi-GPU tensor parallelism runs over PCIe, which is roughly an order of magnitude slower than the 1.8 TB/s NVLink inside a DGX node — fine for pipeline-parallel or per-GPU replicas, painful for tensor parallelism.
-> - GeForce cards have no ECC and no MIG, and NVIDIA's GeForce driver licence restricts data center deployment. Read the licence yourself before renting them out; this is the main reason hosting providers buy RTX PRO or data center SKUs.
-> - "Rough local LLM fit" assumes weights plus a modest KV cache. Long context, batching, or unquantized weights all move the ceiling down sharply.
-
-## Quantization vs VRAM (weights)
-
-Weight memory = parameters x bytes per parameter. Sizes below are in GiB (2^30 bytes), the same unit a card's "24 GB" label uses.
-
-| Name | Bits/param | Per 1B params | 7B model | 13B model | 32B model | 70B model | Native support | Typical use |
-|---|---|---|---|---|---|---|---|---|
-| FP32 | 32 | 3.7 GiB | 26 GiB | 48 GiB | 119 GiB | 261 GiB | everything | training master weights; rarely used for inference |
-| FP16 / BF16 | 16 | 1.9 GiB | 13 GiB | 24 GiB | 60 GiB | 130 GiB | FP16 from V100; BF16 from A100 / RTX 30 | the accuracy baseline everything else is measured against |
-| FP8 (E4M3) | 8 | 0.93 GiB | 6.5 GiB | 12 GiB | 30 GiB | 65 GiB | H100 / H200 / Ada (RTX 40) / Blackwell | near-lossless; no dequantization step on supported hardware |
-| INT8 | 8 | 0.93 GiB | 6.5 GiB | 12 GiB | 30 GiB | 65 GiB | Turing (RTX 20) onward | the 8-bit option on pre-Hopper hardware |
-| INT4 / NF4 / GPTQ / AWQ | 4 | 0.47 GiB | 3.3 GiB | 6.1 GiB | 15 GiB | 33 GiB | any GPU (dequantized in software) | the workhorse for running a big model on one consumer card |
-| FP4 (NVFP4 / MXFP4) | 4 | 0.47 GiB | 3.3 GiB | 6.1 GiB | 15 GiB | 33 GiB | Blackwell only (RTX 50 / B200 / B300) | 4-bit with tensor core support; no dequantization |
-
-> - Add 10-15% to the 4-bit rows in practice: quantized formats store scales and zero-points alongside the weights, so "4-bit" is closer to 4.5 bits/param.
-> - Weights are only part of it. Add the KV cache (next table), activations, the CUDA context (~0.5-1 GiB) and fragmentation before deciding a model fits.
-> - Native hardware support buys speed, not capacity. INT4 on a 3090 takes the same VRAM as FP4 on a 5090, but the 3090 dequantizes to FP16 inside the kernel while the 5090 multiplies in 4-bit directly.
-
-## KV Cache vs Context Length
-
-KV bytes per token = 2 x layers x kv_heads x head_dim x bytes_per_element. Figures below are an FP16 KV cache for a single sequence, in GiB. Check your model's config.json for its real layer and kv_head counts.
-
-| Name | Config | Per token | 1K context | 8K context | 32K context | 128K context |
-|---|---|---|---|---|---|---|
-| 7B, multi-head attention | 32 layers x 32 kv heads x 128 | 512 KiB | 0.5 GiB | 4 GiB | 16 GiB | 64 GiB |
-| 8B, grouped-query (8 kv heads) | 32 layers x 8 kv heads x 128 | 128 KiB | 0.13 GiB | 1 GiB | 4 GiB | 16 GiB |
-| 32B, grouped-query (8 kv heads) | 64 layers x 8 kv heads x 128 | 256 KiB | 0.25 GiB | 2 GiB | 8 GiB | 32 GiB |
-| 70B, grouped-query (8 kv heads) | 80 layers x 8 kv heads x 128 | 320 KiB | 0.31 GiB | 2.5 GiB | 10 GiB | 40 GiB |
-
-> - Halve every number for an FP8 or INT8 KV cache. This is usually the cheapest way to buy context length back.
-> - Multiply by batch size. The KV cache is per sequence, so 8 concurrent requests cost 8x. On a serving GPU this, not the weights, is what runs out.
-> - Grouped-query attention is the biggest lever here: the 7B MHA row costs 4x the 8B GQA row despite being the smaller model. Latent attention (MLA) cuts it by roughly another order of magnitude.
-> - This is why a 24 GB card "fits" a 30B 4-bit model (15 GiB of weights) and then dies at long context: 32K of KV cache is another 8 GiB.
-
-## Grace-based Superchips
+### Grace-based Superchips
 
 CPU+GPU packages joined by NVLink-C2C, giving the GPU cache-coherent access to the CPU's LPDDR5X as a second memory tier.
 
@@ -149,7 +155,7 @@ CPU+GPU packages joined by NVLink-C2C, giving the GPU cache-coherent access to t
 
 > - Roadmap parts are listed from public announcements and may change before shipping.
 
-## Rack-Scale NVLink Systems
+### Rack-Scale NVLink Systems
 
 One rack behaves as a single large GPU: every GPU in the rack sits inside one NVLink domain instead of talking over the network.
 
@@ -170,7 +176,7 @@ One rack behaves as a single large GPU: every GPU in the rack sits inside one NV
 
 > - "GPU count" follows NVIDIA's convention: NVL72 counts packages, NVL144 counts reticle-sized dies. Both racks hold 72 GPU packages.
 
-## NVLink & NVSwitch Generations
+### NVLink & NVSwitch Generations
 
 Per-GPU NVLink bandwidth is bidirectional aggregate across all links, which is how NVIDIA quotes it.
 
@@ -184,7 +190,7 @@ Per-GPU NVLink bandwidth is bidirectional aggregate across all links, which is h
 
 > - NVLink-C2C is the 900 GB/s CPU-to-GPU link used inside Grace superchips; it is separate from GPU-to-GPU NVLink.
 
-## Scale-Out Networking
+### Scale-Out Networking
 
 Once you leave the NVLink domain, GPU-to-GPU traffic runs over InfiniBand or Spectrum-X Ethernet.
 
@@ -200,7 +206,7 @@ Once you leave the NVLink domain, GPU-to-GPU traffic runs over InfiniBand or Spe
 
 > - A DGX/HGX node typically pairs 8 compute NICs (one per GPU, east-west) with 1-2 DPUs for storage and management traffic.
 
-## Platform Roadmap
+### Platform Roadmap
 
 NVIDIA's publicly stated one-architecture-per-year cadence. Everything from 2026 on is announcement-level information.
 
@@ -215,14 +221,118 @@ NVIDIA's publicly stated one-architecture-per-year cadence. Everything from 2026
 
 > - Roadmap rows are from GTC keynotes and press releases; treat dates and specs as targets, not commitments.
 
+## AMD
+
+### AMD Instinct Accelerators
+
+AMD's data center GPU line. HBM capacity has been AMD's consistent lead over the equivalent NVIDIA part; scale-up domain size is where it falls behind.
+
+| Parameter | MI250X | MI300X | MI325X | MI350X | MI355X |
+|---|---|---|---|---|---|
+| Architecture | CDNA 2 | CDNA 3 | CDNA 3 | CDNA 4 | CDNA 4 |
+| Process | TSMC 6nm | TSMC 5nm + 6nm chiplets | TSMC 5nm + 6nm chiplets | TSMC 3nm + 6nm chiplets | TSMC 3nm + 6nm chiplets |
+| Compute units | 220 | 304 | 304 | 256 | 256 |
+| Memory | 128 GB HBM2e | 192 GB HBM3 | 256 GB HBM3E | 288 GB HBM3E | 288 GB HBM3E |
+| Memory bandwidth | 3.2 TB/s | 5.3 TB/s | 6 TB/s | 8 TB/s | 8 TB/s |
+| FP64 matrix | 95.7 TFLOPS | 163.4 TFLOPS | 163.4 TFLOPS | ~78.6 TFLOPS | ~78.6 TFLOPS |
+| FP16/BF16 (dense) | 383 TFLOPS | 1.3 PFLOPS | 1.3 PFLOPS | ~2.3 PFLOPS | 2.5 PFLOPS |
+| FP8 (dense) | not supported | 2.6 PFLOPS | 2.6 PFLOPS | 4.6 PFLOPS | 5.0 PFLOPS |
+| FP4 / MXFP4 (dense) | not supported | not supported | not supported | 9.2 PFLOPS | 10 PFLOPS |
+| GPU interconnect | Infinity Fabric 3rd gen | Infinity Fabric, 8-GPU fully connected mesh | Infinity Fabric, 8-GPU fully connected mesh | Infinity Fabric 4th gen, 8-GPU mesh | Infinity Fabric 4th gen, 8-GPU mesh |
+| Total board power | 560 W | 750 W | 1,000 W | 1,000 W | 1,400 W |
+| Cooling | air or liquid | air | air | air | direct liquid |
+| Launch | 2021 | 2023 | 2024 | 2025 | 2025 |
+
+> - AMD quotes MXFP4 and MXFP6 (OCP microscaling formats) where NVIDIA quotes NVFP4. They are different 4-bit encodings with different scaling-block layouts; a model quantized for one is not automatically portable.
+> - CDNA 4 traded FP64 away: MI355X FP64 matrix is roughly half MI300X's, after CDNA 3 had been the HPC-friendly choice. Same direction NVIDIA took with Blackwell Ultra.
+> - FP64 and FP16 figures for the MI350 series are derived from AMD's published platform totals divided by eight; check the datasheet PDFs before quoting them in a procurement document.
+
+### AMD Instinct Platforms & Racks
+
+AMD sells an 8-GPU OAM baseboard (the "platform") to OEMs rather than a branded appliance like DGX. The scale-up domain stops at 8 GPUs until Helios.
+
+| Parameter | MI300X Platform | MI325X Platform | MI355X Platform | Helios (MI400 series, announced) |
+|---|---|---|---|---|
+| GPUs | 8 x MI300X | 8 x MI325X | 8 x MI355X | 72 x MI400-series |
+| Total GPU memory | 1.5 TB HBM3 | 2 TB HBM3E | 2.3 TB HBM3E | TBA |
+| Aggregate bandwidth | 42.4 TB/s | 48 TB/s | 64 TB/s | TBA |
+| FP8 (dense) | 20.8 PFLOPS | 20.8 PFLOPS | 40.3 PFLOPS | TBA |
+| FP4 / MXFP4 (dense) | not supported | not supported | 80.5 PFLOPS | TBA |
+| Scale-up domain | 8 GPUs, fully connected mesh, no switch | 8 GPUs, fully connected mesh, no switch | 8 GPUs, fully connected mesh, no switch | 72 GPUs over UALink - AMD's answer to NVL72 |
+| Scale-out network | OEM choice, typically 8 x 400 Gb/s | OEM choice, typically 8 x 400 Gb/s | OEM choice, up to 8 x 400 Gb/s | Ultra Ethernet |
+| Cooling | air | air | air or direct liquid | liquid |
+| Sold as | OCP UBB baseboard for OEM chassis | OCP UBB baseboard for OEM chassis | OCP UBB baseboard for OEM chassis | full rack reference design |
+| Availability | 2023-2024 | 2024-2025 | 2025 | 2026 (roadmap) |
+
+> - This is the structural difference, not a spec-sheet one. An MI355X node is 8 GPUs in one coherent domain; a GB300 NVL72 rack is 72. Anything larger than 8 GPUs on AMD crosses the network today, which changes how you shard a model.
+> - AMD's answer is UALink (an open scale-up interconnect standard) plus Ultra Ethernet for scale-out, arriving with Helios. Open standards versus NVIDIA's vertically integrated NVLink is the actual strategic bet.
+> - There is no DGX equivalent: AMD ships baseboards, and Dell, HPE, Supermicro and others build the box. Chassis power and physical specs therefore vary by OEM and are not listed here.
+
+## Head to head
+
+### NVIDIA vs AMD, Generation by Generation
+
+Which AMD part competes with which NVIDIA part, and what actually separates them. Memory capacity has been AMD's lever; domain size and software have been NVIDIA's.
+
+| Name | Era | NVIDIA | NVIDIA HBM | AMD | AMD HBM | What decides it |
+|---|---|---|---|---|---|---|
+| Hopper vs CDNA 3 | 2023 | H100 SXM | 80 GB | MI300X | 192 GB | AMD fits models H100 cannot; NVIDIA wins on software maturity and a 256-GPU NVLink domain |
+| Hopper refresh vs CDNA 3 refresh | 2024 | H200 SXM | 141 GB | MI325X | 256 GB | same matchup, both sides added HBM; AMD still ~1.8x the capacity |
+| Blackwell vs CDNA 4 | 2025 | B200 SXM | 180 GB | MI355X | 288 GB | first generation where both have native 4-bit, but in incompatible formats (NVFP4 vs MXFP4) |
+| Blackwell Ultra vs CDNA 4 | 2025 | B300 SXM | 288 GB | MI355X | 288 GB | memory parity for the first time; the gap moves entirely to rack scale (NVL72 vs 8-GPU nodes) |
+| Rubin vs MI400 | 2026 (roadmap) | Rubin / VR200 NVL144 | 288 GB HBM4 | MI400 series / Helios | TBA | both go rack-scale; AMD bets on open UALink + Ultra Ethernet against NVLink |
+
+> - Memory capacity decides what you can run at all, and AMD has led on it every generation until B300. If a model fits on one MI300X but needs two H100s, AMD wins that comparison before any benchmark runs.
+> - Scale-up domain size decides how you shard. NVIDIA extended NVLink to 72 GPUs in one rack; AMD's coherent domain is 8 GPUs until Helios ships. For tensor parallelism across more than 8 GPUs that difference is structural, not a tuning problem.
+> - Software is the part no spec table shows. CUDA has a decade-plus lead in kernels, libraries and framework defaults. ROCm has closed much of the gap for mainstream inference and training on popular models, and much less of it for anything custom or new.
+> - The 4-bit formats are not interchangeable. NVIDIA's NVFP4 and AMD's MXFP4 use different scaling-block layouts, so a checkpoint quantized for one needs requantizing for the other.
+
+## Sizing math
+
+### Quantization vs VRAM (weights)
+
+Weight memory = parameters x bytes per parameter. Sizes below are in GiB (2^30 bytes), the same unit a card's "24 GB" label uses.
+
+| Name | Bits/param | Per 1B params | 7B model | 13B model | 32B model | 70B model | Native support | Typical use |
+|---|---|---|---|---|---|---|---|---|
+| FP32 | 32 | 3.7 GiB | 26 GiB | 48 GiB | 119 GiB | 261 GiB | everything | training master weights; rarely used for inference |
+| FP16 / BF16 | 16 | 1.9 GiB | 13 GiB | 24 GiB | 60 GiB | 130 GiB | FP16 from V100; BF16 from A100 / RTX 30 | the accuracy baseline everything else is measured against |
+| FP8 (E4M3) | 8 | 0.93 GiB | 6.5 GiB | 12 GiB | 30 GiB | 65 GiB | H100 / H200 / Ada (RTX 40) / Blackwell | near-lossless; no dequantization step on supported hardware |
+| INT8 | 8 | 0.93 GiB | 6.5 GiB | 12 GiB | 30 GiB | 65 GiB | Turing (RTX 20) onward | the 8-bit option on pre-Hopper hardware |
+| INT4 / NF4 / GPTQ / AWQ | 4 | 0.47 GiB | 3.3 GiB | 6.1 GiB | 15 GiB | 33 GiB | any GPU (dequantized in software) | the workhorse for running a big model on one consumer card |
+| FP4 (NVFP4 / MXFP4) | 4 | 0.47 GiB | 3.3 GiB | 6.1 GiB | 15 GiB | 33 GiB | Blackwell only (RTX 50 / B200 / B300) | 4-bit with tensor core support; no dequantization |
+
+> - Add 10-15% to the 4-bit rows in practice: quantized formats store scales and zero-points alongside the weights, so "4-bit" is closer to 4.5 bits/param.
+> - Weights are only part of it. Add the KV cache (next table), activations, the CUDA context (~0.5-1 GiB) and fragmentation before deciding a model fits.
+> - Native hardware support buys speed, not capacity. INT4 on a 3090 takes the same VRAM as FP4 on a 5090, but the 3090 dequantizes to FP16 inside the kernel while the 5090 multiplies in 4-bit directly.
+
+### KV Cache vs Context Length
+
+KV bytes per token = 2 x layers x kv_heads x head_dim x bytes_per_element. Figures below are an FP16 KV cache for a single sequence, in GiB. Check your model's config.json for its real layer and kv_head counts.
+
+| Name | Config | Per token | 1K context | 8K context | 32K context | 128K context |
+|---|---|---|---|---|---|---|
+| 7B, multi-head attention | 32 layers x 32 kv heads x 128 | 512 KiB | 0.5 GiB | 4 GiB | 16 GiB | 64 GiB |
+| 8B, grouped-query (8 kv heads) | 32 layers x 8 kv heads x 128 | 128 KiB | 0.13 GiB | 1 GiB | 4 GiB | 16 GiB |
+| 32B, grouped-query (8 kv heads) | 64 layers x 8 kv heads x 128 | 256 KiB | 0.25 GiB | 2 GiB | 8 GiB | 32 GiB |
+| 70B, grouped-query (8 kv heads) | 80 layers x 8 kv heads x 128 | 320 KiB | 0.31 GiB | 2.5 GiB | 10 GiB | 40 GiB |
+
+> - Halve every number for an FP8 or INT8 KV cache. This is usually the cheapest way to buy context length back.
+> - Multiply by batch size. The KV cache is per sequence, so 8 concurrent requests cost 8x. On a serving GPU this, not the weights, is what runs out.
+> - Grouped-query attention is the biggest lever here: the 7B MHA row costs 4x the 8B GQA row despite being the smaller model. Latent attention (MLA) cuts it by roughly another order of magnitude.
+> - This is why a 24 GB card "fits" a 30B 4-bit model (15 GiB of weights) and then dies at long context: 32K of KV cache is another 8 GiB.
+
 ## How to read the numbers
 
-- **Sparse vs dense.** NVIDIA headline FLOPS are usually the sparse (2:4
-  structured sparsity) number, which is 2x the dense number. Tables state which
-  one they use.
-- **Bandwidth.** NVLink figures are bidirectional aggregate per GPU.
-- **Same die, different bins.** Air-cooled HGX/DGX parts run at lower power and
-  lower clocks than the liquid-cooled superchip versions of the same chip.
+- **Sparse vs dense.** Headline FLOPS are usually the sparse (2:4 structured
+  sparsity) number, which is 2x the dense number. Tables state which one they
+  use.
+- **Bandwidth.** NVLink and Infinity Fabric figures are bidirectional aggregate
+  per GPU.
+- **Same die, different bins.** Air-cooled parts run at lower power and lower
+  clocks than the liquid-cooled versions of the same chip.
+- **Vendor AI figures are not comparable.** NVIDIA quotes FP8 for Ada and FP4
+  for Blackwell; AMD quotes MXFP4; Apple does not publish an equivalent at all.
 - **Roadmap entries** come from keynotes and press releases, not datasheets.
 
 ## Contributing
@@ -235,22 +345,21 @@ pip install -r requirements.txt
 python scripts/generate.py
 ```
 
-Corrections should cite an NVIDIA datasheet, product page, or press release —
+Corrections should cite a vendor datasheet, product page, or press release —
 see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Acknowledgements
 
 The DGX comparison that started this repo comes from ServerMall's write-up
 [NVIDIA DGX B300 vs DGX B200 vs DGX H100/H200](https://servermall.com/blog/nvidia-dgx-b300-vs-dgx-b200-vs-dgx-h100-h200-which-dgx-server-to-choose-under-llm-inference-and-fine/).
-Spec values here are re-checked against NVIDIA's own material, so some differ.
+Spec values here are re-checked against vendor material, so some differ.
 
 ## Disclaimer
 
-Community-maintained and unaffiliated with NVIDIA Corporation. Specifications
-are collected from public NVIDIA material and may be incomplete or out of date;
+Community-maintained and unaffiliated with NVIDIA, AMD or Apple. Specifications
+are collected from public vendor material and may be incomplete or out of date;
 always confirm against the official datasheet before buying or sizing anything.
-NVIDIA, DGX, Grace, Hopper, Blackwell, NVLink and Spectrum-X are trademarks of
-NVIDIA Corporation.
+All trademarks belong to their respective owners.
 
 ## License
 

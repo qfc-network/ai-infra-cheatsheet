@@ -1,0 +1,130 @@
+id: amd-systems
+title: AMD Instinct Platforms & Racks
+title_zh: AMD Instinct 整机与机柜
+summary: >-
+  AMD sells an 8-GPU OAM baseboard (the "platform") to OEMs rather than a
+  branded appliance like DGX. The scale-up domain stops at 8 GPUs until Helios.
+summary_zh: >-
+  AMD 卖的是 8 卡 OAM 基板（"platform"）给 OEM，而不是 DGX 那样的自有整机品牌。
+  在 Helios 之前，其 scale-up 域上限就是 8 卡。
+orientation: columns
+fields:
+  - {key: gpus,          label: GPUs,                    label_zh: GPU 数量}
+  - {key: memory_total,  label: Total GPU memory,        label_zh: 整机显存}
+  - {key: bandwidth,     label: Aggregate bandwidth,     label_zh: 总显存带宽}
+  - {key: fp8,           label: FP8 (dense),             label_zh: FP8（稠密）}
+  - {key: fp4,           label: FP4 / MXFP4 (dense),     label_zh: FP4 / MXFP4（稠密）}
+  - {key: scale_up,      label: Scale-up domain,         label_zh: scale-up 域}
+  - {key: scale_out,     label: Scale-out network,       label_zh: 横向扩展网络}
+  - {key: cooling,       label: Cooling,                 label_zh: 散热}
+  - {key: packaging,     label: Sold as,                 label_zh: 交付形态}
+  - {key: launch,        label: Availability,            label_zh: 上市时间}
+items:
+  - id: mi300x-platform
+    name: MI300X Platform
+    specs:
+      gpus: 8 x MI300X
+      memory_total: 1.5 TB HBM3
+      bandwidth: 42.4 TB/s
+      fp8: 20.8 PFLOPS
+      fp4: not supported
+      scale_up: 8 GPUs, fully connected mesh, no switch
+      scale_out: OEM choice, typically 8 x 400 Gb/s
+      cooling: air
+      packaging: OCP UBB baseboard for OEM chassis
+      launch: 2023-2024
+    specs_zh:
+      fp4: 不支持
+      scale_up: 8 卡全互联网格，无交换芯片
+      scale_out: 由 OEM 决定，通常 8 x 400 Gb/s
+      cooling: 风冷
+      packaging: OCP UBB 基板，装进 OEM 机箱
+    sources:
+      - https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/data-sheets/amd-instinct-mi300x-platform-data-sheet.pdf
+  - id: mi325x-platform
+    name: MI325X Platform
+    specs:
+      gpus: 8 x MI325X
+      memory_total: 2 TB HBM3E
+      bandwidth: 48 TB/s
+      fp8: 20.8 PFLOPS
+      fp4: not supported
+      scale_up: 8 GPUs, fully connected mesh, no switch
+      scale_out: OEM choice, typically 8 x 400 Gb/s
+      cooling: air
+      packaging: OCP UBB baseboard for OEM chassis
+      launch: 2024-2025
+    specs_zh:
+      fp4: 不支持
+      scale_up: 8 卡全互联网格，无交换芯片
+      scale_out: 由 OEM 决定，通常 8 x 400 Gb/s
+      cooling: 风冷
+      packaging: OCP UBB 基板，装进 OEM 机箱
+  - id: mi355x-platform
+    name: MI355X Platform
+    specs:
+      gpus: 8 x MI355X
+      memory_total: 2.3 TB HBM3E
+      bandwidth: 64 TB/s
+      fp8: 40.3 PFLOPS
+      fp4: 80.5 PFLOPS
+      scale_up: 8 GPUs, fully connected mesh, no switch
+      scale_out: OEM choice, up to 8 x 400 Gb/s
+      cooling: air or direct liquid
+      packaging: OCP UBB baseboard for OEM chassis
+      launch: 2025
+    specs_zh:
+      scale_up: 8 卡全互联网格，无交换芯片
+      scale_out: 由 OEM 决定，最高 8 x 400 Gb/s
+      cooling: 风冷或直接液冷
+      packaging: OCP UBB 基板，装进 OEM 机箱
+    sources:
+      - https://www.amd.com/en/products/accelerators/instinct/mi350/mi355x/platform.html
+  - id: helios
+    name: Helios (MI400 series, announced)
+    specs:
+      gpus: 72 x MI400-series
+      memory_total: TBA
+      bandwidth: TBA
+      fp8: TBA
+      fp4: TBA
+      scale_up: 72 GPUs over UALink - AMD's answer to NVL72
+      scale_out: Ultra Ethernet
+      cooling: liquid
+      packaging: full rack reference design
+      launch: 2026 (roadmap)
+    specs_zh:
+      memory_total: 未公布
+      bandwidth: 未公布
+      fp8: 未公布
+      fp4: 未公布
+      scale_up: 72 卡经 UALink 互联，对标 NVL72
+      scale_out: Ultra Ethernet
+      cooling: 液冷
+      packaging: 整机柜参考设计
+      launch: 2026（路线图）
+notes:
+  - >-
+    This is the structural difference, not a spec-sheet one. An MI355X node is
+    8 GPUs in one coherent domain; a GB300 NVL72 rack is 72. Anything larger
+    than 8 GPUs on AMD crosses the network today, which changes how you shard a
+    model.
+  - >-
+    AMD's answer is UALink (an open scale-up interconnect standard) plus Ultra
+    Ethernet for scale-out, arriving with Helios. Open standards versus NVIDIA's
+    vertically integrated NVLink is the actual strategic bet.
+  - >-
+    There is no DGX equivalent: AMD ships baseboards, and Dell, HPE, Supermicro
+    and others build the box. Chassis power and physical specs therefore vary by
+    OEM and are not listed here.
+notes_zh:
+  - >-
+    这才是结构性差异，不是规格表上的差异。一台 MI355X 是 8 卡一个一致性域，
+    一个 GB300 NVL72 机柜是 72 卡。今天在 AMD 上超过 8 卡就要过网络，
+    这会直接改变模型怎么切分。
+  - >-
+    AMD 的答案是 UALink（开放的 scale-up 互联标准）加 Ultra Ethernet 做横向扩展，
+    随 Helios 一起落地。开放标准 vs NVIDIA 垂直整合的 NVLink，这才是真正的战略分歧。
+  - >-
+    AMD 没有 DGX 的对应物：它出基板，戴尔、慧与、超微等厂商做整机。
+    所以机箱功耗和物理规格因 OEM 而异，本表不列。

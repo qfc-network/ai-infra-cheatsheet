@@ -19,8 +19,9 @@ fails if they drift apart.
 ## Rules for spec data
 
 1. **Cite a source.** Every item carries a `sources:` list. Prefer, in order:
-   NVIDIA datasheet (PDF) → NVIDIA product page → NVIDIA press release / GTC
-   keynote → reputable technical press. No forum posts or rumors.
+   vendor datasheet (PDF) → vendor product page → vendor press release or
+   keynote → reputable technical press. No forum posts or rumors. "Vendor" means
+   NVIDIA, AMD or Apple depending on the table.
 2. **Say which number it is.** Dense vs sparse, per-GPU vs per-node vs per-rack,
    uni- vs bidirectional. If the field label does not already pin it down, put
    it in the value: `9 PFLOPS (dense)`.

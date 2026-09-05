@@ -1,50 +1,83 @@
-# NVIDIA AI 基础设施速查表
+# AI 基础设施速查表
 
-一份 NVIDIA AI 数据中心全栈的对照速查表：GPU、DGX 整机、Grace 超级芯片、
-机柜级 NVLink 系统，以及把它们连起来的网络。所有表格都由
-[`data/`](data/) 下的 YAML 自动生成，改一个数字就是一个 PR。
+一份"真正用来跑模型的硬件"对照速查表：从桌上的 Mac mini 到 72 卡的 NVLink 机柜，
+涵盖 NVIDIA、AMD、Apple，以及决定"到底装不装得下"的显存换算。
+所有表格都由 [`data/`](data/) 下的 YAML 自动生成，改一个数字就是一个 PR。
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
 ## 目录
 
+**桌面与本地**
+- [桌面与本地 AI 主机](#桌面与本地-ai-主机)
+- [消费级与工作站 GPU](#消费级与工作站-gpu)
+
+**NVIDIA 数据中心**
 - [DGX 整机](#dgx-整机)
 - [数据中心旗舰 GPU（SXM）](#数据中心旗舰-gpusxm)
-- [消费级与工作站 GPU](#消费级与工作站-gpu)
-- [量化格式与显存占用（权重）](#量化格式与显存占用权重)
-- [KV Cache 与上下文长度](#kv-cache-与上下文长度)
 - [Grace 系列超级芯片](#grace-系列超级芯片)
 - [机柜级 NVLink 系统](#机柜级-nvlink-系统)
 - [NVLink / NVSwitch 各代对比](#nvlink--nvswitch-各代对比)
 - [横向扩展网络](#横向扩展网络)
 - [平台路线图](#平台路线图)
 
-{{section:dgx-systems}}
+**AMD**
+- [AMD Instinct 加速卡](#amd-instinct-加速卡)
+- [AMD Instinct 整机与机柜](#amd-instinct-整机与机柜)
 
-{{section:datacenter-gpus}}
+**正面对位**
+- [NVIDIA 与 AMD 逐代对位](#nvidia-与-amd-逐代对位)
 
-{{section:consumer-gpus}}
+**容量换算**
+- [量化格式与显存占用（权重）](#量化格式与显存占用权重)
+- [KV Cache 与上下文长度](#kv-cache-与上下文长度)
 
-{{section:quantization}}
+## 桌面与本地
 
-{{section:kv-cache}}
+{{section3:local-systems}}
 
-{{section:superchips}}
+{{section3:consumer-gpus}}
 
-{{section:rack-scale}}
+## NVIDIA 数据中心
 
-{{section:interconnect}}
+{{section3:dgx-systems}}
 
-{{section:networking}}
+{{section3:datacenter-gpus}}
 
-{{section:roadmap}}
+{{section3:superchips}}
+
+{{section3:rack-scale}}
+
+{{section3:interconnect}}
+
+{{section3:networking}}
+
+{{section3:roadmap}}
+
+## AMD
+
+{{section3:amd-gpus}}
+
+{{section3:amd-systems}}
+
+## 正面对位
+
+{{section3:head-to-head}}
+
+## 容量换算
+
+{{section3:quantization}}
+
+{{section3:kv-cache}}
 
 ## 数字怎么看
 
-- **稀疏 vs 稠密**：NVIDIA 宣传的算力通常是稀疏（2:4 结构化稀疏）值，
-  为稠密值的 2 倍。本表会标明用的是哪一个。
-- **带宽口径**：NVLink 带宽为单卡所有链路的双向合计值。
-- **同 die 不同档**：风冷 HGX/DGX 版本的功耗与频率都低于同一颗芯片的液冷超级芯片版本。
+- **稀疏 vs 稠密**：宣传用的算力通常是稀疏（2:4 结构化稀疏）值，为稠密值的 2 倍。
+  本表会标明用的是哪一个。
+- **带宽口径**：NVLink 与 Infinity Fabric 带宽均为单卡所有链路的双向合计值。
+- **同 die 不同档**：风冷版本的功耗与频率都低于同一颗芯片的液冷版本。
+- **厂商标称算力不可跨家对比**：NVIDIA 对 Ada 报 FP8、对 Blackwell 报 FP4，
+  AMD 报 MXFP4，苹果压根没有对应口径。
 - **路线图条目**来自发布会与新闻稿，不是规格书。
 
 ## 参与贡献
@@ -57,20 +90,20 @@ pip install -r requirements.txt
 python scripts/generate.py
 ```
 
-修改请附上 NVIDIA 官方规格书、产品页或新闻稿链接，详见
+修改请附上厂商官方规格书、产品页或新闻稿链接，详见
 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
 ## 致谢
 
 本项目最初的 DGX 对照表来自 ServerMall 的这篇文章
 [NVIDIA DGX B300 vs DGX B200 vs DGX H100/H200](https://servermall.com/blog/nvidia-dgx-b300-vs-dgx-b200-vs-dgx-h100-h200-which-dgx-server-to-choose-under-llm-inference-and-fine/)。
-本仓库的数值都会再对照 NVIDIA 官方资料核一遍，因此个别数字与原文不同。
+本仓库的数值都会再对照厂商官方资料核一遍，因此个别数字与原文不同。
 
 ## 免责声明
 
-本项目由社区维护，与 NVIDIA Corporation 无关。规格数据整理自 NVIDIA 公开资料，
+本项目由社区维护，与 NVIDIA、AMD、Apple 均无关。规格数据整理自各厂商公开资料，
 可能不完整或已过时；采购与容量规划请以官方规格书为准。
-NVIDIA、DGX、Grace、Hopper、Blackwell、NVLink、Spectrum-X 均为 NVIDIA Corporation 的商标。
+所有商标归各自所有者所有。
 
 ## 许可
 

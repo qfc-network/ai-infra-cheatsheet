@@ -1,0 +1,188 @@
+id: local-systems
+title: Desktop & Local AI Systems
+title_zh: 桌面与本地 AI 主机
+summary: >-
+  Boxes you can put on a desk and run a model on. Two different bets: unified
+  memory (lots of capacity, moderate bandwidth) versus a discrete GPU (little
+  capacity, huge bandwidth). Decode speed tracks bandwidth; what fits at all
+  tracks capacity.
+summary_zh: >-
+  能摆在桌上直接跑模型的机器，分两条路线：统一内存（容量大、带宽中等）
+  和独立显卡（容量小、带宽极高）。能装下多大模型看容量，出词多快看带宽。
+orientation: columns
+fields:
+  - {key: chip,        label: Chip,                    label_zh: 芯片}
+  - {key: memory,      label: Memory for the model,    label_zh: 可用于模型的内存}
+  - {key: bandwidth,   label: Memory bandwidth,        label_zh: 内存带宽}
+  - {key: ai_perf,     label: Vendor AI figure,        label_zh: 厂商标称算力}
+  - {key: precision,   label: Low precision support,   label_zh: 低精度支持}
+  - {key: network,     label: Networking,              label_zh: 网络}
+  - {key: clustering,  label: Multi-box linking,       label_zh: 多机互联}
+  - {key: power,       label: System power,            label_zh: 整机功耗}
+  - {key: fits,        label: Rough model ceiling,     label_zh: 大致能跑到多大}
+  - {key: launch,      label: Launch,                  label_zh: 上市时间}
+items:
+  - id: dgx-spark
+    name: NVIDIA DGX Spark
+    specs:
+      chip: GB10 Grace Blackwell (20-core Arm)
+      memory: 128 GB LPDDR5X unified
+      bandwidth: 273 GB/s
+      ai_perf: 1 PFLOP FP4 (sparse)
+      precision: FP4 / FP8 native (Blackwell tensor cores)
+      network: ConnectX-7 200 GbE + 10 GbE
+      clustering: up to 4 units, ~700B params
+      power: 240 W PSU (140 W chip TDP)
+      fits: 70B at 4-bit on one box
+      launch: 2025
+    specs_zh:
+      chip: GB10 Grace Blackwell（20 核 Arm）
+      memory: 128 GB LPDDR5X 统一内存
+      ai_perf: 1 PFLOP FP4（稀疏）
+      precision: 原生 FP4 / FP8（Blackwell 张量核）
+      clustering: 最多 4 台互联，约 700B 参数
+      power: 240 W 电源（芯片 TDP 140 W）
+      fits: 单机 70B 四位量化
+    sources:
+      - https://www.nvidia.com/en-us/products/workstations/dgx-spark/
+  - id: gb10-oem
+    name: GB10 OEM boxes
+    specs:
+      chip: GB10 Grace Blackwell (same silicon)
+      memory: 128 GB LPDDR5X unified
+      bandwidth: 273 GB/s
+      ai_perf: 1 PFLOP FP4 (sparse)
+      precision: FP4 / FP8 native
+      network: ConnectX-7 200 GbE + 10 GbE
+      clustering: same as DGX Spark
+      power: ~240 W
+      fits: 70B at 4-bit on one box
+      launch: 2025
+    specs_zh:
+      chip: GB10 Grace Blackwell（同一颗芯片）
+      memory: 128 GB LPDDR5X 统一内存
+      ai_perf: 1 PFLOP FP4（稀疏）
+      precision: 原生 FP4 / FP8
+      clustering: 与 DGX Spark 相同
+      fits: 单机 70B 四位量化
+  - id: mac-mini
+    name: Mac mini (M5 Pro)
+    specs:
+      chip: Apple M5 Pro
+      memory: 24 / 48 / 64 GB unified
+      bandwidth: 307 GB/s
+      ai_perf: not published in comparable terms
+      precision: no FP4/FP8 tensor path; GPU + Neural Engine
+      network: 10 GbE, Thunderbolt 5
+      clustering: Thunderbolt only, not a real fabric
+      power: 155 W max continuous
+      fits: 32B at 4-bit on 64 GB
+      launch: 2026
+    specs_zh:
+      memory: 24 / 48 / 64 GB 统一内存
+      ai_perf: 官方未给出可比口径
+      precision: 无 FP4/FP8 张量通路，走 GPU + 神经引擎
+      clustering: 只有雷雳，算不上互联网络
+      power: 最大持续 155 W
+      fits: 64 GB 版可跑 32B 四位量化
+    sources:
+      - https://www.apple.com/mac-mini/specs/
+  - id: mac-studio-max
+    name: Mac Studio (M5 Max)
+    specs:
+      chip: Apple M5 Max
+      memory: 36 / 48 / 64 / 128 GB unified
+      bandwidth: 460-614 GB/s
+      ai_perf: not published in comparable terms
+      precision: no FP4/FP8 tensor path
+      network: 10 GbE, Thunderbolt 5
+      clustering: Thunderbolt only
+      power: 480 W max continuous
+      fits: 70B at 4-bit on 128 GB
+      launch: 2026
+    specs_zh:
+      memory: 36 / 48 / 64 / 128 GB 统一内存
+      ai_perf: 官方未给出可比口径
+      precision: 无 FP4/FP8 张量通路
+      clustering: 只有雷雳
+      power: 最大持续 480 W
+      fits: 128 GB 版可跑 70B 四位量化
+    sources:
+      - https://www.apple.com/mac-studio/specs/
+  - id: mac-studio-ultra
+    name: Mac Studio (M5 Ultra)
+    specs:
+      chip: Apple M5 Ultra
+      memory: 96 / 256 / 512 GB unified
+      bandwidth: 1.2 TB/s
+      ai_perf: not published in comparable terms
+      precision: no FP4/FP8 tensor path
+      network: 10 GbE, Thunderbolt 5
+      clustering: Thunderbolt only
+      power: 480 W max continuous
+      fits: 400B+ at 4-bit on 512 GB
+      launch: 2026
+    specs_zh:
+      memory: 96 / 256 / 512 GB 统一内存
+      ai_perf: 官方未给出可比口径
+      precision: 无 FP4/FP8 张量通路
+      clustering: 只有雷雳
+      power: 最大持续 480 W
+      fits: 512 GB 版可跑 400B+ 四位量化
+    sources:
+      - https://www.apple.com/mac-studio/specs/
+  - id: rtx-5090-pc
+    name: RTX 5090 desktop
+    specs:
+      chip: GB202 discrete GPU
+      memory: 32 GB GDDR7 (VRAM only)
+      bandwidth: 1,792 GB/s
+      ai_perf: 3,352 AI TOPS FP4 (sparse)
+      precision: FP4 / FP8 native
+      network: whatever the motherboard has
+      clustering: PCIe only, no NVLink
+      power: 575 W card, ~1 kW system
+      fits: 30B at 4-bit, hard ceiling at 32 GB
+      launch: 2025
+    specs_zh:
+      chip: GB202 独立显卡
+      memory: 32 GB GDDR7（仅显存）
+      ai_perf: 3,352 AI TOPS FP4（稀疏）
+      precision: 原生 FP4 / FP8
+      network: 取决于主板
+      clustering: 只有 PCIe，无 NVLink
+      power: 显卡 575 W，整机约 1 kW
+      fits: 30B 四位量化，32 GB 是硬上限
+    sources:
+      - https://www.nvidia.com/en-us/geforce/graphics-cards/50-series/rtx-5090/
+notes:
+  - >-
+    "GB10 OEM boxes" are the same GB10 superchip in someone else's case - ASUS
+    Ascent GX10, Dell Pro Max with GB10, HP ZGX Nano, Lenovo and MSI all ship
+    one. They differ in storage, chassis and price, not in compute or bandwidth.
+  - >-
+    Bandwidth is the number to watch for token generation. A 5090 has 6.6x the
+    bandwidth of a DGX Spark but a quarter of the memory: the Spark runs models
+    the 5090 cannot load at all, and the 5090 runs the models that fit far
+    faster.
+  - >-
+    Apple does not publish FLOPS in a form comparable to NVIDIA's AI TOPS, and
+    Apple Silicon has no FP4/FP8 tensor path, so 4-bit models are dequantized in
+    software. Capacity and bandwidth are the honest comparison points.
+  - >-
+    None of these are cluster hardware. DGX Spark's ConnectX-7 is the only real
+    fabric here, and it tops out at 4 boxes; Thunderbolt between Macs is not
+    comparable to NVLink or InfiniBand.
+notes_zh:
+  - >-
+    "GB10 OEM 机型" 就是同一颗 GB10 换了个壳：华硕 Ascent GX10、戴尔 Pro Max with GB10、
+    惠普 ZGX Nano、联想和微星都有。差别在存储、机箱和价格，算力与带宽完全一样。
+  - >-
+    看出词速度就看带宽。5090 的带宽是 DGX Spark 的 6.6 倍，但内存只有四分之一：
+    Spark 能跑 5090 根本装不下的模型，而装得下的模型 5090 快得多。
+  - >-
+    苹果没有公布可与 NVIDIA AI TOPS 对比的算力口径，且 Apple Silicon 没有 FP4/FP8
+    张量通路，4bit 模型要靠软件反量化。容量和带宽才是能诚实对比的两项。
+  - >-
+    这些都不是集群硬件。这里只有 DGX Spark 的 ConnectX-7 算真正的互联网络，且最多 4 台；
+    Mac 之间的雷雳连接和 NVLink、InfiniBand 不是一个量级。

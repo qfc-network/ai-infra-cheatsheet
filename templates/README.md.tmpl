@@ -1,53 +1,87 @@
-# NVIDIA AI Infrastructure Cheat Sheet
+# AI Infrastructure Cheat Sheet
 
-Side-by-side spec tables for NVIDIA's AI data center stack — GPUs, DGX systems,
-Grace superchips, rack-scale NVLink systems, and the networking that ties them
-together. Every table is generated from the YAML files in [`data/`](data/), so
-corrections are a one-line pull request.
+Side-by-side spec tables for the hardware people actually run models on — from a
+Mac mini on a desk to a 72-GPU NVLink rack. NVIDIA, AMD and Apple, plus the
+sizing math that decides what fits. Every table is generated from the YAML in
+[`data/`](data/), so a correction is a one-line pull request.
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
 ## Contents
 
+**Desktop and local**
+- [Desktop & Local AI Systems](#desktop--local-ai-systems)
+- [Consumer & Workstation GPUs](#consumer--workstation-gpus)
+
+**NVIDIA data center**
 - [DGX Systems](#dgx-systems)
 - [Flagship Data Center GPUs (SXM)](#flagship-data-center-gpus-sxm)
-- [Consumer & Workstation GPUs](#consumer--workstation-gpus)
-- [Quantization vs VRAM (weights)](#quantization-vs-vram-weights)
-- [KV Cache vs Context Length](#kv-cache-vs-context-length)
 - [Grace-based Superchips](#grace-based-superchips)
 - [Rack-Scale NVLink Systems](#rack-scale-nvlink-systems)
 - [NVLink & NVSwitch Generations](#nvlink--nvswitch-generations)
 - [Scale-Out Networking](#scale-out-networking)
 - [Platform Roadmap](#platform-roadmap)
 
-{{section:dgx-systems}}
+**AMD**
+- [AMD Instinct Accelerators](#amd-instinct-accelerators)
+- [AMD Instinct Platforms & Racks](#amd-instinct-platforms--racks)
 
-{{section:datacenter-gpus}}
+**Head to head**
+- [NVIDIA vs AMD, Generation by Generation](#nvidia-vs-amd-generation-by-generation)
 
-{{section:consumer-gpus}}
+**Sizing math**
+- [Quantization vs VRAM (weights)](#quantization-vs-vram-weights)
+- [KV Cache vs Context Length](#kv-cache-vs-context-length)
 
-{{section:quantization}}
+## Desktop and local
 
-{{section:kv-cache}}
+{{section3:local-systems}}
 
-{{section:superchips}}
+{{section3:consumer-gpus}}
 
-{{section:rack-scale}}
+## NVIDIA data center
 
-{{section:interconnect}}
+{{section3:dgx-systems}}
 
-{{section:networking}}
+{{section3:datacenter-gpus}}
 
-{{section:roadmap}}
+{{section3:superchips}}
+
+{{section3:rack-scale}}
+
+{{section3:interconnect}}
+
+{{section3:networking}}
+
+{{section3:roadmap}}
+
+## AMD
+
+{{section3:amd-gpus}}
+
+{{section3:amd-systems}}
+
+## Head to head
+
+{{section3:head-to-head}}
+
+## Sizing math
+
+{{section3:quantization}}
+
+{{section3:kv-cache}}
 
 ## How to read the numbers
 
-- **Sparse vs dense.** NVIDIA headline FLOPS are usually the sparse (2:4
-  structured sparsity) number, which is 2x the dense number. Tables state which
-  one they use.
-- **Bandwidth.** NVLink figures are bidirectional aggregate per GPU.
-- **Same die, different bins.** Air-cooled HGX/DGX parts run at lower power and
-  lower clocks than the liquid-cooled superchip versions of the same chip.
+- **Sparse vs dense.** Headline FLOPS are usually the sparse (2:4 structured
+  sparsity) number, which is 2x the dense number. Tables state which one they
+  use.
+- **Bandwidth.** NVLink and Infinity Fabric figures are bidirectional aggregate
+  per GPU.
+- **Same die, different bins.** Air-cooled parts run at lower power and lower
+  clocks than the liquid-cooled versions of the same chip.
+- **Vendor AI figures are not comparable.** NVIDIA quotes FP8 for Ada and FP4
+  for Blackwell; AMD quotes MXFP4; Apple does not publish an equivalent at all.
 - **Roadmap entries** come from keynotes and press releases, not datasheets.
 
 ## Contributing
@@ -60,22 +94,21 @@ pip install -r requirements.txt
 python scripts/generate.py
 ```
 
-Corrections should cite an NVIDIA datasheet, product page, or press release —
+Corrections should cite a vendor datasheet, product page, or press release —
 see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Acknowledgements
 
 The DGX comparison that started this repo comes from ServerMall's write-up
 [NVIDIA DGX B300 vs DGX B200 vs DGX H100/H200](https://servermall.com/blog/nvidia-dgx-b300-vs-dgx-b200-vs-dgx-h100-h200-which-dgx-server-to-choose-under-llm-inference-and-fine/).
-Spec values here are re-checked against NVIDIA's own material, so some differ.
+Spec values here are re-checked against vendor material, so some differ.
 
 ## Disclaimer
 
-Community-maintained and unaffiliated with NVIDIA Corporation. Specifications
-are collected from public NVIDIA material and may be incomplete or out of date;
+Community-maintained and unaffiliated with NVIDIA, AMD or Apple. Specifications
+are collected from public vendor material and may be incomplete or out of date;
 always confirm against the official datasheet before buying or sizing anything.
-NVIDIA, DGX, Grace, Hopper, Blackwell, NVLink and Spectrum-X are trademarks of
-NVIDIA Corporation.
+All trademarks belong to their respective owners.
 
 ## License
 

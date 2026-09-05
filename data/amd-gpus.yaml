@@ -1,0 +1,159 @@
+id: amd-gpus
+title: AMD Instinct Accelerators
+title_zh: AMD Instinct 加速卡
+summary: >-
+  AMD's data center GPU line. HBM capacity has been AMD's consistent lead over
+  the equivalent NVIDIA part; scale-up domain size is where it falls behind.
+summary_zh: >-
+  AMD 的数据中心 GPU 线。相对同期 NVIDIA 产品，AMD 一直在 HBM 容量上领先，
+  短板在 scale-up 域的规模。
+orientation: columns
+fields:
+  - {key: architecture,  label: Architecture,             label_zh: 架构}
+  - {key: process,       label: Process,                  label_zh: 制程}
+  - {key: cu,            label: Compute units,            label_zh: 计算单元}
+  - {key: memory,        label: Memory,                   label_zh: 显存}
+  - {key: bandwidth,     label: Memory bandwidth,         label_zh: 显存带宽}
+  - {key: fp64,          label: FP64 matrix,              label_zh: FP64 矩阵}
+  - {key: fp16,          label: FP16/BF16 (dense),        label_zh: FP16/BF16（稠密）}
+  - {key: fp8,           label: FP8 (dense),              label_zh: FP8（稠密）}
+  - {key: fp4,           label: FP4 / MXFP4 (dense),      label_zh: FP4 / MXFP4（稠密）}
+  - {key: interconnect,  label: GPU interconnect,         label_zh: GPU 互联}
+  - {key: tbp,           label: Total board power,        label_zh: 整卡功耗}
+  - {key: cooling,       label: Cooling,                  label_zh: 散热}
+  - {key: launch,        label: Launch,                   label_zh: 上市时间}
+items:
+  - id: mi250x
+    name: MI250X
+    specs:
+      architecture: CDNA 2
+      process: TSMC 6nm
+      cu: 220
+      memory: 128 GB HBM2e
+      bandwidth: 3.2 TB/s
+      fp64: 95.7 TFLOPS
+      fp16: 383 TFLOPS
+      fp8: not supported
+      fp4: not supported
+      interconnect: Infinity Fabric 3rd gen
+      tbp: 560 W
+      cooling: air or liquid
+      launch: 2021
+    specs_zh:
+      fp8: 不支持
+      fp4: 不支持
+      cooling: 风冷或液冷
+  - id: mi300x
+    name: MI300X
+    specs:
+      architecture: CDNA 3
+      process: TSMC 5nm + 6nm chiplets
+      cu: 304
+      memory: 192 GB HBM3
+      bandwidth: 5.3 TB/s
+      fp64: 163.4 TFLOPS
+      fp16: 1.3 PFLOPS
+      fp8: 2.6 PFLOPS
+      fp4: not supported
+      interconnect: Infinity Fabric, 8-GPU fully connected mesh
+      tbp: 750 W
+      cooling: air
+      launch: 2023
+    specs_zh:
+      process: TSMC 5nm + 6nm 小芯片
+      fp4: 不支持
+      interconnect: Infinity Fabric，8 卡全互联网格
+      cooling: 风冷
+    sources:
+      - https://www.amd.com/en/products/accelerators/instinct/mi300.html
+  - id: mi325x
+    name: MI325X
+    specs:
+      architecture: CDNA 3
+      process: TSMC 5nm + 6nm chiplets
+      cu: 304
+      memory: 256 GB HBM3E
+      bandwidth: 6 TB/s
+      fp64: 163.4 TFLOPS
+      fp16: 1.3 PFLOPS
+      fp8: 2.6 PFLOPS
+      fp4: not supported
+      interconnect: Infinity Fabric, 8-GPU fully connected mesh
+      tbp: 1,000 W
+      cooling: air
+      launch: 2024
+    specs_zh:
+      process: TSMC 5nm + 6nm 小芯片
+      fp4: 不支持
+      interconnect: Infinity Fabric，8 卡全互联网格
+      cooling: 风冷
+    sources:
+      - https://www.amd.com/en/products/accelerators/instinct/mi300.html
+  - id: mi350x
+    name: MI350X
+    specs:
+      architecture: CDNA 4
+      process: TSMC 3nm + 6nm chiplets
+      cu: 256
+      memory: 288 GB HBM3E
+      bandwidth: 8 TB/s
+      fp64: ~78.6 TFLOPS
+      fp16: ~2.3 PFLOPS
+      fp8: 4.6 PFLOPS
+      fp4: 9.2 PFLOPS
+      interconnect: Infinity Fabric 4th gen, 8-GPU mesh
+      tbp: 1,000 W
+      cooling: air
+      launch: 2025
+    specs_zh:
+      process: TSMC 3nm + 6nm 小芯片
+      interconnect: 第 4 代 Infinity Fabric，8 卡网格
+      cooling: 风冷
+    sources:
+      - https://www.amd.com/en/products/accelerators/instinct/mi350/mi350x.html
+  - id: mi355x
+    name: MI355X
+    specs:
+      architecture: CDNA 4
+      process: TSMC 3nm + 6nm chiplets
+      cu: 256
+      memory: 288 GB HBM3E
+      bandwidth: 8 TB/s
+      fp64: ~78.6 TFLOPS
+      fp16: 2.5 PFLOPS
+      fp8: 5.0 PFLOPS
+      fp4: 10 PFLOPS
+      interconnect: Infinity Fabric 4th gen, 8-GPU mesh
+      tbp: 1,400 W
+      cooling: direct liquid
+      launch: 2025
+    specs_zh:
+      process: TSMC 3nm + 6nm 小芯片
+      interconnect: 第 4 代 Infinity Fabric，8 卡网格
+      cooling: 直接液冷
+    sources:
+      - https://www.amd.com/en/products/accelerators/instinct/mi350/mi355x.html
+      - https://www.amd.com/content/dam/amd/en/documents/instinct-tech-docs/product-briefs/amd-instinct-mi355x-gpu-brochure.pdf
+notes:
+  - >-
+    AMD quotes MXFP4 and MXFP6 (OCP microscaling formats) where NVIDIA quotes
+    NVFP4. They are different 4-bit encodings with different scaling-block
+    layouts; a model quantized for one is not automatically portable.
+  - >-
+    CDNA 4 traded FP64 away: MI355X FP64 matrix is roughly half MI300X's, after
+    CDNA 3 had been the HPC-friendly choice. Same direction NVIDIA took with
+    Blackwell Ultra.
+  - >-
+    FP64 and FP16 figures for the MI350 series are derived from AMD's published
+    platform totals divided by eight; check the datasheet PDFs before quoting
+    them in a procurement document.
+notes_zh:
+  - >-
+    AMD 标的是 MXFP4 / MXFP6（OCP microscaling 格式），NVIDIA 标的是 NVFP4。
+    两者是不同的 4bit 编码，缩放块布局也不同，为其一量化的模型不能直接搬到另一边。
+  - >-
+    CDNA 4 砍掉了 FP64：MI355X 的 FP64 矩阵算力大约只有 MI300X 的一半，
+    而 CDNA 3 本来是 HPC 友好的选择。NVIDIA 在 Blackwell Ultra 上是同一个方向。
+  - >-
+    MI350 系列的 FP64 与 FP16 数字是用 AMD 公布的整机数据除以 8 推算的，
+    写进采购文件前请核对官方 datasheet PDF。

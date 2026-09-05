@@ -1,25 +1,86 @@
-# NVIDIA AI 基础设施速查表
+# AI 基础设施速查表
 
-一份 NVIDIA AI 数据中心全栈的对照速查表：GPU、DGX 整机、Grace 超级芯片、
-机柜级 NVLink 系统，以及把它们连起来的网络。所有表格都由
-[`data/`](data/) 下的 YAML 自动生成，改一个数字就是一个 PR。
+一份"真正用来跑模型的硬件"对照速查表：从桌上的 Mac mini 到 72 卡的 NVLink 机柜，
+涵盖 NVIDIA、AMD、Apple，以及决定"到底装不装得下"的显存换算。
+所有表格都由 [`data/`](data/) 下的 YAML 自动生成，改一个数字就是一个 PR。
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
 ## 目录
 
+**桌面与本地**
+- [桌面与本地 AI 主机](#桌面与本地-ai-主机)
+- [消费级与工作站 GPU](#消费级与工作站-gpu)
+
+**NVIDIA 数据中心**
 - [DGX 整机](#dgx-整机)
 - [数据中心旗舰 GPU（SXM）](#数据中心旗舰-gpusxm)
-- [消费级与工作站 GPU](#消费级与工作站-gpu)
-- [量化格式与显存占用（权重）](#量化格式与显存占用权重)
-- [KV Cache 与上下文长度](#kv-cache-与上下文长度)
 - [Grace 系列超级芯片](#grace-系列超级芯片)
 - [机柜级 NVLink 系统](#机柜级-nvlink-系统)
 - [NVLink / NVSwitch 各代对比](#nvlink--nvswitch-各代对比)
 - [横向扩展网络](#横向扩展网络)
 - [平台路线图](#平台路线图)
 
-## DGX 整机
+**AMD**
+- [AMD Instinct 加速卡](#amd-instinct-加速卡)
+- [AMD Instinct 整机与机柜](#amd-instinct-整机与机柜)
+
+**正面对位**
+- [NVIDIA 与 AMD 逐代对位](#nvidia-与-amd-逐代对位)
+
+**容量换算**
+- [量化格式与显存占用（权重）](#量化格式与显存占用权重)
+- [KV Cache 与上下文长度](#kv-cache-与上下文长度)
+
+## 桌面与本地
+
+### 桌面与本地 AI 主机
+
+能摆在桌上直接跑模型的机器，分两条路线：统一内存（容量大、带宽中等） 和独立显卡（容量小、带宽极高）。能装下多大模型看容量，出词多快看带宽。
+
+| 参数 | NVIDIA DGX Spark | GB10 OEM boxes | Mac mini (M5 Pro) | Mac Studio (M5 Max) | Mac Studio (M5 Ultra) | RTX 5090 desktop |
+|---|---|---|---|---|---|---|
+| 芯片 | GB10 Grace Blackwell（20 核 Arm） | GB10 Grace Blackwell（同一颗芯片） | Apple M5 Pro | Apple M5 Max | Apple M5 Ultra | GB202 独立显卡 |
+| 可用于模型的内存 | 128 GB LPDDR5X 统一内存 | 128 GB LPDDR5X 统一内存 | 24 / 48 / 64 GB 统一内存 | 36 / 48 / 64 / 128 GB 统一内存 | 96 / 256 / 512 GB 统一内存 | 32 GB GDDR7（仅显存） |
+| 内存带宽 | 273 GB/s | 273 GB/s | 307 GB/s | 460-614 GB/s | 1.2 TB/s | 1,792 GB/s |
+| 厂商标称算力 | 1 PFLOP FP4（稀疏） | 1 PFLOP FP4（稀疏） | 官方未给出可比口径 | 官方未给出可比口径 | 官方未给出可比口径 | 3,352 AI TOPS FP4（稀疏） |
+| 低精度支持 | 原生 FP4 / FP8（Blackwell 张量核） | 原生 FP4 / FP8 | 无 FP4/FP8 张量通路，走 GPU + 神经引擎 | 无 FP4/FP8 张量通路 | 无 FP4/FP8 张量通路 | 原生 FP4 / FP8 |
+| 网络 | ConnectX-7 200 GbE + 10 GbE | ConnectX-7 200 GbE + 10 GbE | 10 GbE, Thunderbolt 5 | 10 GbE, Thunderbolt 5 | 10 GbE, Thunderbolt 5 | 取决于主板 |
+| 多机互联 | 最多 4 台互联，约 700B 参数 | 与 DGX Spark 相同 | 只有雷雳，算不上互联网络 | 只有雷雳 | 只有雷雳 | 只有 PCIe，无 NVLink |
+| 整机功耗 | 240 W 电源（芯片 TDP 140 W） | ~240 W | 最大持续 155 W | 最大持续 480 W | 最大持续 480 W | 显卡 575 W，整机约 1 kW |
+| 大致能跑到多大 | 单机 70B 四位量化 | 单机 70B 四位量化 | 64 GB 版可跑 32B 四位量化 | 128 GB 版可跑 70B 四位量化 | 512 GB 版可跑 400B+ 四位量化 | 30B 四位量化，32 GB 是硬上限 |
+| 上市时间 | 2025 | 2025 | 2026 | 2026 | 2026 | 2025 |
+
+> - "GB10 OEM 机型" 就是同一颗 GB10 换了个壳：华硕 Ascent GX10、戴尔 Pro Max with GB10、 惠普 ZGX Nano、联想和微星都有。差别在存储、机箱和价格，算力与带宽完全一样。
+> - 看出词速度就看带宽。5090 的带宽是 DGX Spark 的 6.6 倍，但内存只有四分之一： Spark 能跑 5090 根本装不下的模型，而装得下的模型 5090 快得多。
+> - 苹果没有公布可与 NVIDIA AI TOPS 对比的算力口径，且 Apple Silicon 没有 FP4/FP8 张量通路，4bit 模型要靠软件反量化。容量和带宽才是能诚实对比的两项。
+> - 这些都不是集群硬件。这里只有 DGX Spark 的 ConnectX-7 算真正的互联网络，且最多 4 台； Mac 之间的雷雳连接和 NVLink、InfiniBand 不是一个量级。
+
+### 消费级与工作站 GPU
+
+大部分人本地跑 LLM 用的其实是这些卡。推理阶段的瓶颈依次是显存容量和显存带宽， 峰值算力基本不是决定因素。
+
+| 参数 | RTX 2080 Ti | RTX 3090 | RTX 4090 | RTX 5090 | RTX PRO 6000 Blackwell |
+|---|---|---|---|---|---|
+| 架构 | Turing (TU102) | Ampere (GA102) | Ada Lovelace (AD102) | Blackwell (GB202) | Blackwell (GB202) |
+| 显存 | 11 GB GDDR6 | 24 GB GDDR6X | 24 GB GDDR6X | 32 GB GDDR7 | 96 GB GDDR7 |
+| 显存带宽 | 616 GB/s | 936 GB/s | 1,008 GB/s | 1,792 GB/s | 1,792 GB/s |
+| 最低原生精度 | FP16 / INT8（无 BF16） | BF16 / INT8 | FP8 | FP4 | FP4 |
+| NVIDIA 标称算力 | ~108 TFLOPS FP16 (FP16 accumulate) | 285 TFLOPS FP16（稀疏） | 1,321 AI TOPS（FP8，稀疏） | 3,352 AI TOPS（FP4，稀疏） | 4,000 AI TOPS（FP4，稀疏） |
+| 卡间互联 | NVLink 2 桥接，100 GB/s（限 2 卡） | NVLink 3 桥接，112.5 GB/s（限 2 卡） | 仅 PCIe 4.0 x16，无 NVLink | 仅 PCIe 5.0 x16，无 NVLink | 仅 PCIe 5.0 x16，无 NVLink |
+| ECC 显存 | 无 | 无 | 无 | 无 | 有 |
+| 整卡功耗 | 250-260 W | 350 W | 450 W | 575 W | 600 W |
+| 本地 LLM 大致可跑 | 7~8B 四位量化 | 约 30B 四位量化，14B 八位量化 | 约 30B 四位量化，14B 八位量化 | 约 30B 四位量化且能带长上下文 | 70B 八位量化，120B+ 四位量化 |
+| 上市时间 | 2018 | 2020 | 2022 | 2025 | 2025 |
+
+> - "NVIDIA 标称算力" 这一行跨代不可比：Turing/Ampere 报的是 FP16，Ada 报 FP8， Blackwell 报 FP4，且 Ampere 之后都是稀疏值。同精度下 5090 并不是 4090 的 2.5 倍。
+> - RTX 3090 之后 GeForce 就没有 NVLink 了。4090/5090 多卡做张量并行只能走 PCIe， 比 DGX 机内 1.8 TB/s 的 NVLink 慢一个数量级左右——跑流水线并行或每卡一个副本没问题， 跑张量并行会很难受。
+> - GeForce 没有 ECC、没有 MIG，而且 NVIDIA 的 GeForce 驱动许可协议对数据中心部署有限制。 要对外出租算力前请自己读一遍许可条款；这也是各家托管商买 RTX PRO 或数据中心卡的主要原因。
+> - "本地 LLM 大致可跑" 按权重加少量 KV cache 估算。长上下文、批量推理或不量化都会显著拉低上限。
+
+## NVIDIA 数据中心
+
+### DGX 整机
 
 NVIDIA 官方整机产品线，从 2017 年的 DGX-1 到今天的 Blackwell Ultra 节点。 DGX-2 之后每一代都把机内 GPU 挂在同一个 NVSwitch 全互联域上， 只有 DGX-1 用的是 NVLink 直连网格。
 
@@ -49,7 +110,7 @@ NVIDIA 官方整机产品线，从 2017 年的 DGX-1 到今天的 Blackwell Ultr
 > - 未特别标注时算力为稠密值；NVIDIA 官方宣传数字通常是稀疏（2:4 结构化稀疏）值。
 > - B200 芯片规格为 192 GB HBM3e，但 DGX B200 整机按每卡 180 GB 配置（整机 1,440 GB）。
 
-## 数据中心旗舰 GPU（SXM）
+### 数据中心旗舰 GPU（SXM）
 
 用于 HGX 基板与 DGX 整机的 SXM 芯片级对比，所有数字均为单卡值。
 
@@ -75,62 +136,7 @@ NVIDIA 官方整机产品线，从 2017 年的 DGX-1 到今天的 Blackwell Ultr
 > - 稠密算力 x2 即为 NVIDIA 宣传常用的稀疏（2:4 结构化稀疏）算力。
 > - 同一颗 die 会按功耗/显存分档：风冷 HGX/DGX 版本频率低于液冷超级芯片版本。
 
-## 消费级与工作站 GPU
-
-大部分人本地跑 LLM 用的其实是这些卡。推理阶段的瓶颈依次是显存容量和显存带宽， 峰值算力基本不是决定因素。
-
-| 参数 | RTX 2080 Ti | RTX 3090 | RTX 4090 | RTX 5090 | RTX PRO 6000 Blackwell |
-|---|---|---|---|---|---|
-| 架构 | Turing (TU102) | Ampere (GA102) | Ada Lovelace (AD102) | Blackwell (GB202) | Blackwell (GB202) |
-| 显存 | 11 GB GDDR6 | 24 GB GDDR6X | 24 GB GDDR6X | 32 GB GDDR7 | 96 GB GDDR7 |
-| 显存带宽 | 616 GB/s | 936 GB/s | 1,008 GB/s | 1,792 GB/s | 1,792 GB/s |
-| 最低原生精度 | FP16 / INT8（无 BF16） | BF16 / INT8 | FP8 | FP4 | FP4 |
-| NVIDIA 标称算力 | ~108 TFLOPS FP16 (FP16 accumulate) | 285 TFLOPS FP16（稀疏） | 1,321 AI TOPS（FP8，稀疏） | 3,352 AI TOPS（FP4，稀疏） | 4,000 AI TOPS（FP4，稀疏） |
-| 卡间互联 | NVLink 2 桥接，100 GB/s（限 2 卡） | NVLink 3 桥接，112.5 GB/s（限 2 卡） | 仅 PCIe 4.0 x16，无 NVLink | 仅 PCIe 5.0 x16，无 NVLink | 仅 PCIe 5.0 x16，无 NVLink |
-| ECC 显存 | 无 | 无 | 无 | 无 | 有 |
-| 整卡功耗 | 250-260 W | 350 W | 450 W | 575 W | 600 W |
-| 本地 LLM 大致可跑 | 7~8B 四位量化 | 约 30B 四位量化，14B 八位量化 | 约 30B 四位量化，14B 八位量化 | 约 30B 四位量化且能带长上下文 | 70B 八位量化，120B+ 四位量化 |
-| 上市时间 | 2018 | 2020 | 2022 | 2025 | 2025 |
-
-> - "NVIDIA 标称算力" 这一行跨代不可比：Turing/Ampere 报的是 FP16，Ada 报 FP8， Blackwell 报 FP4，且 Ampere 之后都是稀疏值。同精度下 5090 并不是 4090 的 2.5 倍。
-> - RTX 3090 之后 GeForce 就没有 NVLink 了。4090/5090 多卡做张量并行只能走 PCIe， 比 DGX 机内 1.8 TB/s 的 NVLink 慢一个数量级左右——跑流水线并行或每卡一个副本没问题， 跑张量并行会很难受。
-> - GeForce 没有 ECC、没有 MIG，而且 NVIDIA 的 GeForce 驱动许可协议对数据中心部署有限制。 要对外出租算力前请自己读一遍许可条款；这也是各家托管商买 RTX PRO 或数据中心卡的主要原因。
-> - "本地 LLM 大致可跑" 按权重加少量 KV cache 估算。长上下文、批量推理或不量化都会显著拉低上限。
-
-## 量化格式与显存占用（权重）
-
-权重显存 = 参数量 x 每参数字节数。下表单位为 GiB（2^30 字节）， 与显卡标称的 "24 GB" 是同一口径。
-
-| 名称 | 每参数位数 | 每 10 亿参数 | 7B 模型 | 13B 模型 | 32B 模型 | 70B 模型 | 硬件原生支持 | 典型用途 |
-|---|---|---|---|---|---|---|---|---|
-| FP32 | 32 | 3.7 GiB | 26 GiB | 48 GiB | 119 GiB | 261 GiB | 全部 | 训练主权重，推理基本不用 |
-| FP16 / BF16 | 16 | 1.9 GiB | 13 GiB | 24 GiB | 60 GiB | 130 GiB | FP16 自 V100 起；BF16 自 A100 / RTX 30 起 | 精度基线，其他格式都拿它做对比 |
-| FP8 (E4M3) | 8 | 0.93 GiB | 6.5 GiB | 12 GiB | 30 GiB | 65 GiB | H100 / H200 / Ada（RTX 40）/ Blackwell | 接近无损，且在支持的硬件上不需要反量化 |
-| INT8 | 8 | 0.93 GiB | 6.5 GiB | 12 GiB | 30 GiB | 65 GiB | Turing（RTX 20）及以后 | Hopper 之前硬件上的 8bit 方案 |
-| INT4 / NF4 / GPTQ / AWQ | 4 | 0.47 GiB | 3.3 GiB | 6.1 GiB | 15 GiB | 33 GiB | 任意 GPU（软件反量化） | 单张消费卡跑大模型的主力方案 |
-| FP4 (NVFP4 / MXFP4) | 4 | 0.47 GiB | 3.3 GiB | 6.1 GiB | 15 GiB | 33 GiB | 仅 Blackwell（RTX 50 / B200 / B300） | 有张量核原生支持的 4bit，无需反量化 |
-
-> - 实际用 4bit 时在表上再加 10~15%：量化格式要额外存 scale 和 zero-point， 所谓 "4bit" 实际接近每参数 4.5 bit。
-> - 权重只是一部分。判断能不能装下，还要加上 KV cache（见下表）、激活值、 CUDA 上下文（约 0.5~1 GiB）以及显存碎片。
-> - 硬件原生支持买到的是速度不是容量。3090 上的 INT4 和 5090 上的 FP4 占显存一样多， 但 3090 要在 kernel 里反量化回 FP16 再算，5090 可以直接用 4bit 做乘法。
-
-## KV Cache 与上下文长度
-
-每 token 的 KV 字节数 = 2 x 层数 x kv_head 数 x head_dim x 每元素字节数。 下表是单条序列、FP16 KV cache 的占用（GiB）。具体层数和 kv_head 数请查模型的 config.json。
-
-| 名称 | 配置 | 每 token | 1K 上下文 | 8K 上下文 | 32K 上下文 | 128K 上下文 |
-|---|---|---|---|---|---|---|
-| 7B, multi-head attention | 32 层 x 32 kv head x 128 | 512 KiB | 0.5 GiB | 4 GiB | 16 GiB | 64 GiB |
-| 8B, grouped-query (8 kv heads) | 32 层 x 8 kv head x 128 | 128 KiB | 0.13 GiB | 1 GiB | 4 GiB | 16 GiB |
-| 32B, grouped-query (8 kv heads) | 64 层 x 8 kv head x 128 | 256 KiB | 0.25 GiB | 2 GiB | 8 GiB | 32 GiB |
-| 70B, grouped-query (8 kv heads) | 80 层 x 8 kv head x 128 | 320 KiB | 0.31 GiB | 2.5 GiB | 10 GiB | 40 GiB |
-
-> - KV cache 量化到 FP8 或 INT8，所有数字直接减半——这通常是换回上下文长度最划算的做法。
-> - 还要乘以 batch size。KV cache 是每条序列一份，同时服务 8 个请求就是 8 倍。 在服务端把显存撑爆的通常是它，不是权重。
-> - GQA 是这里影响最大的一项：7B 的 MHA 行比 8B 的 GQA 行贵 4 倍，尽管模型更小。 MLA（潜在注意力）还能在此基础上再降大约一个数量级。
-> - 这就是为什么 24 GB 的卡"装得下" 30B 四位量化模型（权重 15 GiB）， 但一开长上下文就 OOM：32K 的 KV cache 又要 8 GiB。
-
-## Grace 系列超级芯片
+### Grace 系列超级芯片
 
 通过 NVLink-C2C 把 CPU 与 GPU 封装在一起，GPU 可缓存一致地访问 CPU 侧 LPDDR5X， 形成第二级大容量内存。
 
@@ -148,7 +154,7 @@ NVIDIA 官方整机产品线，从 2017 年的 DGX-1 到今天的 Blackwell Ultr
 
 > - 路线图产品来自公开发布信息，量产前规格可能变化。
 
-## 机柜级 NVLink 系统
+### 机柜级 NVLink 系统
 
 整机柜当作一块大 GPU 使用：柜内所有 GPU 处于同一个 NVLink 域内，卡间通信不走网络。
 
@@ -169,7 +175,7 @@ NVIDIA 官方整机产品线，从 2017 年的 DGX-1 到今天的 Blackwell Ultr
 
 > - "GPU 数量" 沿用 NVIDIA 的口径：NVL72 按封装计数，NVL144 按 die 计数， 两者机柜内都是 72 个 GPU 封装。
 
-## NVLink / NVSwitch 各代对比
+### NVLink / NVSwitch 各代对比
 
 单卡 NVLink 带宽为所有链路的双向合计值（与 NVIDIA 官方口径一致）。
 
@@ -183,7 +189,7 @@ NVIDIA 官方整机产品线，从 2017 年的 DGX-1 到今天的 Blackwell Ultr
 
 > - NVLink-C2C 是 Grace 超级芯片内部 900 GB/s 的 CPU-GPU 互联，与 GPU 间 NVLink 不是同一条链路。
 
-## 横向扩展网络
+### 横向扩展网络
 
 出了 NVLink 域之后，GPU 之间的流量走 InfiniBand 或 Spectrum-X 以太网。
 
@@ -199,7 +205,7 @@ NVIDIA 官方整机产品线，从 2017 年的 DGX-1 到今天的 Blackwell Ultr
 
 > - 一台 DGX/HGX 通常是 8 张计算网卡（每卡一张，用于东西向）+ 1~2 张 DPU （用于存储与管理流量）。
 
-## 平台路线图
+### 平台路线图
 
 NVIDIA 公开宣布的"一年一代架构"节奏。2026 年及以后均为发布会公布信息，非量产规格。
 
@@ -214,12 +220,115 @@ NVIDIA 公开宣布的"一年一代架构"节奏。2026 年及以后均为发布
 
 > - 路线图内容来自 GTC 主题演讲与新闻稿，时间与规格均为目标值而非承诺。
 
+## AMD
+
+### AMD Instinct 加速卡
+
+AMD 的数据中心 GPU 线。相对同期 NVIDIA 产品，AMD 一直在 HBM 容量上领先， 短板在 scale-up 域的规模。
+
+| 参数 | MI250X | MI300X | MI325X | MI350X | MI355X |
+|---|---|---|---|---|---|
+| 架构 | CDNA 2 | CDNA 3 | CDNA 3 | CDNA 4 | CDNA 4 |
+| 制程 | TSMC 6nm | TSMC 5nm + 6nm 小芯片 | TSMC 5nm + 6nm 小芯片 | TSMC 3nm + 6nm 小芯片 | TSMC 3nm + 6nm 小芯片 |
+| 计算单元 | 220 | 304 | 304 | 256 | 256 |
+| 显存 | 128 GB HBM2e | 192 GB HBM3 | 256 GB HBM3E | 288 GB HBM3E | 288 GB HBM3E |
+| 显存带宽 | 3.2 TB/s | 5.3 TB/s | 6 TB/s | 8 TB/s | 8 TB/s |
+| FP64 矩阵 | 95.7 TFLOPS | 163.4 TFLOPS | 163.4 TFLOPS | ~78.6 TFLOPS | ~78.6 TFLOPS |
+| FP16/BF16（稠密） | 383 TFLOPS | 1.3 PFLOPS | 1.3 PFLOPS | ~2.3 PFLOPS | 2.5 PFLOPS |
+| FP8（稠密） | 不支持 | 2.6 PFLOPS | 2.6 PFLOPS | 4.6 PFLOPS | 5.0 PFLOPS |
+| FP4 / MXFP4（稠密） | 不支持 | 不支持 | 不支持 | 9.2 PFLOPS | 10 PFLOPS |
+| GPU 互联 | Infinity Fabric 3rd gen | Infinity Fabric，8 卡全互联网格 | Infinity Fabric，8 卡全互联网格 | 第 4 代 Infinity Fabric，8 卡网格 | 第 4 代 Infinity Fabric，8 卡网格 |
+| 整卡功耗 | 560 W | 750 W | 1,000 W | 1,000 W | 1,400 W |
+| 散热 | 风冷或液冷 | 风冷 | 风冷 | 风冷 | 直接液冷 |
+| 上市时间 | 2021 | 2023 | 2024 | 2025 | 2025 |
+
+> - AMD 标的是 MXFP4 / MXFP6（OCP microscaling 格式），NVIDIA 标的是 NVFP4。 两者是不同的 4bit 编码，缩放块布局也不同，为其一量化的模型不能直接搬到另一边。
+> - CDNA 4 砍掉了 FP64：MI355X 的 FP64 矩阵算力大约只有 MI300X 的一半， 而 CDNA 3 本来是 HPC 友好的选择。NVIDIA 在 Blackwell Ultra 上是同一个方向。
+> - MI350 系列的 FP64 与 FP16 数字是用 AMD 公布的整机数据除以 8 推算的， 写进采购文件前请核对官方 datasheet PDF。
+
+### AMD Instinct 整机与机柜
+
+AMD 卖的是 8 卡 OAM 基板（"platform"）给 OEM，而不是 DGX 那样的自有整机品牌。 在 Helios 之前，其 scale-up 域上限就是 8 卡。
+
+| 参数 | MI300X Platform | MI325X Platform | MI355X Platform | Helios (MI400 series, announced) |
+|---|---|---|---|---|
+| GPU 数量 | 8 x MI300X | 8 x MI325X | 8 x MI355X | 72 x MI400-series |
+| 整机显存 | 1.5 TB HBM3 | 2 TB HBM3E | 2.3 TB HBM3E | 未公布 |
+| 总显存带宽 | 42.4 TB/s | 48 TB/s | 64 TB/s | 未公布 |
+| FP8（稠密） | 20.8 PFLOPS | 20.8 PFLOPS | 40.3 PFLOPS | 未公布 |
+| FP4 / MXFP4（稠密） | 不支持 | 不支持 | 80.5 PFLOPS | 未公布 |
+| scale-up 域 | 8 卡全互联网格，无交换芯片 | 8 卡全互联网格，无交换芯片 | 8 卡全互联网格，无交换芯片 | 72 卡经 UALink 互联，对标 NVL72 |
+| 横向扩展网络 | 由 OEM 决定，通常 8 x 400 Gb/s | 由 OEM 决定，通常 8 x 400 Gb/s | 由 OEM 决定，最高 8 x 400 Gb/s | Ultra Ethernet |
+| 散热 | 风冷 | 风冷 | 风冷或直接液冷 | 液冷 |
+| 交付形态 | OCP UBB 基板，装进 OEM 机箱 | OCP UBB 基板，装进 OEM 机箱 | OCP UBB 基板，装进 OEM 机箱 | 整机柜参考设计 |
+| 上市时间 | 2023-2024 | 2024-2025 | 2025 | 2026（路线图） |
+
+> - 这才是结构性差异，不是规格表上的差异。一台 MI355X 是 8 卡一个一致性域， 一个 GB300 NVL72 机柜是 72 卡。今天在 AMD 上超过 8 卡就要过网络， 这会直接改变模型怎么切分。
+> - AMD 的答案是 UALink（开放的 scale-up 互联标准）加 Ultra Ethernet 做横向扩展， 随 Helios 一起落地。开放标准 vs NVIDIA 垂直整合的 NVLink，这才是真正的战略分歧。
+> - AMD 没有 DGX 的对应物：它出基板，戴尔、慧与、超微等厂商做整机。 所以机箱功耗和物理规格因 OEM 而异，本表不列。
+
+## 正面对位
+
+### NVIDIA 与 AMD 逐代对位
+
+哪张 AMD 卡对标哪张 NVIDIA 卡，以及真正拉开差距的是什么。 AMD 的杠杆一直是显存容量，NVIDIA 的是互联域规模和软件。
+
+| 名称 | 时期 | NVIDIA | NVIDIA 显存 | AMD | AMD 显存 | 决定因素 |
+|---|---|---|---|---|---|---|
+| Hopper vs CDNA 3 | 2023 | H100 SXM | 80 GB | MI300X | 192 GB | AMD 装得下 H100 装不下的模型；NVIDIA 赢在软件成熟度和 256 卡 NVLink 域 |
+| Hopper refresh vs CDNA 3 refresh | 2024 | H200 SXM | 141 GB | MI325X | 256 GB | 同一组对位，双方都加了 HBM；AMD 容量仍约为 1.8 倍 |
+| Blackwell vs CDNA 4 | 2025 | B200 SXM | 180 GB | MI355X | 288 GB | 双方第一次都有原生 4bit，但格式互不兼容（NVFP4 与 MXFP4） |
+| Blackwell Ultra vs CDNA 4 | 2025 | B300 SXM | 288 GB | MI355X | 288 GB | 显存首次持平，差距完全转移到机柜级（NVL72 对 8 卡节点） |
+| Rubin vs MI400 | 2026（路线图） | Rubin / VR200 NVL144 | 288 GB HBM4 | MI400 series / Helios | 未公布 | 双方都上机柜级；AMD 押注开放的 UALink + Ultra Ethernet 对抗 NVLink |
+
+> - 显存容量决定"能不能跑"，而在 B300 之前 AMD 每一代都领先。 如果一个模型单张 MI300X 装得下、却要两张 H100，那还没跑分 AMD 就已经赢了这一局。
+> - scale-up 域的规模决定"怎么切模型"。NVIDIA 把 NVLink 扩到了单柜 72 卡， 而 Helios 之前 AMD 的一致性域是 8 卡。超过 8 卡做张量并行时， 这是结构性差异，不是调优能解决的问题。
+> - 软件是规格表里看不到的那部分。CUDA 在算子、库和框架默认路径上领先十年以上。 ROCm 在主流模型的推理和训练上已经追上不少，但一旦涉及自定义或全新的东西差距依然明显。
+> - 两家的 4bit 格式不通用。NVIDIA 的 NVFP4 和 AMD 的 MXFP4 缩放块布局不同， 为其一量化好的权重要重新量化才能给另一边用。
+
+## 容量换算
+
+### 量化格式与显存占用（权重）
+
+权重显存 = 参数量 x 每参数字节数。下表单位为 GiB（2^30 字节）， 与显卡标称的 "24 GB" 是同一口径。
+
+| 名称 | 每参数位数 | 每 10 亿参数 | 7B 模型 | 13B 模型 | 32B 模型 | 70B 模型 | 硬件原生支持 | 典型用途 |
+|---|---|---|---|---|---|---|---|---|
+| FP32 | 32 | 3.7 GiB | 26 GiB | 48 GiB | 119 GiB | 261 GiB | 全部 | 训练主权重，推理基本不用 |
+| FP16 / BF16 | 16 | 1.9 GiB | 13 GiB | 24 GiB | 60 GiB | 130 GiB | FP16 自 V100 起；BF16 自 A100 / RTX 30 起 | 精度基线，其他格式都拿它做对比 |
+| FP8 (E4M3) | 8 | 0.93 GiB | 6.5 GiB | 12 GiB | 30 GiB | 65 GiB | H100 / H200 / Ada（RTX 40）/ Blackwell | 接近无损，且在支持的硬件上不需要反量化 |
+| INT8 | 8 | 0.93 GiB | 6.5 GiB | 12 GiB | 30 GiB | 65 GiB | Turing（RTX 20）及以后 | Hopper 之前硬件上的 8bit 方案 |
+| INT4 / NF4 / GPTQ / AWQ | 4 | 0.47 GiB | 3.3 GiB | 6.1 GiB | 15 GiB | 33 GiB | 任意 GPU（软件反量化） | 单张消费卡跑大模型的主力方案 |
+| FP4 (NVFP4 / MXFP4) | 4 | 0.47 GiB | 3.3 GiB | 6.1 GiB | 15 GiB | 33 GiB | 仅 Blackwell（RTX 50 / B200 / B300） | 有张量核原生支持的 4bit，无需反量化 |
+
+> - 实际用 4bit 时在表上再加 10~15%：量化格式要额外存 scale 和 zero-point， 所谓 "4bit" 实际接近每参数 4.5 bit。
+> - 权重只是一部分。判断能不能装下，还要加上 KV cache（见下表）、激活值、 CUDA 上下文（约 0.5~1 GiB）以及显存碎片。
+> - 硬件原生支持买到的是速度不是容量。3090 上的 INT4 和 5090 上的 FP4 占显存一样多， 但 3090 要在 kernel 里反量化回 FP16 再算，5090 可以直接用 4bit 做乘法。
+
+### KV Cache 与上下文长度
+
+每 token 的 KV 字节数 = 2 x 层数 x kv_head 数 x head_dim x 每元素字节数。 下表是单条序列、FP16 KV cache 的占用（GiB）。具体层数和 kv_head 数请查模型的 config.json。
+
+| 名称 | 配置 | 每 token | 1K 上下文 | 8K 上下文 | 32K 上下文 | 128K 上下文 |
+|---|---|---|---|---|---|---|
+| 7B, multi-head attention | 32 层 x 32 kv head x 128 | 512 KiB | 0.5 GiB | 4 GiB | 16 GiB | 64 GiB |
+| 8B, grouped-query (8 kv heads) | 32 层 x 8 kv head x 128 | 128 KiB | 0.13 GiB | 1 GiB | 4 GiB | 16 GiB |
+| 32B, grouped-query (8 kv heads) | 64 层 x 8 kv head x 128 | 256 KiB | 0.25 GiB | 2 GiB | 8 GiB | 32 GiB |
+| 70B, grouped-query (8 kv heads) | 80 层 x 8 kv head x 128 | 320 KiB | 0.31 GiB | 2.5 GiB | 10 GiB | 40 GiB |
+
+> - KV cache 量化到 FP8 或 INT8，所有数字直接减半——这通常是换回上下文长度最划算的做法。
+> - 还要乘以 batch size。KV cache 是每条序列一份，同时服务 8 个请求就是 8 倍。 在服务端把显存撑爆的通常是它，不是权重。
+> - GQA 是这里影响最大的一项：7B 的 MHA 行比 8B 的 GQA 行贵 4 倍，尽管模型更小。 MLA（潜在注意力）还能在此基础上再降大约一个数量级。
+> - 这就是为什么 24 GB 的卡"装得下" 30B 四位量化模型（权重 15 GiB）， 但一开长上下文就 OOM：32K 的 KV cache 又要 8 GiB。
+
 ## 数字怎么看
 
-- **稀疏 vs 稠密**：NVIDIA 宣传的算力通常是稀疏（2:4 结构化稀疏）值，
-  为稠密值的 2 倍。本表会标明用的是哪一个。
-- **带宽口径**：NVLink 带宽为单卡所有链路的双向合计值。
-- **同 die 不同档**：风冷 HGX/DGX 版本的功耗与频率都低于同一颗芯片的液冷超级芯片版本。
+- **稀疏 vs 稠密**：宣传用的算力通常是稀疏（2:4 结构化稀疏）值，为稠密值的 2 倍。
+  本表会标明用的是哪一个。
+- **带宽口径**：NVLink 与 Infinity Fabric 带宽均为单卡所有链路的双向合计值。
+- **同 die 不同档**：风冷版本的功耗与频率都低于同一颗芯片的液冷版本。
+- **厂商标称算力不可跨家对比**：NVIDIA 对 Ada 报 FP8、对 Blackwell 报 FP4，
+  AMD 报 MXFP4，苹果压根没有对应口径。
 - **路线图条目**来自发布会与新闻稿，不是规格书。
 
 ## 参与贡献
@@ -232,20 +341,20 @@ pip install -r requirements.txt
 python scripts/generate.py
 ```
 
-修改请附上 NVIDIA 官方规格书、产品页或新闻稿链接，详见
+修改请附上厂商官方规格书、产品页或新闻稿链接，详见
 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
 ## 致谢
 
 本项目最初的 DGX 对照表来自 ServerMall 的这篇文章
 [NVIDIA DGX B300 vs DGX B200 vs DGX H100/H200](https://servermall.com/blog/nvidia-dgx-b300-vs-dgx-b200-vs-dgx-h100-h200-which-dgx-server-to-choose-under-llm-inference-and-fine/)。
-本仓库的数值都会再对照 NVIDIA 官方资料核一遍，因此个别数字与原文不同。
+本仓库的数值都会再对照厂商官方资料核一遍，因此个别数字与原文不同。
 
 ## 免责声明
 
-本项目由社区维护，与 NVIDIA Corporation 无关。规格数据整理自 NVIDIA 公开资料，
+本项目由社区维护，与 NVIDIA、AMD、Apple 均无关。规格数据整理自各厂商公开资料，
 可能不完整或已过时；采购与容量规划请以官方规格书为准。
-NVIDIA、DGX、Grace、Hopper、Blackwell、NVLink、Spectrum-X 均为 NVIDIA Corporation 的商标。
+所有商标归各自所有者所有。
 
 ## 许可
 
