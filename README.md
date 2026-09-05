@@ -45,6 +45,9 @@ sizing math that decides what fits. Every table is generated from the YAML in
 - [Data Center - NVIDIA vs AMD vs Intel](#data-center---nvidia-vs-amd-vs-intel)
 - [Local Options by Memory Tier](#local-options-by-memory-tier)
 
+**Software**
+- [Inference Engines & Local Apps](#inference-engines--local-apps)
+
 **Sizing math**
 - [Quantization vs VRAM (weights)](#quantization-vs-vram-weights)
 - [KV Cache vs Context Length](#kv-cache-vs-context-length)
@@ -446,6 +449,29 @@ The practical way to shop: pick the capacity your model needs, then see who sell
 > - Apple is the only vendor selling 256-512 GB to one machine, and the M5 Ultra holds 1.2 TB/s while doing it - but with no FP4 path and no cluster fabric.
 > - Intel stops at 32 GB. Above that tier its answer is multiple B60 or B70 cards over PCIe, not a bigger card.
 > - Parts named here that have no row of their own elsewhere in this repo (RTX 5060 Ti, RTX 6000 Ada) are listed for orientation only; no specs are claimed for them beyond the memory tier.
+
+## Software
+
+### Inference Engines & Local Apps
+
+The layer between model weights and the hardware above. Which engine runs on your accelerator decides whether the chip is usable at all - a spec sheet is worth nothing if no engine targets the backend.
+
+| Parameter | vLLM | SGLang | TensorRT-LLM | llama.cpp | Ollama | LM Studio |
+|---|---|---|---|---|---|---|
+| What it is | serving engine (Python) | serving engine (Python) | compiled engine (C++ / Python) | C/C++ library + bundled server | CLI + local server | desktop GUI app |
+| Hardware backends | NVIDIA, AMD ROCm, Intel XPU, CPU; plugins for TPU, Gaudi, Ascend, Apple Silicon | NVIDIA (incl. GB200, B300, DGX Spark, 5090), AMD MI300/MI355, Intel Xeon CPU, TPU, Ascend NPU | NVIDIA only | CUDA, ROCm, Metal, SYCL/oneAPI, Vulkan, plain CPU | CUDA, ROCm, Metal (wraps llama.cpp) | Metal / MLX on Mac; CUDA, ROCm, Vulkan on PC |
+| Key technique | PagedAttention + continuous batching | RadixAttention prefix caching + frontend DSL | ahead-of-time kernel compilation, in-flight batching | GGUF format, aggressive quantization, CPU/GPU hybrid offload | model library with one-command pull and run | GUI over llama.cpp and MLX |
+| Weight format | HF safetensors | HF safetensors | HF safetensors, compiled to an engine file | GGUF | GGUF | GGUF, MLX |
+| Quantization | GPTQ, AWQ, FP8, INT8, and more | FP8, AWQ, GPTQ | FP8, FP4 on Blackwell, INT4 AWQ, SmoothQuant | GGUF K-quants and IQ-quants, roughly 2-8 bit | GGUF | GGUF, MLX |
+| Multi-GPU | tensor + pipeline parallel | tensor + pipeline + data parallel | tensor + pipeline parallel | split layers across GPUs, not true tensor parallel | inherited from llama.cpp | limited |
+| API | OpenAI-compatible HTTP | OpenAI-compatible HTTP | via Triton Inference Server or NVIDIA Dynamo | OpenAI-compatible server included | own API plus OpenAI-compatible | local OpenAI-compatible server |
+| Best for | general production serving, the default choice | shared prefixes, agents, structured and multi-call programs | squeezing the last throughput out of NVIDIA when a build step is acceptable | running anywhere - Mac, mixed CPU/GPU, odd hardware | fastest path to a model running on a dev machine | browsing and running models without touching a terminal |
+| License | Apache 2.0 | Apache 2.0 | Apache 2.0 | MIT | MIT | proprietary, free to use |
+
+> - Two families, two weight formats. vLLM, SGLang and TensorRT-LLM consume Hugging Face safetensors; llama.cpp, Ollama and LM Studio consume GGUF. A quantized checkpoint from one family does not load in the other.
+> - Serving many users needs paged KV cache and continuous batching, which is what vLLM and SGLang exist for. For one user at a time on a laptop, llama.cpp is simpler and gives up little.
+> - Backend support moves fast, especially the plugin backends for Gaudi, Ascend, TPU and Apple Silicon. Check the project's own install docs before assuming a chip is covered; "supported" can mean a community plugin rather than a tested first-class path.
+> - This table is why the software column matters in the hardware tables above. A GPU with no engine targeting it is not usable no matter what its datasheet says.
 
 ## Sizing math
 

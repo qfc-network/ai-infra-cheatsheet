@@ -55,6 +55,8 @@ ORDER = [
     # Cross-vendor
     "head-to-head",
     "local-options",
+    # Software
+    "inference-engines",
     # Sizing math
     "quantization",
     "kv-cache",

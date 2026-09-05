@@ -1,0 +1,178 @@
+id: inference-engines
+title: Inference Engines & Local Apps
+title_zh: 推理引擎与本地应用
+summary: >-
+  The layer between model weights and the hardware above. Which engine runs on
+  your accelerator decides whether the chip is usable at all - a spec sheet is
+  worth nothing if no engine targets the backend.
+summary_zh: >-
+  模型权重和上面那些硬件之间的一层。你的加速卡能不能用，取决于哪个引擎支持它——
+  没有引擎做后端的话，规格再好也是废的。
+orientation: columns
+fields:
+  - {key: kind,        label: What it is,             label_zh: 是什么}
+  - {key: hardware,    label: Hardware backends,      label_zh: 硬件后端}
+  - {key: key_tech,    label: Key technique,          label_zh: 核心技术}
+  - {key: weights,     label: Weight format,          label_zh: 权重格式}
+  - {key: quant,       label: Quantization,           label_zh: 量化支持}
+  - {key: multi_gpu,   label: Multi-GPU,              label_zh: 多卡}
+  - {key: api,         label: API,                    label_zh: 接口}
+  - {key: best_for,    label: Best for,               label_zh: 适合场景}
+  - {key: license,     label: License,                label_zh: 许可}
+items:
+  - id: vllm
+    name: vLLM
+    specs:
+      kind: serving engine (Python)
+      hardware: NVIDIA, AMD ROCm, Intel XPU, CPU; plugins for TPU, Gaudi, Ascend, Apple Silicon
+      key_tech: PagedAttention + continuous batching
+      weights: HF safetensors
+      quant: GPTQ, AWQ, FP8, INT8, and more
+      multi_gpu: tensor + pipeline parallel
+      api: OpenAI-compatible HTTP
+      best_for: general production serving, the default choice
+      license: Apache 2.0
+    specs_zh:
+      kind: 服务引擎（Python）
+      hardware: NVIDIA、AMD ROCm、Intel XPU、CPU；TPU / Gaudi / 昇腾 / Apple Silicon 有插件
+      key_tech: PagedAttention + 连续批处理
+      quant: GPTQ、AWQ、FP8、INT8 等
+      multi_gpu: 张量并行 + 流水线并行
+      api: OpenAI 兼容 HTTP
+      best_for: 通用生产部署，默认选择
+    sources:
+      - https://docs.vllm.ai/en/stable/getting_started/installation/
+      - https://github.com/vllm-project/vllm
+  - id: sglang
+    name: SGLang
+    specs:
+      kind: serving engine (Python)
+      hardware: NVIDIA (incl. GB200, B300, DGX Spark, 5090), AMD MI300/MI355, Intel Xeon CPU, TPU, Ascend NPU
+      key_tech: RadixAttention prefix caching + frontend DSL
+      weights: HF safetensors
+      quant: FP8, AWQ, GPTQ
+      multi_gpu: tensor + pipeline + data parallel
+      api: OpenAI-compatible HTTP
+      best_for: shared prefixes, agents, structured and multi-call programs
+      license: Apache 2.0
+    specs_zh:
+      kind: 服务引擎（Python）
+      hardware: NVIDIA（含 GB200、B300、DGX Spark、5090）、AMD MI300/MI355、Intel Xeon CPU、TPU、昇腾 NPU
+      key_tech: RadixAttention 前缀缓存 + 前端 DSL
+      multi_gpu: 张量 + 流水线 + 数据并行
+      api: OpenAI 兼容 HTTP
+      best_for: 共享前缀多的场景、agent、结构化与多轮调用
+    sources:
+      - https://github.com/sgl-project/sglang
+  - id: tensorrt-llm
+    name: TensorRT-LLM
+    specs:
+      kind: compiled engine (C++ / Python)
+      hardware: NVIDIA only
+      key_tech: ahead-of-time kernel compilation, in-flight batching
+      weights: HF safetensors, compiled to an engine file
+      quant: FP8, FP4 on Blackwell, INT4 AWQ, SmoothQuant
+      multi_gpu: tensor + pipeline parallel
+      api: via Triton Inference Server or NVIDIA Dynamo
+      best_for: squeezing the last throughput out of NVIDIA when a build step is acceptable
+      license: Apache 2.0
+    specs_zh:
+      kind: 编译式引擎（C++ / Python）
+      hardware: 仅 NVIDIA
+      key_tech: 预先编译 kernel、in-flight batching
+      weights: HF safetensors，需编译成 engine 文件
+      quant: FP8、Blackwell 上的 FP4、INT4 AWQ、SmoothQuant
+      multi_gpu: 张量并行 + 流水线并行
+      api: 经 Triton Inference Server 或 NVIDIA Dynamo
+      best_for: 能接受编译步骤、要把 NVIDIA 榨到极限时
+  - id: llama-cpp
+    name: llama.cpp
+    specs:
+      kind: C/C++ library + bundled server
+      hardware: CUDA, ROCm, Metal, SYCL/oneAPI, Vulkan, plain CPU
+      key_tech: GGUF format, aggressive quantization, CPU/GPU hybrid offload
+      weights: GGUF
+      quant: GGUF K-quants and IQ-quants, roughly 2-8 bit
+      multi_gpu: split layers across GPUs, not true tensor parallel
+      api: OpenAI-compatible server included
+      best_for: running anywhere - Mac, mixed CPU/GPU, odd hardware
+      license: MIT
+    specs_zh:
+      kind: C/C++ 库 + 自带服务端
+      hardware: CUDA、ROCm、Metal、SYCL/oneAPI、Vulkan、纯 CPU
+      key_tech: GGUF 格式、激进量化、CPU/GPU 混合卸载
+      quant: GGUF 的 K-quant 与 IQ-quant，约 2~8 bit
+      multi_gpu: 按层切分到多卡，不是真正的张量并行
+      api: 自带 OpenAI 兼容服务端
+      best_for: 哪儿都能跑——Mac、CPU/GPU 混合、冷门硬件
+  - id: ollama
+    name: Ollama
+    specs:
+      kind: CLI + local server
+      hardware: CUDA, ROCm, Metal (wraps llama.cpp)
+      key_tech: model library with one-command pull and run
+      weights: GGUF
+      quant: GGUF
+      multi_gpu: inherited from llama.cpp
+      api: own API plus OpenAI-compatible
+      best_for: fastest path to a model running on a dev machine
+      license: MIT
+    specs_zh:
+      kind: 命令行 + 本地服务
+      hardware: CUDA、ROCm、Metal（封装 llama.cpp）
+      key_tech: 模型库，一条命令拉取即用
+      multi_gpu: 继承 llama.cpp
+      api: 自有 API + OpenAI 兼容
+      best_for: 开发机上最快跑起一个模型
+  - id: lm-studio
+    name: LM Studio
+    specs:
+      kind: desktop GUI app
+      hardware: Metal / MLX on Mac; CUDA, ROCm, Vulkan on PC
+      key_tech: GUI over llama.cpp and MLX
+      weights: GGUF, MLX
+      quant: GGUF, MLX
+      multi_gpu: limited
+      api: local OpenAI-compatible server
+      best_for: browsing and running models without touching a terminal
+      license: proprietary, free to use
+    specs_zh:
+      kind: 桌面图形应用
+      hardware: Mac 上 Metal / MLX；PC 上 CUDA、ROCm、Vulkan
+      key_tech: llama.cpp 与 MLX 之上的图形界面
+      multi_gpu: 有限
+      api: 本地 OpenAI 兼容服务
+      best_for: 不碰终端就能找模型、跑模型
+      license: 闭源，免费使用
+notes:
+  - >-
+    Two families, two weight formats. vLLM, SGLang and TensorRT-LLM consume
+    Hugging Face safetensors; llama.cpp, Ollama and LM Studio consume GGUF. A
+    quantized checkpoint from one family does not load in the other.
+  - >-
+    Serving many users needs paged KV cache and continuous batching, which is
+    what vLLM and SGLang exist for. For one user at a time on a laptop,
+    llama.cpp is simpler and gives up little.
+  - >-
+    Backend support moves fast, especially the plugin backends for Gaudi,
+    Ascend, TPU and Apple Silicon. Check the project's own install docs before
+    assuming a chip is covered; "supported" can mean a community plugin rather
+    than a tested first-class path.
+  - >-
+    This table is why the software column matters in the hardware tables above.
+    A GPU with no engine targeting it is not usable no matter what its
+    datasheet says.
+notes_zh:
+  - >-
+    两大阵营，两种权重格式。vLLM、SGLang、TensorRT-LLM 吃 Hugging Face safetensors；
+    llama.cpp、Ollama、LM Studio 吃 GGUF。一边量化好的权重在另一边加载不了。
+  - >-
+    要服务多用户就需要分页 KV cache 和连续批处理，这正是 vLLM 和 SGLang 存在的理由。
+    笔记本上一次只有一个人用的话，llama.cpp 更简单，也没损失多少。
+  - >-
+    后端支持变化很快，尤其是 Gaudi、昇腾、TPU、Apple Silicon 这些插件后端。
+    判断某颗芯片是否被支持前请查项目自己的安装文档——"支持"有时指社区插件，
+    而不是经过测试的一等公民路径。
+  - >-
+    这张表也解释了上面那些硬件表里"软件栈"那一列为什么重要：
+    没有引擎做后端的 GPU，规格书写得再好也用不起来。
