@@ -24,6 +24,61 @@ fields:
   - {key: mig,              label: MIG instances,           label_zh: MIG 实例}
   - {key: launch,           label: Launch,                  label_zh: 上市时间}
 items:
+  - id: p100
+    name: P100 SXM
+    specs:
+      architecture: Pascal (GP100)
+      process: TSMC 16nm FinFET
+      transistors: 15.3 B
+      dies: 1
+      memory: 16 GB HBM2
+      bandwidth: 732 GB/s
+      fp64: 5.3 TFLOPS / no FP64 Tensor
+      tf32: not supported
+      bf16: no Tensor Cores (21.2 TFLOPS FP16 vector)
+      fp8: not supported
+      fp4: not supported
+      nvlink: NVLink 1, 160 GB/s
+      tdp: 300 W
+      mig: not supported
+      launch: 2016
+    specs_zh:
+      fp64: 5.3 TFLOPS / 无 FP64 张量核
+      tf32: 不支持
+      bf16: 无 Tensor Core（FP16 向量 21.2 TFLOPS）
+      fp8: 不支持
+      fp4: 不支持
+      mig: 不支持
+    sources:
+      - https://www.nvidia.com/en-us/data-center/tesla-p100/
+  - id: v100
+    name: V100 SXM2
+    specs:
+      architecture: Volta (GV100)
+      process: TSMC 12nm FFN
+      transistors: 21.1 B
+      dies: 1
+      memory: 16 or 32 GB HBM2
+      bandwidth: 900 GB/s
+      fp64: 7.8 TFLOPS / no FP64 Tensor
+      tf32: not supported
+      bf16: 125 TFLOPS (FP16 only, no BF16)
+      fp8: not supported
+      fp4: not supported
+      nvlink: NVLink 2, 300 GB/s
+      tdp: 300 W (350 W SXM3)
+      mig: not supported
+      launch: 2017
+    specs_zh:
+      memory: 16 或 32 GB HBM2
+      fp64: 7.8 TFLOPS / 无 FP64 张量核
+      tf32: 不支持
+      bf16: 125 TFLOPS（仅 FP16，无 BF16）
+      fp8: 不支持
+      fp4: 不支持
+      mig: 不支持
+    sources:
+      - https://www.nvidia.com/en-us/data-center/v100/
   - id: a100
     name: A100 SXM4
     specs:
@@ -141,11 +196,16 @@ items:
       - https://www.nvidia.com/en-us/data-center/gb300-nvl72/
 notes:
   - >-
+    Volta and Pascal predate structured sparsity, TF32, BF16 and MIG; V100
+    Tensor Cores are FP16-only.
+  - >-
     Multiply the dense numbers by 2 for the sparse (2:4 structured sparsity)
     figures NVIDIA quotes in marketing material.
   - >-
     The same die ships in different power/memory bins: HGX/DGX air-cooled parts
     are clocked lower than the liquid-cooled superchip variants.
 notes_zh:
+  - >-
+    Volta 与 Pascal 早于结构化稀疏、TF32、BF16 和 MIG；V100 的 Tensor Core 只支持 FP16。
   - 稠密算力 x2 即为 NVIDIA 宣传常用的稀疏（2:4 结构化稀疏）算力。
   - 同一颗 die 会按功耗/显存分档：风冷 HGX/DGX 版本频率低于液冷超级芯片版本。

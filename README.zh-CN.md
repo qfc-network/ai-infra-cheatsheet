@@ -49,24 +49,25 @@ NVIDIA 官方的 8 卡整机产品线。一台 = 8 张 SXM GPU + 单机内 NVSwi
 
 用于 HGX 基板与 DGX 整机的 SXM 芯片级对比，所有数字均为单卡值。
 
-| 参数 | A100 SXM4 | H100 SXM5 | H200 SXM5 | B200 SXM | B300 SXM |
-|---|---|---|---|---|---|
-| 架构 | Ampere (GA100) | Hopper (GH100) | Hopper (GH100) | Blackwell | Blackwell Ultra |
-| 制程 | TSMC N7 | TSMC 4N | TSMC 4N | TSMC 4NP | TSMC 4NP |
-| 晶体管数 | 54.2 B | 80 B | 80 B | 208 B | 208 B |
-| 封装内 die 数 | 1 | 1 | 1 | 2（片间 10 TB/s） | 2（片间 10 TB/s） |
-| 显存 | 80 GB HBM2e | 80 GB HBM3 | 141 GB HBM3e | 180-192 GB HBM3e | 288 GB HBM3e |
-| 显存带宽 | 2,039 GB/s | 3,350 GB/s | 4,800 GB/s | 7.7-8 TB/s | 8 TB/s |
-| FP64 / FP64 张量 | 9.7 / 19.5 TFLOPS | 34 / 67 TFLOPS | 34 / 67 TFLOPS | 40 TFLOPS (FP64 Tensor) | 相对 B200 大幅弱化 |
-| TF32 张量（稠密） | 156 TFLOPS | 495 TFLOPS | 495 TFLOPS | 1.1 PFLOPS | 1.1 PFLOPS |
-| FP16/BF16 张量（稠密） | 312 TFLOPS | 989 TFLOPS | 989 TFLOPS | 2.2 PFLOPS | 2.2 PFLOPS |
-| FP8 张量（稠密） | 不支持 | 1,979 TFLOPS | 1,979 TFLOPS | 4.5 PFLOPS | 4.5 PFLOPS |
-| FP4 张量（稠密） | 不支持 | 不支持 | 不支持 | 9 PFLOPS | 13.5 PFLOPS（GB300 中为 15 PFLOPS） |
-| NVLink | NVLink 3, 600 GB/s | NVLink 4, 900 GB/s | NVLink 4, 900 GB/s | NVLink 5, 1.8 TB/s | NVLink 5, 1.8 TB/s |
-| 功耗 | 400 W (up to 500 W) | up to 700 W | up to 700 W | 1,000 W (1,200 W in GB200) | ~1,400 W |
-| MIG 实例 | up to 7 | up to 7 | up to 7 | up to 7 | up to 7 |
-| 上市时间 | 2020 | 2022 | 2023 | 2024 | 2025 |
+| 参数 | P100 SXM | V100 SXM2 | A100 SXM4 | H100 SXM5 | H200 SXM5 | B200 SXM | B300 SXM |
+|---|---|---|---|---|---|---|---|
+| 架构 | Pascal (GP100) | Volta (GV100) | Ampere (GA100) | Hopper (GH100) | Hopper (GH100) | Blackwell | Blackwell Ultra |
+| 制程 | TSMC 16nm FinFET | TSMC 12nm FFN | TSMC N7 | TSMC 4N | TSMC 4N | TSMC 4NP | TSMC 4NP |
+| 晶体管数 | 15.3 B | 21.1 B | 54.2 B | 80 B | 80 B | 208 B | 208 B |
+| 封装内 die 数 | 1 | 1 | 1 | 1 | 1 | 2（片间 10 TB/s） | 2（片间 10 TB/s） |
+| 显存 | 16 GB HBM2 | 16 或 32 GB HBM2 | 80 GB HBM2e | 80 GB HBM3 | 141 GB HBM3e | 180-192 GB HBM3e | 288 GB HBM3e |
+| 显存带宽 | 732 GB/s | 900 GB/s | 2,039 GB/s | 3,350 GB/s | 4,800 GB/s | 7.7-8 TB/s | 8 TB/s |
+| FP64 / FP64 张量 | 5.3 TFLOPS / 无 FP64 张量核 | 7.8 TFLOPS / 无 FP64 张量核 | 9.7 / 19.5 TFLOPS | 34 / 67 TFLOPS | 34 / 67 TFLOPS | 40 TFLOPS (FP64 Tensor) | 相对 B200 大幅弱化 |
+| TF32 张量（稠密） | 不支持 | 不支持 | 156 TFLOPS | 495 TFLOPS | 495 TFLOPS | 1.1 PFLOPS | 1.1 PFLOPS |
+| FP16/BF16 张量（稠密） | 无 Tensor Core（FP16 向量 21.2 TFLOPS） | 125 TFLOPS（仅 FP16，无 BF16） | 312 TFLOPS | 989 TFLOPS | 989 TFLOPS | 2.2 PFLOPS | 2.2 PFLOPS |
+| FP8 张量（稠密） | 不支持 | 不支持 | 不支持 | 1,979 TFLOPS | 1,979 TFLOPS | 4.5 PFLOPS | 4.5 PFLOPS |
+| FP4 张量（稠密） | 不支持 | 不支持 | 不支持 | 不支持 | 不支持 | 9 PFLOPS | 13.5 PFLOPS（GB300 中为 15 PFLOPS） |
+| NVLink | NVLink 1, 160 GB/s | NVLink 2, 300 GB/s | NVLink 3, 600 GB/s | NVLink 4, 900 GB/s | NVLink 4, 900 GB/s | NVLink 5, 1.8 TB/s | NVLink 5, 1.8 TB/s |
+| 功耗 | 300 W | 300 W (350 W SXM3) | 400 W (up to 500 W) | up to 700 W | up to 700 W | 1,000 W (1,200 W in GB200) | ~1,400 W |
+| MIG 实例 | 不支持 | 不支持 | up to 7 | up to 7 | up to 7 | up to 7 | up to 7 |
+| 上市时间 | 2016 | 2017 | 2020 | 2022 | 2023 | 2024 | 2025 |
 
+> - Volta 与 Pascal 早于结构化稀疏、TF32、BF16 和 MIG；V100 的 Tensor Core 只支持 FP16。
 > - 稠密算力 x2 即为 NVIDIA 宣传常用的稀疏（2:4 结构化稀疏）算力。
 > - 同一颗 die 会按功耗/显存分档：风冷 HGX/DGX 版本频率低于液冷超级芯片版本。
 
