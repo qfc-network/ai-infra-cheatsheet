@@ -1,0 +1,170 @@
+id: frameworks
+title: Training Frameworks
+title_zh: 训练框架
+summary: >-
+  The layer models are actually written in, between the inference engines above
+  and the compute stacks below. PyTorch is the gravity centre: every vendor
+  writes a PyTorch backend, and the two that also build a full vertical stack -
+  Huawei and Apple - do it because they had to.
+summary_zh: >-
+  模型真正是用这一层写的，上接推理引擎，下接计算栈。PyTorch 是引力中心：
+  每家硬件厂商都得给它写后端；而另外自建一整套垂直栈的两家——华为和苹果——
+  是因为不得不这么做。
+orientation: columns
+fields:
+  - {key: origin,       label: Origin,                label_zh: 出处}
+  - {key: model,        label: Programming model,     label_zh: 编程范式}
+  - {key: compiler,     label: Compiler path,         label_zh: 编译路径}
+  - {key: nn,           label: Neural net layer,      label_zh: 神经网络层}
+  - {key: hardware,     label: Hardware backends,     label_zh: 硬件后端}
+  - {key: distributed,  label: Distributed training,  label_zh: 分布式训练}
+  - {key: ecosystem,    label: Ecosystem,             label_zh: 生态}
+  - {key: best_for,     label: Best for,              label_zh: 适合场景}
+items:
+  - id: pytorch
+    name: PyTorch
+    specs:
+      origin: Meta, now the PyTorch Foundation
+      model: eager by default, graphs via torch.compile
+      compiler: TorchDynamo + Inductor
+      nn: torch.nn, built in
+      hardware: CUDA, ROCm, Intel XPU, Apple MPS; vendor plugins torch_npu and torch_musa
+      distributed: DDP, FSDP; tensor and pipeline parallel via libraries
+      ecosystem: everything targets it first - HF Transformers, vLLM, SGLang
+      best_for: the default for research and open-source models
+    specs_zh:
+      origin: Meta，现由 PyTorch 基金会托管
+      model: 默认即时执行，torch.compile 转图
+      nn: 内置 torch.nn
+      hardware: CUDA、ROCm、Intel XPU、Apple MPS；厂商插件 torch_npu、torch_musa
+      distributed: DDP、FSDP；张量与流水线并行靠外部库
+      ecosystem: 所有东西都优先适配它——HF Transformers、vLLM、SGLang
+      best_for: 研究和开源模型的默认选择
+  - id: jax
+    name: JAX
+    specs:
+      origin: Google
+      model: functional; grad, jit, vmap and pmap compose
+      compiler: XLA
+      nn: separate - Flax or NNX
+      hardware: TPU first, then CUDA and ROCm
+      distributed: jit sharding and GSPMD
+      ecosystem: DeepMind stack, MaxText
+      best_for: TPU-scale training, and anything that wants composable transforms
+    specs_zh:
+      model: 函数式；grad / jit / vmap / pmap 可组合
+      nn: 需另配——Flax 或 NNX
+      hardware: 首选 TPU，其次 CUDA 与 ROCm
+      distributed: jit 分片与 GSPMD
+      best_for: TPU 上的大规模训练，以及需要可组合变换的场景
+  - id: tensorflow
+    name: TensorFlow + Keras 3
+    specs:
+      origin: Google
+      model: graph-first with an eager mode
+      compiler: XLA, Grappler
+      nn: Keras 3, which now also runs on JAX and PyTorch
+      hardware: CUDA, TPU, CPU; LiteRT on device
+      distributed: tf.distribute
+      ecosystem: production serving and mobile or edge
+      best_for: existing deployments; research has moved on
+    specs_zh:
+      model: 图优先，也有即时模式
+      nn: Keras 3，现在也能跑在 JAX 和 PyTorch 上
+      hardware: CUDA、TPU、CPU；端侧走 LiteRT
+      ecosystem: 生产部署与移动/边缘端
+      best_for: 存量部署；研究侧已经转移
+  - id: mlx
+    name: MLX
+    specs:
+      origin: Apple
+      model: eager API with lazy evaluation
+      compiler: lazy graph, mx.compile
+      nn: mlx.nn, built in
+      hardware: Apple Silicon only
+      distributed: limited, single machine in practice
+      ecosystem: mlx-lm; an LM Studio backend on Mac
+      best_for: local work on a Mac, exploiting unified memory
+    specs_zh:
+      model: 即时 API + 惰性求值
+      compiler: 惰性图，mx.compile
+      nn: 内置 mlx.nn
+      hardware: 仅 Apple Silicon
+      distributed: 有限，实际是单机
+      ecosystem: mlx-lm；Mac 上 LM Studio 的一种后端
+      best_for: Mac 本地开发，吃统一内存的红利
+  - id: mindspore
+    name: MindSpore
+    specs:
+      origin: Huawei
+      model: graph and eager
+      compiler: GraphEngine into CANN
+      nn: built in
+      hardware: Ascend NPU first, plus GPU and CPU
+      distributed: auto-parallel
+      ecosystem: the Ascend software stack
+      best_for: training on Ascend without going through PyTorch
+    specs_zh:
+      origin: 华为（昇思）
+      model: 图模式与即时模式
+      compiler: GraphEngine 下接 CANN
+      nn: 内置
+      hardware: 首选昇腾 NPU，另支持 GPU 与 CPU
+      distributed: 自动并行
+      ecosystem: 昇腾软件栈
+      best_for: 不绕道 PyTorch，直接在昇腾上训练
+  - id: paddle
+    name: PaddlePaddle
+    specs:
+      origin: Baidu
+      model: eager and static graph
+      compiler: its own graph compiler
+      nn: built in
+      hardware: CUDA, Kunlun, Ascend, CPU
+      distributed: 4D hybrid parallelism
+      ecosystem: large Chinese industrial ecosystem - PaddleOCR and friends
+      best_for: industrial deployment in China, especially on domestic silicon
+    specs_zh:
+      origin: 百度（飞桨）
+      model: 动态图与静态图
+      compiler: 自有图编译器
+      nn: 内置
+      hardware: CUDA、昆仑芯、昇腾、CPU
+      distributed: 4D 混合并行
+      ecosystem: 中文产业生态大——PaddleOCR 等
+      best_for: 国内产业部署，尤其是国产芯片上
+notes:
+  - >-
+    PyTorch bundles its neural-network layer; JAX does not, which is why a JAX
+    project also picks Flax or NNX. Keras 3 is the odd one out - it is now a
+    front end over TensorFlow, JAX or PyTorch rather than TensorFlow's own.
+  - >-
+    The training frameworks people name most often are not peers of these. HF
+    Transformers, Lightning, DeepSpeed, Megatron-LM, torchtitan, TRL, Axolotl
+    and Unsloth all sit on top of PyTorch. "Training in PyTorch" usually means
+    touching that layer, not this one.
+  - >-
+    Also in this layer but not tabled: OneFlow (PyTorch-compatible API, SBP
+    parallelism), tinygrad (about ten thousand lines, many backends), and the
+    Rust pair Candle and Burn, aimed at inference and embedded deployment.
+  - >-
+    Framework choice and silicon choice are coupled. MindSpore exists for
+    Ascend, MLX for Apple Silicon, Paddle reaches Kunlun. Only PyTorch is
+    something every vendor writes a backend for, which is the same gravity the
+    compute stacks table shows for CUDA one layer down.
+notes_zh:
+  - >-
+    PyTorch 自带神经网络层，JAX 没有——所以 JAX 项目还要另选 Flax 或 NNX。
+    Keras 3 比较特殊，它现在是 TensorFlow / JAX / PyTorch 三者之上的公共前端，
+    不再只属于 TensorFlow。
+  - >-
+    大家嘴里的"训练框架"多半不是这一层的同类。HF Transformers、Lightning、DeepSpeed、
+    Megatron-LM、torchtitan、TRL、Axolotl、Unsloth 都长在 PyTorch 之上。
+    说"用 PyTorch 训练"，动的通常是那一层，不是这一层。
+  - >-
+    同层但没进表的还有：OneFlow（API 兼容 PyTorch，SBP 并行抽象）、
+    tinygrad（约万行，多后端），以及 Rust 的 Candle 和 Burn，主打推理与嵌入式部署。
+  - >-
+    选框架和选芯片是绑在一起的。昇思是为昇腾存在的，MLX 是为 Apple Silicon，
+    飞桨能接昆仑芯。只有 PyTorch 是每家都得为它写后端的那个——
+    和下面一层 CUDA 在计算栈表里的引力是同一回事。

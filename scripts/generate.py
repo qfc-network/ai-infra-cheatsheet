@@ -57,6 +57,7 @@ ORDER = [
     "local-options",
     # Software
     "inference-engines",
+    "frameworks",
     "compute-stacks",
     "compute-capability",
     # Sizing math
